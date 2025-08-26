@@ -8,7 +8,7 @@ export default function TopBar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-2 py-2">
         
         {/* Search bar */}
-        <div className="flex-1 max-w-3xl">
+        <div className="w-[60%] max-w-3xl">
           <div className="flex items-center bg-gray-100 rounded-full px-3 py-1.5">
             <Search size={18} className="text-gray-500 mr-2" />
             <input
@@ -28,10 +28,13 @@ export default function TopBar() {
           </button>
 
           {/* Language */}
-          <button className="flex items-center gap-1 border bg-white px-2.5 py-1.5 rounded-md text-sm font-medium hover:bg-gray-50">
-            <Globe size={16} className="text-black" />
-            English
-          </button>
+              <div className="flex  items-center border rounded px-2 py-1">
+                <Globe className="h-4 w-4 mr-1" />
+                <select className="bg-transparent outline-none">
+                  <option value="English">English</option>
+                  <option value="Amharic">Amharic</option>
+                </select>
+              </div>
 
           {/* Login */}
           <Button>Login</Button>
