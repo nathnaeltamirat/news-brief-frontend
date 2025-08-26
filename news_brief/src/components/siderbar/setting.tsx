@@ -1,14 +1,21 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("Language & Translation");
-
-  const handleScroll = (id: string, itemName: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  const router = useRouter();
+  const handleClick = (id: string, itemName: string) => {
+    if (id === "home") {
+      // Route to homepage instead of scrolling
+      router.push("/");
+    } else {
+      // Scroll to section
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
     setActiveItem(itemName);
   };
-
   const items = [
     { id: "home", label: "Home" },
     { id: "language", label: "Language & Translation" },
@@ -35,7 +42,7 @@ const Sidebar = () => {
           {items.map((item) => (
             <li key={item.id}>
               <button
-                onClick={() => handleScroll(item.id, item.label)}
+                onClick={() => handleClick(item.id, item.label)}
             className={`flex items-center w-full px-3 py-2 rounded-md transition-colors text-left text-sm ${
               activeItem === item.label
                 ? "bg-black text-white"
