@@ -33,7 +33,7 @@ export default function ForyouComponent() {
 
   return (
     <>
-      <h1 className="my-5 font-bold text-xl">Foryou Feed</h1>
+      <h1 className="my-5 font-bold text-xl">For you Feed</h1>
 
       <div>
         {news?.map((item, index) => (
