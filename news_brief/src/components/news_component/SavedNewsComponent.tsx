@@ -52,7 +52,7 @@ export default function SavedNewsComponent() {
                   ))}
                 </div>
 
-                <p className="text-gray-200 my-2">{item.posted_at}</p>
+                <p className="text-gray-400 my-2">{item.posted_at}</p>
               </div>
               <div className="w-[90%]">
                 {" "}

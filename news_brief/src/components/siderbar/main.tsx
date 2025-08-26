@@ -9,7 +9,7 @@ const Sidebar = () => {
 
   const navItems = [
     { name: "Home", href: "/news" },
-    { name: "Foryou", href: "/foryou" },
+    { name: "For you", href: "/foryou" },
     { name: "Subscribed", href: "/subscribed" },
     { name: "Saved News", href: "/news/saved" },
     { name: "Setting", href: "/setting" },
@@ -24,7 +24,7 @@ const Sidebar = () => {
             <path d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z" />
           </svg>
         );
-      case "Foryou":
+      case "For you":
         return (
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zM9 8h2v8H9zm4 0h2v8h-2z" />

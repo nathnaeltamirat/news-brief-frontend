@@ -45,9 +45,10 @@ export default function NewsComponent() {
         <div>
           {topNews?.map((item, index) => (
             <div key={index} className="p-2">
-              <div className="flex gap-2">
+              <div className="flex justify-between mr-7">
                 <Button variant="tertiary">Top Story</Button>
-                <p className="text-gray-200 my-2">{item.posted_at}</p>
+
+                <p className="text-gray-400 my-2">{item.posted_at}</p>
               </div>
               <div className="w-[70%]">
                 {" "}
@@ -81,7 +82,7 @@ export default function NewsComponent() {
               alt="Top-News_image"
             />
             <div className="p-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between ">
                 <div className="flex gap-2">
                   {item.topics.map((value, index) => (
                     <Button variant="tertiary" key={index}>
@@ -90,7 +91,7 @@ export default function NewsComponent() {
                   ))}
                 </div>
 
-                <p className="text-gray-200 my-2">{item.posted_at}</p>
+                <p className="text-gray-400 my-2">{item.posted_at}</p>
               </div>
               <div className="w-[90%]">
                 {" "}
