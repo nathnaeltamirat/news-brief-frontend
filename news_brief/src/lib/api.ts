@@ -1,4 +1,3 @@
-import { resolve } from "path";
 
 // API service layer for backend integration
 const API_BASE_URL = "https://ehopn-test-project.onrender.com/api";
