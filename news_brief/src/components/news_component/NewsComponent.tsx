@@ -70,6 +70,7 @@ export default function NewsComponent() {
       </div>
       <h1 className="my-5 font-bold text-xl">Your Brifieng</h1>
 
+
       <div>
         {news?.map((item, index) => (
           <div
@@ -101,16 +102,30 @@ export default function NewsComponent() {
               <div className="flex gap-2 my-2">
                 <Button variant="tertiary">
                   <Bookmark className="w-4 h-4 mr-1" />
-                </Button>
 
-                <Button variant="tertiary">
-                  <ThumbsDown className="w-4 h-4 mr-1" />
                 </Button>
-              </div>
+              ))}
             </div>
+            <p className="text-gray-400 my-2 text-sm">{item.posted_at}</p>
           </div>
-        ))}
+          <div className="mt-2">
+            <p className="font-bold text-lg my-2">{item.title}</p>
+            <p className="my-2 font-light">{item.description}</p>
+          </div>
+          <div className="flex gap-2 my-2">
+            <Button variant="tertiary">
+              <Bookmark className="w-4 h-4 mr-1" />
+            </Button>
+            <Button variant="tertiary">
+              <ThumbsDown className="w-4 h-4 mr-1" />
+            </Button>
+          </div>
+          <p className="text-sm text-gray-400">Source: {item.source}</p>
+        </div>
       </div>
+      
+              ))}
+            </div>
     </>
   );
 }
