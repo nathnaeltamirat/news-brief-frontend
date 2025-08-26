@@ -20,8 +20,12 @@ export default function NewsComponent() {
         ]);
         setNews(newsData);
         setTopNews(topNewsData);
-      } catch (err: any) {
-        setErrorMessage(err || "Failed to fetch News");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setErrorMessage(err.message);
+        } else {
+          setErrorMessage("Failed to fetch news");
+        }
       } finally {
         setLoading(false);
       }

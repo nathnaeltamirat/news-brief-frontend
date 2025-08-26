@@ -2,10 +2,9 @@
 import { apiClient, News } from "@/lib/api";
 import { useEffect, useState } from "react";
 import Button from "../reusable_components/Button";
-import { Bookmark, ThumbsDown } from "lucide-react";
+import { Bookmark } from "lucide-react";
 
 export default function SavedNewsComponent() {
-  const [topNews, setTopNews] = useState<News[] | null>(null);
   const [news, setNews] = useState<News[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -14,14 +13,14 @@ export default function SavedNewsComponent() {
     const getInformation = async () => {
       try {
         setLoading(true);
-        const [newsData, topNewsData] = await Promise.all([
-          apiClient.getDummyNews(),
-          apiClient.getTopNews(),
-        ]);
+        const newsData = await apiClient.getDummyNews();
         setNews(newsData);
-        setTopNews(topNewsData);
-      } catch (err: any) {
-        setErrorMessage(err || "Failed to fetch News");
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setErrorMessage(err.message);
+        } else {
+          setErrorMessage("Failed to fetch news");
+        }
       } finally {
         setLoading(false);
       }
@@ -32,8 +31,6 @@ export default function SavedNewsComponent() {
   if (errorMessage) return <p>Error: {errorMessage}</p>;
   return (
     <>
-
-
       <div>
         {news?.map((item, index) => (
           <div
@@ -66,8 +63,6 @@ export default function SavedNewsComponent() {
                 <Button variant="tertiary">
                   <Bookmark className="w-4 h-4 mr-1" />
                 </Button>
-
-
               </div>
             </div>
           </div>
