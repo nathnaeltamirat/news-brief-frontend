@@ -2,6 +2,7 @@ import Button from "@/components/reusable_components/Button";
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
 import Sidebar from "@/components/siderbar/main";
+import ChatBot from "@/components/reusable_components/chatbot";
 
 
 const News = () => {
@@ -30,6 +31,7 @@ const News = () => {
 
   return (
     <>
+    <ChatBot/>
       <div className="flex gap-5 bg-white text-black">
         <Sidebar />
         <div className="mt-10 flex-1 mr-10">
@@ -39,6 +41,7 @@ const News = () => {
           </div>
           <MainTopics />
           <NewsComponent/>
+         
         </div>
       </div>
     </>
