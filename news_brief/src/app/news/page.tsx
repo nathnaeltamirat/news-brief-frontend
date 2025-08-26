@@ -1,20 +1,12 @@
-
-import { Bell, Globe } from "lucide-react";
 import Button from "@/components/reusable_components/Button";
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
+import Sidebar from "@/components/siderbar/main";
 
 
 const News = () => {
 
 
-  const NavBar = () => {
-    return (
-      <>
-        <div className="h-full bg-black  md:w-[20%]"></div>
-      </>
-    );
-  };
   const categories = [
     "All",
     "Technology",
@@ -39,7 +31,7 @@ const News = () => {
   return (
     <>
       <div className="flex gap-5 bg-white text-black">
-        <NavBar />
+        <Sidebar />
         <div className="mt-10 flex-1 mr-10">
           <div className="flex justify-between">
             <TopBar/>
