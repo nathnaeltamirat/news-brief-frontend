@@ -28,7 +28,7 @@ export default function AccountPage() {
     <div className="flex bg-gray-100 min-h-screen">
       <Sidebar />
 
-      <div className="p-8 flex-1">
+      <div className="p-4 lg:p-8 flex-1 lg:ml-0 mt-20 lg:mt-0">
         <h2 className="text-2xl font-bold mb-6">Account Information</h2>
 
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">

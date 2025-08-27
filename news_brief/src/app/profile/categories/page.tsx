@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
 import Sidebar from "../../../components/siderbar/profile";
 import { apiClient, Category } from "@/lib/api";
 import Button from "@/components/reusable_components/Button";
@@ -22,12 +21,12 @@ const App = () => {
     <div className="bg-gray-100 min-h-screen font-sans flex md:flex-row">
       <Sidebar />
 
-      <main className="flex-1 p-6 md:p-12">
+      <main className="flex-1 p-4 lg:p-6 lg:ml-0 mt-20 lg:mt-0">
         <h1 className="text-black font-bold text-xl">Categories of Interest</h1>
         <p className="my-5 text-gray-400">
-          Select or add topics to personalize your “For You” feed.
+          Select or add topics to personalize your For You feed.
         </p>
-        {topics ?        <div className="bg-white w-[80%] p-6">
+        {topics ?        <div className="bg-white w-full lg:w-[80%] p-6">
           <h1 className="text-black font-bold text-xl">Selected Categories</h1>
           <div className="flex flex-wrap my-5">
             {topics?.map((item, index) => (
@@ -46,7 +45,7 @@ const App = () => {
             </Button>
           </div>
           <div className="flex items-center gap-2 mt-8 ml-5">
-            <div className="flex flex-1 gap-2 border w-[80%] px-3 py-1 rounded-lg">
+            <div className="flex flex-1 gap-2 border w-full lg:w-[80%] px-3 py-1 rounded-lg">
               <Search />
               <input
                 type="text"

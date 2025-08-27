@@ -30,7 +30,7 @@ export default function Settings() {
     <div className="flex">
       <Navbar />
 
-      <main className="ml-65 w-full p-8 space-y-10 scroll-smooth bg-gray-50 min-h-screen">
+      <main className="lg:ml-65 w-full p-4 lg:p-8 space-y-10 scroll-smooth bg-gray-50 min-h-screen lg:mt-0 mt-20">
         {/* Language & Translation */}
         <section id="language" className="bg-white p-6 rounded-2xl shadow max-w-3xl space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Language & Translation</h2>

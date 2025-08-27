@@ -8,9 +8,9 @@ const SavedNews = () => {
 
   return (
     <>
-      <div className="flex gap-5 bg-white text-black">
+      <div className="flex gap-5 bg-white text-black min-h-screen">
         <Sidebar />
-        <div className="mt-10 flex-1 mr-10">
+        <div className="flex-1 lg:ml-0 lg:mt-10 mt-20 px-4 lg:px-0 lg:mr-10">
           <TopBar />
 
           <h1 className="my-5 font-bold text-xl">Saved News</h1>
