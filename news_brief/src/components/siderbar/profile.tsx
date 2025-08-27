@@ -9,7 +9,7 @@ const Sidebar = () => {
   const navItems = [
     { name: "Home", href: "/news" },
     { name: "Account", href: "/profile/account" },
-    { name: "Categories", href: "/categories" },
+    { name: "Categories", href: "/profile/categories" },
     { name: "Subscription", href: "/profile/subscription" },
     { name: "Notifications", href: "/notifications" },
     { name: "Saved News", href: "/news/saved" },
