@@ -17,7 +17,9 @@ const App = () => {
     };
     getTopics();
   }, []);
-
+  if(!topics){
+    return <>Loading....</>
+  }
   return (
     <div className="bg-gray-100 min-h-screen font-sans flex md:flex-row">
       <Sidebar />
