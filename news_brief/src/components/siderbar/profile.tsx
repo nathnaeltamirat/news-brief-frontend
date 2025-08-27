@@ -12,7 +12,7 @@ const Sidebar = () => {
     { name: "Categories", href: "/categories" },
     { name: "Subscription", href: "/profile/subscription" },
     { name: "Notifications", href: "/notifications" },
-    { name: "Saved News", href: "/news/saved" },
+    { name: "Saved News", href: "/profile/savedNews" },
   ];
 
   const getIcon = (item: string) => {
