@@ -11,7 +11,7 @@ const Sidebar = () => {
     { name: "Account", href: "/profile/account" },
     { name: "Categories", href: "/categories" },
     { name: "Subscription", href: "/profile/subscription" },
-    { name: "Notifications", href: "/notifications" },
+    { name: "Notifications", href: "/profile/notification" },
     { name: "Saved News", href: "/news/saved" },
   ];
 
