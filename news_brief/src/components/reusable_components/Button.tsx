@@ -11,7 +11,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "px-4 py-2 rounded-full font-medium text-sm transition border";
+    "px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full font-medium text-xs sm:text-sm transition border";
 
   const styles =
     variant === "primary"

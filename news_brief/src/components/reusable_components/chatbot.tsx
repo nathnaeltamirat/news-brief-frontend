@@ -1,8 +1,13 @@
 "use client";
-import { Key, useState } from "react";
+import { useState, useEffect } from "react";
 
-const ChatBot = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatBotProps {
+  defaultOpen?: boolean;
+}
+
+const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -11,6 +16,23 @@ const ChatBot = () => {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
+
+  // Check if device is mobile and adjust default state
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // For mobile devices, always start closed regardless of defaultOpen prop
+    if (isMobile) {
+      setIsOpen(false);
+    }
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [isMobile, defaultOpen]);
 
   const handleSendMessage = () => {
     if (inputValue.trim() === "") return;
@@ -49,16 +71,16 @@ const ChatBot = () => {
     ]);
   };
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-50">
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-black text-white px-4 py-3 rounded-full hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl text-sm font-medium"
+          className="bg-black text-white px-3 py-2 lg:px-4 lg:py-3 rounded-full hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl text-sm font-medium"
           aria-label="Open chat"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8"
+            className="h-6 w-6 lg:h-8 lg:w-8"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -74,10 +96,10 @@ const ChatBot = () => {
       )}
 
       {isOpen && (
-        <div className="bg-white rounded-xl shadow-xl w-72 h-[28rem] flex flex-col overflow-hidden border border-gray-200 animate-fade-in-up">
+        <div className="bg-white rounded-xl shadow-xl w-80 lg:w-72 h-96 lg:h-[28rem] flex flex-col overflow-hidden border border-gray-200 animate-fade-in-up">
           {/* Header */}
           <div className="bg-gradient-to-r from-gray-900 to-black text-white p-3 flex justify-between items-center shadow-md">
-            <h3 className="font-bold text-sm tracking-wide">
+            <h3 className="font-bold text-xs lg:text-sm tracking-wide">
               NEWS BRIEF ASSISTANT
             </h3>
             <div className="flex space-x-1">

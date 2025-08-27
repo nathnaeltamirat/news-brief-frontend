@@ -71,22 +71,22 @@ useEffect(() => {
       
       <Sidebar />
 
-      <div className="flex-1 p-12 w-full">
+      <div className="flex-1 p-4 lg:p-12 w-full lg:ml-0 mt-20 lg:mt-0">
         {/* "saved news text size_ 40 " */}
-        <h1 className=" font-bold mb-2 text-2xl">Saved News</h1>
-        <p className="text-gray-500 mb-6 text-xl ">Manage saved news and storage</p>
+        <h1 className="font-bold mb-2 text-xl lg:text-2xl">Saved News</h1>
+        <p className="text-gray-500 mb-6 text-lg lg:text-xl">Manage saved news and storage</p>
 
         {/* Management Card */}
-        <div className="bg-white rounded-2xl shadow p-6  w-full">
-          <p className="font-semibold text-xl mb-4"> Saved News Management</p>
-           <div className="mb-3 rounded-2xl shadow p-4  w-full bg-[#F9FAFB]">
+        <div className="bg-white rounded-2xl shadow p-4 lg:p-6 w-full">
+          <p className="font-semibold text-lg lg:text-xl mb-4"> Saved News Management</p>
+           <div className="mb-3 rounded-2xl shadow p-4 w-full bg-[#F9FAFB]">
             {loading && <p>Loading...</p>}
             <p className="font-medium text mb-2"> Storage used</p>
             <p className="text-[#6B7280] text-sm "> <b>{savedNews.length}</b> articles saved </p>
            </div>
 
           <div className="mb-6">
-            <label className="block text-lg font-medium mb-1">
+            <label className="block text-base lg:text-lg font-medium mb-1">
               Auto-delete after
             </label>
             <select className="w-full border rounded-md px-3 p-4 py-2">
@@ -108,7 +108,7 @@ useEffect(() => {
       </div>
       {showDeleteModal && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80 lg:w-96 mx-4">
             <h2 className="text-lg font-semibold mb-4 text-red-600">
               Are you sure?
             </h2>
