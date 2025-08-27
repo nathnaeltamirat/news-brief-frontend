@@ -18,6 +18,7 @@ export interface User {
   email: string;
   subscribed: string[];      // news sources / publishers user follows
   topic_interest: string[];  // topics user is interested in
+  saved_news: string[]; // IDs of saved news articles
 }
 
 export interface Category {
@@ -75,6 +76,7 @@ class ApiClient {
     email: "john@example.com",
     subscribed: ["TechCrunch"],
     topic_interest: ["AI", "Tech", "Science"],  // topics user cares about
+    saved_news: ["1", "3"],
   };
 }
 
@@ -163,6 +165,29 @@ async getSubscribedFeed(): Promise<News[]> {
   return news.filter((n) => user.subscribed.includes(n.source));
 }
 
+async getSavedNews(): Promise<News[]> {
+  const [user, news] = await Promise.all([this.getUser(), this.getDummyNews()]);
+  return news.filter((n) => user.saved_news.includes(n.id));
+}
+
+async deleteAllSavedNews(): Promise<void> {
+  const user = await this.getUser();
+  user.saved_news = [];
+  return;
+
+}
+
+async saveNewsItem(newsId: string): Promise<void> {
+  const user = await this.getUser();
+  if (!user.saved_news.includes(newsId)) {
+    user.saved_news.push(newsId);
+  }
+}
+
+async removeSavedNewsItem(newsId: string): Promise<void> {
+  const user = await this.getUser();
+  user.saved_news = user.saved_news.filter((id) => id !== newsId);
+}
 }
 
 // Export singleton instance
