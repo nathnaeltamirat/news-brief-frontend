@@ -33,7 +33,6 @@ export default function AccountPage() {
 
         <div className="bg-white shadow-md rounded-lg p-6 mb-8">
           <div className="grid gap-4">
-            {/* Full Name */}
             <div className="flex justify-between items-center pb-3">
               <div className="flex items-center gap-3">
                 <p className="text-gray-800 font-semibold w-32">Full Name :</p>
@@ -69,7 +68,6 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Email */}
             <div className="flex justify-between items-center pb-3">
               <div className="flex items-center gap-3">
                 <p className="text-gray-800 font-semibold w-32">Email :</p>
@@ -103,7 +101,6 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Password */}
             <div className="flex justify-between items-center pb-3">
               <div className="flex items-center gap-3">
                 <p className="text-gray-800 font-semibold w-32">Password :</p>
@@ -152,7 +149,6 @@ export default function AccountPage() {
               </div>
             </div>
 
-            {/* Created Date */}
             <div className="flex items-center pt-3">
               <p className="text-gray-800 font-semibold w-32">
                 Account Created:
@@ -162,7 +158,6 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* Danger Zone */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <h3 className="text-red-600 font-semibold text-md mb-2">
             Danger Zone
@@ -180,7 +175,6 @@ export default function AccountPage() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
