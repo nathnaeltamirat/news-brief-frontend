@@ -20,7 +20,10 @@ export interface User {
   topic_interest: string[];  // topics user is interested in
 }
 
-
+export interface Category {
+  id: number;
+  name: string;
+}
 class ApiClient {
   private baseURL: string;
 
@@ -94,6 +97,25 @@ class ApiClient {
       }, 500);
     });
   }
+async getTopic(): Promise<Category[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, name: "Agriculture" },
+        { id: 2, name: "Technology" },
+        { id: 3, name: "Health" },
+        { id: 4, name: "Education" },
+        { id: 5, name: "Sports" },
+        { id: 6, name: "Entertainment" },
+        { id: 7, name: "Business" },
+        { id: 8, name: "Politics" },
+        { id: 9, name: "Science" },
+        { id: 10, name: "Travel" },
+      ]);
+    }, 500);
+  });
+}
+
 
   async getDummyNews(): Promise<News[]> {
     return new Promise((resolve) => {
