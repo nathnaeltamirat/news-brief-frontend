@@ -17,9 +17,7 @@ const App = () => {
     };
     getTopics();
   }, []);
-  if(!topics){
-    return <>Loading....</>
-  }
+
   return (
     <div className="bg-gray-100 min-h-screen font-sans flex md:flex-row">
       <Sidebar />
@@ -29,7 +27,7 @@ const App = () => {
         <p className="my-5 text-gray-400">
           Select or add topics to personalize your “For You” feed.
         </p>
-        <div className="bg-white w-[80%] p-6">
+        {topics ?        <div className="bg-white w-[80%] p-6">
           <h1 className="text-black font-bold text-xl">Selected Categories</h1>
           <div className="flex flex-wrap my-5">
             {topics?.map((item, index) => (
@@ -60,7 +58,8 @@ const App = () => {
               + ADD
             </button>
           </div>
-        </div>
+        </div>  : <p>Loading...</p>}
+
       </main>
     </div>
   );
