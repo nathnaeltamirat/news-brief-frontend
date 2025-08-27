@@ -13,7 +13,7 @@ const Sidebar = () => {
     { name: "Subscribed", href: "/subscribed" },
     { name: "Saved News", href: "/news/saved" },
     { name: "Setting", href: "/setting" },
-    { name: "Profile", href: "/profile" },
+    { name: "Profile", href: "/profile/account" },
   ];
 
   const getIcon = (item: string) => {

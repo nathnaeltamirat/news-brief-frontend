@@ -4,13 +4,11 @@ import { useEffect } from "react";
 import Notification from "../components/notification_component/notification";
 
 export default function Home() {
-  return(
-    <Notification/>
-  )
-  // const router = useRouter();
+  
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   router.replace("/news");
-  // }, [router]);
-  // return <></>;
+  useEffect(() => {
+    router.replace("/news");
+  }, [router]);
+  return <></>;
 }
