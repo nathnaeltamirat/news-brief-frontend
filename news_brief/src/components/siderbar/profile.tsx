@@ -8,11 +8,11 @@ const Sidebar = () => {
 
   const navItems = [
     { name: "Home", href: "/news" },
-    { name: "Account", href: "/account" },
-    { name: "Categories", href: "/categories" },
-    { name: "Subscription", href: "/subscription" },
+    { name: "Account", href: "/profile/account" },
+    { name: "Categories", href: "/profile/categories" },
+    { name: "Subscription", href: "/profile/subscription" },
     { name: "Notifications", href: "/notifications" },
-    { name: "Saved News", href: "/news/saved" },
+    { name: "Saved News", href: "/profile/savedNews" },
   ];
 
   const getIcon = (item: string) => {
@@ -59,7 +59,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 bg-white text-black min-h-screen flex flex-col p-2 rounded-lg shadow-md">
+    <div className="  w-64 bg-white text-black min-h-screen flex flex-col p-2 rounded-lg shadow-md">
       {/* Header */}
       <div className="m-4">
         <h1 className="text-2xl md:text-3xl font-bold m-2">Profile</h1>

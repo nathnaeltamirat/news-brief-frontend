@@ -18,7 +18,7 @@ const Sidebar = () => {
   };
   const items = [
     { id: "home", label: "Home" },
-    { id: "language", label: "Language & Translation" },
+    { id: "language", label: "Language" },
     { id: "voice", label: "Voice Settings" },
     { id: "content", label: "Content Preferences" },
     { id: "accessibility", label: "Accessibility" },
@@ -43,13 +43,13 @@ const Sidebar = () => {
             <li key={item.id}>
               <button
                 onClick={() => handleClick(item.id, item.label)}
-            className={`flex items-center w-full px-3 py-2 rounded-md transition-colors text-left text-sm ${
+            className={`flex items-center px-4 py-3 rounded-md transition-colors ${
               activeItem === item.label
-                ? "bg-black text-white"
-                : "text-black hover:bg-gray-100"
+                ? "bg-[#F3F4F6] text-black"
+                : "text-black hover:bg-[#dddfe2]"
             }`}
               >
-                <span className="mr-2 w-4 h-4 flex items-center justify-center">
+                <span className="mr-3 w-5 h-5 flex items-center justify-center">
                   {/* icons based on label */}
                   {item.label === "Home" && (
                     <svg
@@ -62,7 +62,7 @@ const Sidebar = () => {
                       <path d="M4 21V9l8-6l8 6v12h-6v-7h-4v7z" />
                     </svg>
                   )}
-                  {item.label === "Language & Translation" && (
+                  {item.label === "Language" && (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="20"

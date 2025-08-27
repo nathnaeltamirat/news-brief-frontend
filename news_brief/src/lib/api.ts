@@ -18,9 +18,13 @@ export interface User {
   email: string;
   subscribed: string[];      // news sources / publishers user follows
   topic_interest: string[];  // topics user is interested in
+  saved_news: string[]; // IDs of saved news articles
 }
 
-
+export interface Category {
+  id: number;
+  name: string;
+}
 class ApiClient {
   private baseURL: string;
 
@@ -72,6 +76,7 @@ class ApiClient {
     email: "john@example.com",
     subscribed: ["TechCrunch"],
     topic_interest: ["AI", "Tech", "Science"],  // topics user cares about
+    saved_news: ["1", "3"],
   };
 }
 
@@ -94,6 +99,25 @@ class ApiClient {
       }, 500);
     });
   }
+async getTopic(): Promise<Category[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        { id: 1, name: "Agriculture" },
+        { id: 2, name: "Technology" },
+        { id: 3, name: "Health" },
+        { id: 4, name: "Education" },
+        { id: 5, name: "Sports" },
+        { id: 6, name: "Entertainment" },
+        { id: 7, name: "Business" },
+        { id: 8, name: "Politics" },
+        { id: 9, name: "Science" },
+        { id: 10, name: "Travel" },
+      ]);
+    }, 500);
+  });
+}
+
 
   async getDummyNews(): Promise<News[]> {
     return new Promise((resolve) => {
@@ -141,6 +165,29 @@ async getSubscribedFeed(): Promise<News[]> {
   return news.filter((n) => user.subscribed.includes(n.source));
 }
 
+async getSavedNews(): Promise<News[]> {
+  const [user, news] = await Promise.all([this.getUser(), this.getDummyNews()]);
+  return news.filter((n) => user.saved_news.includes(n.id));
+}
+
+async deleteAllSavedNews(): Promise<void> {
+  const user = await this.getUser();
+  user.saved_news = [];
+  return;
+
+}
+
+async saveNewsItem(newsId: string): Promise<void> {
+  const user = await this.getUser();
+  if (!user.saved_news.includes(newsId)) {
+    user.saved_news.push(newsId);
+  }
+}
+
+async removeSavedNewsItem(newsId: string): Promise<void> {
+  const user = await this.getUser();
+  user.saved_news = user.saved_news.filter((id) => id !== newsId);
+}
 }
 
 // Export singleton instance
