@@ -13,7 +13,7 @@ const SignUpCard = ({ switchToSignIn }: { switchToSignIn: () => void }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -52,8 +52,12 @@ const SignUpCard = ({ switchToSignIn }: { switchToSignIn: () => void }) => {
       setTimeout(() => {
         switchToSignIn();
       }, 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
