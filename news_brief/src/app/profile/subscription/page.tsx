@@ -32,15 +32,15 @@ const App = () => {
       
       <Sidebar />
 
-      <main className="flex-1 p-6 md:p-12">
+      <main className="flex-1 p-4 lg:p-6 lg:ml-0 mt-20 lg:mt-0">
         {/* Header (outside card) */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Subscriptions</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">Subscriptions</h1>
           <p className="text-gray-500">Follow or unfollow news sources.</p>
         </div>
 
         
-        <div className="bg-white rounded-2xl shadow-md p-6 max-w-4xl">
+        <div className="bg-white rounded-2xl shadow-md p-4 lg:p-6 max-w-4xl">
           {/* Search Bar */}
           <div className="relative mb-6">
             <input
@@ -48,7 +48,7 @@ const App = () => {
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-100 pl-10 pr-4 py-3 rounded-xl bg-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800"
+              className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800"
             />
             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
@@ -75,7 +75,7 @@ interface SubscriptionCardProps {
 
 const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-700">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-white rounded-xl border border-gray-700 gap-3 sm:gap-0">
       <div className="flex items-center space-x-4">
         <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-600">
           {subscription.icon}
@@ -87,7 +87,7 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
           </span>
         </div>
       </div>
-      <button className="px-5 py-2 text-sm font-semibold text-white bg-red-500 rounded-xl shadow-md hover:bg-red-600 transition-colors">
+      <button className="px-5 py-2 text-sm font-semibold text-white bg-red-500 rounded-xl shadow-md hover:bg-red-600 transition-colors w-full sm:w-auto">
         Unsubscribe
       </button>
     </div>

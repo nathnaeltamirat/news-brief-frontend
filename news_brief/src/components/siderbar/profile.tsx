@@ -1,9 +1,11 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { name: "Home", href: "/news" },
@@ -93,61 +95,175 @@ const Sidebar = () => {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <div className="  w-64 bg-white text-black min-h-screen flex flex-col p-2 rounded-lg shadow-md">
-      {/* Header */}
-      <div className="m-4">
-        <h1 className="text-2xl md:text-3xl font-bold m-2">Profile</h1>
-        <div className="px-4 pb-3 text-xs text-gray-400">
-          Customize your app experience
-        </div>
+    <>
+      {/* Mobile Hamburger Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <button
+          onClick={toggleMobileMenu}
+          className="p-2 bg-white rounded-md shadow-md hover:bg-gray-100 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {isMobileMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
+          </svg>
+        </button>
       </div>
 
-      {/* Navigation Menu */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.name}>
-                <Link
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 rounded-md transition-colors ${
-                    isActive
-                      ? "bg-[#F3F4F6] text-black"
-                      : "text-black hover:bg-[#dddfe2]"
-                  }`}
-                >
-                  <span className="mr-3 w-5 h-5 flex items-center justify-center">
-                    {getIcon(item.name)}
-                  </span>
-                  {item.name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={closeMobileMenu}
+        />
+      )}
 
-        {/* Logout */}
-        <Link
-          href="/"
-          className="flex items-center px-4 py-3 rounded-md transition-colors text-red-600 hover:bg-red-50 border-t border-gray-200 mt-2 pt-2"
-        >
-          <span className="mr-3 w-5 h-5 flex items-center justify-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
-            </svg>
-          </span>
-          Logout
-        </Link>
-      </nav>
-    </div>
+      {/* Sidebar - Desktop (unchanged) */}
+      <div className="hidden lg:block w-64 bg-white text-black min-h-screen flex flex-col p-2 rounded-lg shadow-md">
+        {/* Header */}
+        <div className="m-4">
+          <h1 className="text-2xl md:text-3xl font-bold m-2">Profile</h1>
+          <div className="px-4 pb-3 text-xs text-gray-400">
+            Customize your app experience
+          </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <nav className="flex-1 p-4">
+          <ul className="space-y-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className={`flex items-center px-4 py-3 rounded-md transition-colors ${
+                      isActive
+                        ? "bg-[#F3F4F6] text-black"
+                        : "text-black hover:bg-[#dddfe2]"
+                    }`}
+                  >
+                    <span className="mr-3 w-5 h-5 flex items-center justify-center">
+                      {getIcon(item.name)}
+                    </span>
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Logout */}
+          <Link
+            href="/"
+            className="flex items-center px-4 py-3 rounded-md transition-colors text-red-600 hover:bg-red-50 border-t border-gray-200 mt-2 pt-2"
+          >
+            <span className="mr-3 w-5 h-5 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+              </svg>
+            </span>
+            Logout
+          </Link>
+        </nav>
+      </div>
+
+      {/* Mobile Sidebar */}
+      <div
+        className={`lg:hidden fixed top-0 left-0 h-full w-64 bg-white text-black z-50 transform transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Header */}
+        <div className="m-4">
+          <h1 className="text-2xl md:text-3xl font-bold m-2">Profile</h1>
+          <div className="px-4 pb-3 text-xs text-gray-400">
+            Customize your app experience
+          </div>
+        </div>
+
+        {/* Navigation Menu */}
+        <nav className="flex-1 p-4">
+          <ul className="space-y-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    onClick={closeMobileMenu}
+                    className={`flex items-center px-4 py-3 rounded-md transition-colors ${
+                      isActive
+                        ? "bg-[#F3F4F6] text-black"
+                        : "text-black hover:bg-[#dddfe2]"
+                    }`}
+                  >
+                    <span className="mr-3 w-5 h-5 flex items-center justify-center">
+                      {getIcon(item.name)}
+                    </span>
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Logout */}
+          <Link
+            href="/"
+            onClick={closeMobileMenu}
+            className="flex items-center px-4 py-3 rounded-md transition-colors text-red-600 hover:bg-red-50 border-t border-gray-200 mt-2 pt-2"
+          >
+            <span className="mr-3 w-5 h-5 flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+              </svg>
+            </span>
+            Logout
+          </Link>
+        </nav>
+      </div>
+    </>
   );
 };
 
