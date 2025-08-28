@@ -1,21 +1,24 @@
-'use client';
+"use client";
 
 import React from "react";
 import SignInCard from "./siginCard";
 import SignUpCard from "../signup_components/signupCard";
 
-
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  view : 'signin' | 'signup';
-  setView :(view : 'signin' | 'signup') => void;
-
+  view: "signin" | "signup";
+  setView: (view: "signin" | "signup") => void;
 }
 
-export default function LoginModal({ isOpen, onClose, view, setView }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  view,
+  setView,
+}: LoginModalProps) {
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
