@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SignInCard from "./siginCard";
+import SignInCard from "./siginCard"
 import SignUpCard from "../signup_components/signupCard";
 
 interface LoginModalProps {
@@ -33,6 +33,7 @@ export default function LoginModal({
         >
           &times;
         </button>
+
         {view === "signin" ? (
           <SignInCard switchToSignUp={() => setView("signup")} />
         ) : (
