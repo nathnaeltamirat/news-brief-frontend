@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
-const SignInCard = () => {
+const SignInCard = ({switchToSignUp} : {switchToSignUp : () => void}) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div
@@ -60,9 +60,9 @@ const SignInCard = () => {
         <div>
           <p className="mt-6 text-center text-gray-500 text-sm">
             Don&apos;t have an account?{" "}
-            <a href="#" className="hover:underline font-medium text-black">
+            <button onClick = {switchToSignUp} className="hover:underline font-medium text-black">
               Sign Up
-            </a>
+            </button>
           </p>
         </div>
       </div>
