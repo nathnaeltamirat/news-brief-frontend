@@ -1,51 +1,141 @@
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 
-const SignUpCard = () => {
+const SignUpCard = ({ switchToSignIn }: { switchToSignIn: () => void }) => {
+  const [username, setUserName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch(
+        "https://news-brief-core-api.onrender.com/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,
+            password,
+            firstName,
+            email,
+            lastName,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      setSuccess("Account created successfully!");
+      console.log("✅ Registered:", data);
+
+      setTimeout(() => {
+        switchToSignIn();
+      }, 1500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div
-        className="w-full max-w-md rounded-2xl shadow-xl p-8"
-        style={{ background: "rgb(245, 245, 245)" }}
+      <form
+        onSubmit={handleSignUp}
+        className="w-full max-w-md rounded-2xl shadow-xl p-8 bg-gray-100"
       >
         <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
           Create your account
         </h1>
 
-        <div className="mb-2">
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
-          />
-        </div>
+        {error && (
+          <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+        )}
+        {success && (
+          <p className="text-green-500 text-sm text-center mb-4">{success}</p>
+        )}
 
-        <div className="mb-2">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          required
+          onChange={(e) => setUserName(e.target.value)}
+          className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
 
-        <div className="mb-2">
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          required
+          onChange={(e) => setFirstName(e.target.value)}
+          className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
 
-        <div className="mb-6">
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black transition"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Last Name"
+          value={lastName}
+          required
+          onChange={(e) => setLastName(e.target.value)}
+          className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
 
-        <button className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 transition">
-          Sign Up
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          required
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          required
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          required
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="w-full mb-6 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 transition"
+        >
+          {loading ? "Signing Up..." : "Sign Up"}
         </button>
 
         <div className="flex items-center my-6">
@@ -55,8 +145,8 @@ const SignUpCard = () => {
         </div>
 
         <button
+          type="button"
           className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-3 text-black font-medium"
-          aria-label="Sign up with Google"
         >
           <Image
             src="/images/google.png"
@@ -67,15 +157,17 @@ const SignUpCard = () => {
           Continue with Google
         </button>
 
-        <div>
-          <p className="mt-6 text-center text-gray-500 text-sm">
-            Already have an account?{" "}
-            <a href="#" className="hover:underline font-medium text-black">
-              Sign In
-            </a>
-          </p>
-        </div>
-      </div>
+        <p className="mt-6 text-center text-gray-500 text-sm">
+          Already have an account?{" "}
+          <button
+            type="button"
+            onClick={switchToSignIn}
+            className="hover:underline font-medium text-black"
+          >
+            Sign In
+          </button>
+        </p>
+      </form>
     </div>
   );
 };
