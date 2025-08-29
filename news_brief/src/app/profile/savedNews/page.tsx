@@ -1,11 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Sidebar from "@/components/siderbar/profile";
 import Button from "@/components/reusable_components/Button";
-import { Trash } from "lucide-react";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { apiClient } from "@/lib/api";
-
-import { AiOutlineBook } from 'react-icons/ai';
 
 type SavedNews = {
   id: string;
@@ -15,24 +13,24 @@ type SavedNews = {
 };
 
 export default function SavedNewsPage() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("SavedNewsPage must be used inside ThemeProvider");
+  const { theme } = context;
+
   const [savedNews, setSavedNews] = useState<SavedNews[]>([]);
   const [loading, setLoading] = useState(false);
-const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-
-useEffect(() => {
+  useEffect(() => {
     const getInformation = async () => {
       try {
         setLoading(true);
-        const topicNews = await apiClient.getSavedNews(); 
+        const topicNews = await apiClient.getSavedNews();
         setSavedNews(topicNews);
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setErrorMessage(err.message);
-        } else {
-          setErrorMessage("Failed to fetch news");
-        }
+        if (err instanceof Error) setErrorMessage(err.message);
+        else setErrorMessage("Failed to fetch news");
       } finally {
         setLoading(false);
       }
@@ -40,9 +38,7 @@ useEffect(() => {
     getInformation();
   }, []);
 
-
   const handleClearAll = async () => {
-   
     try {
       setLoading(true);
       await apiClient.deleteAllSavedNews();
@@ -54,42 +50,32 @@ useEffect(() => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      setLoading(true);
-        await apiClient.removeSavedNewsItem(id);
-        setSavedNews((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("Failed to delete saved news:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const bgMain = theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white";
+  const cardBg = theme === "light" ? "bg-white text-black" : "bg-gray-800 text-white";
+  const subCardBg = theme === "light" ? "bg-gray-100 text-black" : "bg-gray-700 text-white";
+  const textGray = theme === "light" ? "text-gray-700" : "text-gray-300";
+  const selectBg = theme === "light" ? "bg-white border-gray-300 text-black" : "bg-gray-700 border-gray-600 text-white";
 
-   return (
-    <div className="flex min-h-screen bg-[#E6E6E6]">
-      
+  return (
+    <div className={`flex min-h-screen transition-colors ${bgMain}`}>
       <Sidebar />
 
       <div className="flex-1 p-4 lg:p-12 w-full lg:ml-0 mt-20 lg:mt-0">
-        {/* "saved news text size_ 40 " */}
         <h1 className="font-bold mb-2 text-xl lg:text-2xl">Saved News</h1>
-        <p className="text-gray-500 mb-6 text-lg lg:text-xl">Manage saved news and storage</p>
+        <p className={`mb-6 text-lg lg:text-xl ${textGray}`}>Manage saved news and storage</p>
 
-        {/* Management Card */}
-        <div className="bg-white rounded-2xl shadow p-4 lg:p-6 w-full">
-          <p className="font-semibold text-lg lg:text-xl mb-4"> Saved News Management</p>
-           <div className="mb-3 rounded-2xl shadow p-4 w-full bg-[#F9FAFB]">
+        <div className={`rounded-2xl shadow p-4 lg:p-6 w-full transition-colors ${cardBg}`}>
+          <p className="font-semibold text-lg lg:text-xl mb-4">Saved News Management</p>
+
+          <div className={`mb-3 rounded-2xl shadow p-4 w-full ${subCardBg}`}>
             {loading && <p>Loading...</p>}
-            <p className="font-medium text mb-2"> Storage used</p>
-            <p className="text-[#6B7280] text-sm "> <b>{savedNews.length}</b> articles saved </p>
-           </div>
+            <p className="font-medium mb-2">Storage used</p>
+            <p className={`text-sm ${textGray}`}><b>{savedNews.length}</b> articles saved</p>
+          </div>
 
           <div className="mb-6">
-            <label className="block text-base lg:text-lg font-medium mb-1">
-              Auto-delete after
-            </label>
-            <select className="w-full border rounded-md px-3 p-4 py-2">
+            <label className="block text-base lg:text-lg font-medium mb-1">Auto-delete after</label>
+            <select className={`w-full border rounded-md px-3 py-2 ${selectBg}`}>
               <option>Never</option>
               <option>7 days</option>
               <option>30 days</option>
@@ -97,45 +83,45 @@ useEffect(() => {
             </select>
           </div>
 
-          
-          <button
+          <Button
+            variant="primary"
+            className="w-full rounded-full py-2 mt-2"
             onClick={() => setShowDeleteModal(true)}
-            className="w-full bg-red-100 text-red-600 font-semibold py-2 rounded-lg hover:bg-red-200"
           >
             Clear all saved articles
-          </button>
+          </Button>
         </div>
       </div>
+
       {showDeleteModal && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80 lg:w-96 mx-4">
-            <h2 className="text-lg font-semibold mb-4 text-red-600">
-              Are you sure?
-            </h2>
-            <p className="text-gray-600 mb-6">
+          <div className={`rounded-lg shadow-lg p-6 w-80 lg:w-96 mx-4 transition-colors ${cardBg}`}>
+            <h2 className="text-lg font-semibold mb-4 text-red-600">Are you sure?</h2>
+            <p className={`mb-6 ${textGray}`}>
               This action cannot be undone. Do you really want to delete all saved news?
             </p>
-            <div className="flex justify-end gap-3">
-              <button
+            <div className="flex justify-end gap-3 flex-wrap">
+              <Button
+                variant="secondary"
+                className="rounded-full px-4 py-2 w-full sm:w-auto"
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-md border"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                className="rounded-full px-4 py-2 w-full sm:w-auto"
                 onClick={() => {
                   setShowDeleteModal(false);
                   handleClearAll();
                 }}
-                className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
               >
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
     </div>
-    
   );
 }

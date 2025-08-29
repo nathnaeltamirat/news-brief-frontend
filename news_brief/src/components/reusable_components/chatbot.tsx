@@ -1,11 +1,16 @@
 "use client";
-import { useState, useEffect } from "react";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useState, useEffect, useContext } from "react";
 
 interface ChatBotProps {
   defaultOpen?: boolean;
 }
 
 const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
+  const context = useContext(ThemeContext);
+  if (!context)
+    throw new Error("ToggleButton must be used inside ThemeProvider");
+
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isMobile, setIsMobile] = useState(false);
   const [messages, setMessages] = useState([
@@ -22,16 +27,16 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024); // lg breakpoint
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
+    window.addEventListener("resize", checkMobile);
+
     // For mobile devices, always start closed regardless of defaultOpen prop
     if (isMobile) {
       setIsOpen(false);
     }
-    
-    return () => window.removeEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, [isMobile, defaultOpen]);
 
   const handleSendMessage = () => {
