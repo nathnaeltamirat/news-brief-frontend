@@ -1,26 +1,28 @@
 "use client";
 import { apiClient, News } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Button from "../reusable_components/Button";
 import { Bookmark, ThumbsDown } from "lucide-react";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
 
 export default function SubscribedComponent() {
   const [news, setNews] = useState<News[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("SubscribedComponent must be used inside ThemeProvider");
+  const { theme } = context;
+
   useEffect(() => {
     const getInformation = async () => {
       try {
         setLoading(true);
-        const topicNews = await apiClient.getSubscribedFeed(); // <-- use directly
+        const topicNews = await apiClient.getSubscribedFeed();
         setNews(topicNews);
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setErrorMessage(err.message);
-        } else {
-          setErrorMessage("Failed to fetch news");
-        }
+        if (err instanceof Error) setErrorMessage(err.message);
+        else setErrorMessage("Failed to fetch news");
       } finally {
         setLoading(false);
       }
@@ -33,13 +35,17 @@ export default function SubscribedComponent() {
 
   return (
     <>
-      <h1 className="my-5 font-bold text-xl">Subcribed Feed</h1>
+      <h1 className={`my-5 font-bold text-xl ${theme === "light" ? "text-black" : "text-white"}`}>
+        Subscribed Feed
+      </h1>
 
-      <div>
+      <div className="space-y-4">
         {news?.map((item, index) => (
           <div
             key={index}
-            className="flex flex-col lg:flex-row gap-5 rounded-lg border shadow-sm my-2 border-[#E6E6E6] w-full"
+            className={`flex flex-col lg:flex-row gap-5 rounded-lg border shadow-sm my-2 w-full transition-colors ${
+              theme === "light" ? "bg-white text-black border-[#E6E6E6]" : "bg-gray-900 text-white border-gray-700"
+            }`}
           >
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGtH4XtF9PXCNWYUFmZ05OJe_DyG5zvY29oA&s"
@@ -47,28 +53,34 @@ export default function SubscribedComponent() {
               alt="Top-News_image"
             />
             <div className="p-4 flex-1">
+              {/* Topics & Date */}
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                 <div className="flex gap-2 flex-wrap">
-                  {item.topics.map((value, index) => (
-                    <Button variant="tertiary" key={index}>
+                  {item.topics.map((value, idx) => (
+                    <Button key={idx} variant="tertiary" className="rounded-lg px-3 py-1 text-xs sm:text-sm">
                       {value}
                     </Button>
                   ))}
                 </div>
                 <p className="text-gray-400 my-2 text-sm">{item.posted_at}</p>
               </div>
+
+              {/* Title & Description */}
               <div className="mt-2">
                 <p className="font-bold text-lg my-2">{item.title}</p>
                 <p className="my-2 font-light">{item.description}</p>
               </div>
+
+              {/* Action Buttons */}
               <div className="flex gap-2 my-2">
-                <Button variant="tertiary">
-                  <Bookmark className="w-4 h-4 mr-1" />
+                <Button variant="tertiary" className="p-2 rounded-full">
+                  <Bookmark className="w-5 h-5" />
                 </Button>
-                <Button variant="tertiary">
-                  <ThumbsDown className="w-4 h-4 mr-1" />
+                <Button variant="tertiary" className="p-2 rounded-full">
+                  <ThumbsDown className="w-5 h-5" />
                 </Button>
               </div>
+
               <p className="text-sm text-gray-400">Source: {item.source}</p>
             </div>
           </div>

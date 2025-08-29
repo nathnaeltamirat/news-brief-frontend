@@ -1,28 +1,33 @@
-import React from "react";
+"use client";
+import React, { ButtonHTMLAttributes } from "react";
 
-type ButtonProps = {
-  children: React.ReactNode;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "tertiary";
-} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+  children: React.ReactNode;
+  className?: string;
+}
 
-export default function Button({
-  children,
-  variant = "primary",
-  ...props
-}: ButtonProps) {
-  const base =
-    "px-2 sm:px-3 lg:px-4 py-1 sm:py-1.5 lg:py-2 rounded-full font-medium text-xs sm:text-sm transition border";
+const Button: React.FC<ButtonProps> = ({ variant = "primary", children, className = "", ...props }) => {
+  const baseClasses = "font-medium transition-colors duration-200";
 
-  const styles =
-    variant === "primary"
-      ? "bg-gray-900 text-white hover:bg-gray-800 border-transparent"
-      : variant === "secondary"
-      ? "bg-gray-100 text-gray-700 hover:bg-gray-200 border-transparent"
-      : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 font-bold"; 
+  let variantClasses = "";
+  switch (variant) {
+    case "primary":
+      variantClasses = "bg-black text-white hover:bg-white hover:text-black border border-black";
+      break;
+    case "secondary":
+      variantClasses = "bg-white text-black border border-black hover:bg-black hover:text-white";
+      break;
+    case "tertiary":
+      variantClasses = "bg-gray-200 text-black hover:bg-gray-300";
+      break;
+  }
 
   return (
-    <button className={`${base} ${styles}`} {...props}>
+    <button className={`${baseClasses} ${variantClasses} ${className}`} {...props}>
       {children}
     </button>
   );
-}
+};
+
+export default Button;

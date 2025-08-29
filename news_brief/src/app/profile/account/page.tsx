@@ -1,9 +1,15 @@
 "use client";
-import React, { useState } from "react";
-import Sidebar from "../../../components/siderbar/profile";
+import React, { useContext, useState } from "react";
+import Sidebar from "@/components/siderbar/profile";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
+import Button from "@/components/reusable_components/Button";
 
 export default function AccountPage() {
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("context not defined");
+  const { theme } = context;
+
   const [editingField, setEditingField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "Bien Moges",
@@ -11,7 +17,6 @@ export default function AccountPage() {
     password: "password123",
     createdAt: "20.08.2025",
   });
-
   const [showPassword, setShowPassword] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -24,183 +29,144 @@ export default function AccountPage() {
     console.log(`Updated ${field}:`, formData[field as keyof typeof formData]);
   };
 
-  return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
+  const inputClasses = `border rounded-lg px-3 py-2 text-sm transition-colors w-full ${
+    theme === "light"
+      ? "bg-white text-black border-gray-300 focus:ring-black"
+      : "bg-gray-700 text-white border-gray-600 focus:ring-gray-500"
+  }`;
 
-      <div className="p-4 lg:p-8 flex-1 lg:ml-0 mt-20 lg:mt-0">
+  return (
+    <div
+      className={`flex flex-col lg:flex-row min-h-screen transition-colors overflow-x-hidden ${
+        theme === "light" ? "bg-gray-100 text-black" : "bg-gray-900 text-white"
+      }`}
+    >
+      {/* Sidebar */}
+      <div className="flex-shrink-0">
+        <Sidebar />
+      </div>
+
+      {/* Main Content */}
+      <div className="p-4 lg:p-8 flex-1 w-full max-w-full lg:ml-0 mt-20 lg:mt-0">
         <h2 className="text-2xl font-bold mb-6">Account Information</h2>
 
-        <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+        {/* Account Details */}
+        <div
+          className={`shadow-md rounded-lg p-6 mb-8 transition-colors w-full max-w-full overflow-hidden ${
+            theme === "light" ? "bg-white text-black" : "bg-gray-800 text-white"
+          }`}
+        >
           <div className="grid gap-4">
-            <div className="flex justify-between items-center pb-3">
-              <div className="flex items-center gap-3">
-                <p className="text-gray-800 font-semibold w-32">Full Name :</p>
-                {editingField === "fullName" ? (
-                  <input
-                    type="text"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      handleChange("fullName", e.target.value)
-                    }
-                    className="border rounded px-2 py-1 text-sm backdrop-blur-sm bg-white/70"
-                  />
-                ) : (
-                  <span>{formData.fullName}</span>
-                )}
-              </div>
-              <div>
-                {editingField === "fullName" ? (
-                  <button
-                    onClick={() => handleSave("fullName")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setEditingField("fullName")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-            </div>
+            {["fullName", "email", "password"].map((field) => (
+              <div key={field} className="flex flex-col md:flex-row justify-between items-start md:items-center pb-3 gap-3 w-full">
+                <p className="font-semibold w-full md:w-32 capitalize">{field === "fullName" ? "Full Name" : field}</p>
 
-            <div className="flex justify-between items-center pb-3">
-              <div className="flex items-center gap-3">
-                <p className="text-gray-800 font-semibold w-32">Email :</p>
-                {editingField === "email" ? (
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
-                    className="border rounded px-2 py-1 text-sm backdrop-blur-sm bg-white/70"
-                  />
-                ) : (
-                  <span>{formData.email}</span>
-                )}
-              </div>
-              <div>
-                {editingField === "email" ? (
-                  <button
-                    onClick={() => handleSave("email")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setEditingField("email")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-            </div>
+                <div className="flex-1 w-full flex flex-col md:flex-row items-start md:items-center gap-3">
+                  {editingField === field ? (
+                    field === "password" ? (
+                      <div className="relative w-full md:w-auto flex-1">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={formData[field as keyof typeof formData]}
+                          onChange={(e) => handleChange(field, e.target.value)}
+                          className={inputClasses}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute right-2 top-2 text-gray-500"
+                        >
+                          {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        type={field === "email" ? "email" : "text"}
+                        value={formData[field as keyof typeof formData]}
+                        onChange={(e) => handleChange(field, e.target.value)}
+                        className={inputClasses}
+                      />
+                    )
+                  ) : field === "password" ? (
+                    <span>●●●●●●●●</span>
+                  ) : (
+                    <span>{formData[field as keyof typeof formData]}</span>
+                  )}
 
-            <div className="flex justify-between items-center pb-3">
-              <div className="flex items-center gap-3">
-                <p className="text-gray-800 font-semibold w-32">Password :</p>
-                {editingField === "password" ? (
-                  <div className="relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e) =>
-                        handleChange("password", e.target.value)
-                      }
-                      className="border rounded px-2 py-1 text-sm backdrop-blur-sm bg-white/70"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-2 top-1.5 text-gray-500"
+                  {editingField === field ? (
+                    <Button
+                      variant="secondary"
+                      className="rounded-lg px-4 py-2 text-sm mt-2 md:mt-0"
+                      onClick={() => handleSave(field)}
                     >
-                      {showPassword ? (
-                        <AiOutlineEyeInvisible />
-                      ) : (
-                        <AiOutlineEye />
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  <span>●●●●●●●●</span>
-                )}
+                      Save
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      className="rounded-lg px-4 py-2 text-sm mt-2 md:mt-0"
+                      onClick={() => setEditingField(field)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                </div>
               </div>
-              <div>
-                {editingField === "password" ? (
-                  <button
-                    onClick={() => handleSave("password")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Save
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setEditingField("password")}
-                    className="text-blue-600 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
-                )}
-              </div>
-            </div>
+            ))}
 
-            <div className="flex items-center pt-3">
-              <p className="text-gray-800 font-semibold w-32">
-                Account Created:
-              </p>
+            {/* Created At */}
+            <div className="flex flex-col md:flex-row items-start md:items-center pt-3 gap-2">
+              <p className="font-semibold w-full md:w-32">Account Created:</p>
               <span>{formData.createdAt}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h3 className="text-red-600 font-semibold text-md mb-2">
-            Danger Zone
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Once you delete your account, there is no going back. Please be
-            certain.
+        {/* Danger Zone */}
+        <div
+          className={`shadow-md rounded-lg p-6 transition-colors w-full max-w-full overflow-hidden ${
+            theme === "light" ? "bg-white text-black" : "bg-gray-800 text-white"
+          }`}
+        >
+          <h3 className="font-semibold text-md mb-2">Danger Zone</h3>
+          <p className={`text-sm mb-4 ${theme === "light" ? "text-gray-500" : "text-gray-300"}`}>
+            Once you delete your account, there is no going back. Please be certain.
           </p>
-          <button
+          <Button
+            variant="primary"
+            className="rounded-lg px-4 py-2 text-sm"
             onClick={() => setShowDeleteModal(true)}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md"
           >
             Delete Account
-          </button>
+          </Button>
         </div>
       </div>
 
+      {/* Delete Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg font-semibold mb-4 text-red-600">
-              Are you sure?
-            </h2>
-            <p className="text-gray-600 mb-6">
-              This action cannot be undone. Do you really want to delete your
-              account?
+        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div
+            className={`rounded-lg shadow-lg p-6 w-full max-w-md transition-colors`}
+          >
+            <h2 className="text-lg font-semibold mb-4">Are you sure?</h2>
+            <p className={`text-gray-500 mb-6 ${theme === "dark" ? "text-gray-300" : ""}`}>
+              This action cannot be undone. Do you really want to delete your account?
             </p>
-            <div className="flex justify-end gap-3">
-              <button
+            <div className="flex flex-col md:flex-row justify-end gap-3">
+              <Button
+                variant="secondary"
+                className="rounded-lg px-4 py-2 text-sm"
                 onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-md border"
               >
                 Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  console.log("Account Deleted");
-                }}
-                className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600"
+              </Button>
+              <Button
+                variant="primary"
+                className="rounded-lg px-4 py-2 text-sm"
+                onClick={() => setShowDeleteModal(false)}
               >
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         </div>
