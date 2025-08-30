@@ -1,6 +1,6 @@
 
 // API service layer for backend integration
-const API_BASE_URL = "https://ehopn-test-project.onrender.com/api";
+const API_BASE_URL = "https://news-brief-core-api-excr.onrender.com/api/v1";
 
 // Types matching backend interfaces
 export interface News {
@@ -33,40 +33,35 @@ class ApiClient {
   }
 
   private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${this.baseURL}${endpoint}`;
 
-    // Get token from localStorage
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-    const config: RequestInit = {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
-      },
-      ...options,
-    };
+  const config: RequestInit = {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(options.headers || {}),
+    },
+  };
 
-    try {
-      const response = await fetch(url, config);
+  const response = await fetch(url, config);
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("API request failed:", error);
-      throw error;
-    }
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(
+      errorData.message || `HTTP error! status: ${response.status}`
+    );
   }
+
+  return await response.json();
+}
+
 
   //  get user
   async getUser(): Promise<User> {
@@ -80,8 +75,35 @@ class ApiClient {
   };
 }
 
-
+async signUp(full_name: string, email: string, password: string) {
+    return this.request<{ message: string; user?: User }>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({ full_name, email, password }),
+    });
+  }
   // Fetch dummy data
+async signIn(email: string, password: string) {
+    return this.request<{ token: string; user: User }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  // Forgot Password - request reset link
+  async forgotPassword(email: string) {
+    return this.request<{ message: string }>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  // Reset Password - use token + verifier + new password
+  async resetPassword(verifier: string, token: string, password: string) {
+    return this.request<{ message: string }>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ verifier, token, password }),
+    });
+  }
 
   async getTopNews(): Promise<News[]> {
     return new Promise((resolve) => {
