@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; // ✅ App Router uses next/navigation
 
 export default function GoogleCallbackPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (!router) return;
+
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     const refreshToken = params.get("refreshToken");
