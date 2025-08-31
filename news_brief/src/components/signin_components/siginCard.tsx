@@ -4,7 +4,7 @@ import React, { useState } from "react";
 
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { apiClient } from "../../lib/api"; // make sure path is correct
+import { apiClient } from "../../lib/api"; 
 
 interface SignInCardProps {
   onClose?: () => void;
@@ -12,7 +12,11 @@ interface SignInCardProps {
   onSwitchToForgot?: () => void;
 }
 
-const SignInCard: React.FC<SignInCardProps> = ({ onClose, onSwitchToSignUp, onSwitchToForgot}) => {
+const SignInCard: React.FC<SignInCardProps> = ({
+  onClose,
+  onSwitchToSignUp,
+  onSwitchToForgot,
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -30,16 +34,16 @@ const SignInCard: React.FC<SignInCardProps> = ({ onClose, onSwitchToSignUp, onSw
 
       if (onClose) onClose(); // close modal after login
     } catch (err: unknown) {
-  if (err instanceof Error) {
-    if (err.message.includes("401")) {
-      setError("Verify Your Email");
-    } else {
-      setError(err.message);
-    }
-  } else {
-    setError("Something went wrong ❌");
-  }
-}finally {
+      if (err instanceof Error) {
+        if (err.message.includes("401")) {
+          setError("Verify Your Email");
+        } else {
+          setError(err.message);
+        }
+      } else {
+        setError("Something went wrong ❌");
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -91,13 +95,13 @@ const SignInCard: React.FC<SignInCardProps> = ({ onClose, onSwitchToSignUp, onSw
       </div>
 
       <div className="mb-6 text-right">
-  <button
-    onClick={onSwitchToForgot}
-    className="hover:underline font-medium text-[12px] text-black"
-  >
-    Forgot Password?
-  </button>
-</div>
+        <button
+          onClick={onSwitchToForgot}
+          className="hover:underline font-medium text-[12px] text-black"
+        >
+          Forgot Password?
+        </button>
+      </div>
       <button
         onClick={handleSignIn}
         disabled={loading}
@@ -112,8 +116,16 @@ const SignInCard: React.FC<SignInCardProps> = ({ onClose, onSwitchToSignUp, onSw
         <hr className="flex-1 border-gray-300" />
       </div>
 
-      <button className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-3 text-black font-medium">
-        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
+      <button
+        onClick={() => apiClient.signInWithGoogle()}
+        className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-3 text-black font-medium"
+      >
+        <Image
+          src="/images/google.png"
+          width={24}
+          height={24}
+          alt="Google Logo"
+        />
         Continue with Google
       </button>
 
