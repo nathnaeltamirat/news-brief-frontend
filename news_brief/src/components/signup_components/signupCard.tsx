@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { apiClient } from "../../lib/api";
+import { useRouter } from "next/navigation";
 
 interface SignUpCardProps {
   onClose?: () => void;
@@ -24,7 +25,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPasswordMessage, setShowPasswordMessage] = useState(false);
-
+  const router = useRouter();
   // Password validation message
   const getPasswordMessage = (pwd: string) => {
     const messages: string[] = [];
@@ -55,8 +56,13 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
     setSuccess("");
 
     try {
-      const data = await apiClient.signUp(fullName, email, password);
-      setSuccess(data.message || "User created successfully ✅");
+      const res = await apiClient.signUp(fullName, email, password);
+      if (res.status_code == 201) {
+        setSuccess(
+          res.message ||
+            "User created successfully Check your email to Verify ✅"
+        );
+      }
 
       // Clear inputs immediately
       setFullName("");
@@ -67,14 +73,16 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
       // Delay transition to Sign In
       setTimeout(() => {
-        if (onSwitchToSignIn) onSwitchToSignIn();
+        router.push("/");
       }, 1000);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        if (err.message.includes("409")) {
+        const statusError = err as Error & { statusCode?: number };
+
+        if (statusError.statusCode === 409) {
           setError("Account already registered ❌");
         } else {
-          setError(err.message);
+          setError(statusError.message);
         }
       } else {
         setError("Something went wrong ❌");

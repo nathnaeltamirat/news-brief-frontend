@@ -9,6 +9,7 @@ import { ThemeContext } from "../contexts/ThemeContext";
 
 const News = () => {
   const context = useContext(ThemeContext);
+ 
   if (!context)
     throw new Error("ToggleButton must be used inside ThemeProvider");
   const { theme } = context;

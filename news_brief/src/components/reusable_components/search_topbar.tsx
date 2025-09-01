@@ -6,7 +6,8 @@ import SignInCard from "../signin_components/siginCard";
 import SignUpCard from "../signup_components/signupCard";
 import ForgotPasswordCard from "../../components/forgotpassword_components/forgotpassCard";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-
+import { getAccessToken } from "@/lib/api";
+const token = getAccessToken();
 export default function TopBar() {
   const context = useContext(ThemeContext);
   if (!context) throw new Error("ToggleButton must be used inside ThemeProvider");
@@ -48,7 +49,7 @@ export default function TopBar() {
                 <option value="Amharic">Amharic</option>
               </select>
             </div>
-
+              
             <Button
               variant="primary"
               className="rounded-lg px-3 py-1 text-sm"
@@ -57,7 +58,8 @@ export default function TopBar() {
                 setView("signup"); 
               }}
             >
-              Login
+              {token ? "Logout" : "Login"}
+              
             </Button>
           </div>
 

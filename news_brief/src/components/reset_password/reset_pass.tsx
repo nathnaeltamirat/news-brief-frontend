@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
     }
     try {
       setLoading(true);
-      const res = await apiClient.resetPassword(verifier, token, password);
+      // const res = await apiClient.resetPassword(verifier, token, password);
       setMessage("Password reset successfully ✅");
       setTimeout(() => router.push("/signin"), 2000);
     } catch (err: unknown) {
