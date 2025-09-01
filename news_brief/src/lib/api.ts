@@ -93,13 +93,12 @@ class ApiClient {
 
     const data = await res.json();
     if (status_code == 201) {
-
       const methods = {
         method: "POST",
         body: JSON.stringify({ email, password }),
       };
       const logged_res = await fetch(`${this.baseURL}/auth/login`, methods);
-          
+
       const logged_val = await logged_res.json();
       localStorage.setItem("person", JSON.stringify(logged_val));
       console.log(logged_val);
@@ -111,14 +110,14 @@ class ApiClient {
   }
 
   async signIn(email: string, password: string) {
-      const methods = {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      };
-      const logged_res = await fetch(`${this.baseURL}/auth/login`, methods);
-      const logged_val = await logged_res.json();
-      const status_code = logged_res.status;
-      if (status_code != 200) {
+    const methods = {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    };
+    const logged_res = await fetch(`${this.baseURL}/auth/login`, methods);
+    const logged_val = await logged_res.json();
+    const status_code = logged_res.status;
+    if (status_code != 200) {
       const error = new Error("Invalid Credential") as Error & {
         statusCode?: number;
       };
@@ -126,11 +125,10 @@ class ApiClient {
       throw error;
     }
 
-      localStorage.setItem("person", JSON.stringify(logged_val));
-      console.log(logged_val);
+    localStorage.setItem("person", JSON.stringify(logged_val));
+    console.log(logged_val);
   }
 
-  // Forgot Password - request reset link
   async forgotPassword(email: string) {
     return this.request<{ message: string }>("/auth/forgot-password", {
       method: "POST",
@@ -264,6 +262,23 @@ class ApiClient {
   async removeSavedNewsItem(newsId: string): Promise<void> {
     const user = await this.getUser();
     user.saved_news = user.saved_news.filter((id) => id !== newsId);
+  }
+
+  // Verify email with token + verifier
+  async verifyEmail(verifier: string, token: string) {
+    const res = await fetch(
+      `${this.baseURL}/auth/verify-email?verifier=${verifier}&token=${token}`,
+      {
+        method: "GET",
+      }
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      throw new Error(errorData.message || "Verification failed ❌");
+    }
+
+    return await res.json();
   }
 }
 
