@@ -16,6 +16,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  role?: "admin" | "user";  
   subscribed: string[];      // news sources / publishers user follows
   topic_interest: string[];  // topics user is interested in
   saved_news: string[]; // IDs of saved news articles
@@ -69,6 +70,7 @@ class ApiClient {
     id: "u123",
     name: "John Doe",
     email: "john@example.com",
+    role: "user", // add this
     subscribed: ["TechCrunch"],
     topic_interest: ["AI", "Tech", "Science"],  // topics user cares about
     saved_news: ["1", "3"],
@@ -83,7 +85,7 @@ async signUp(full_name: string, email: string, password: string) {
   }
   // Fetch dummy data
 async signIn(email: string, password: string) {
-    return this.request<{ token: string; user: User }>("/auth/login", {
+    return this.request<{ token: string; refresh_token: string;  user: User }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
@@ -104,7 +106,10 @@ async signIn(email: string, password: string) {
       body: JSON.stringify({ verifier, token, password }),
     });
   }
-
+signInWithGoogle() {
+    // Redirect user to backend Google login route
+    window.location.href = `${this.baseURL}/auth/google/login`;
+  }
   async getTopNews(): Promise<News[]> {
     return new Promise((resolve) => {
       setTimeout(() => {

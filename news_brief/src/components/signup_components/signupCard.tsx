@@ -10,7 +10,10 @@ interface SignUpCardProps {
   onSwitchToSignIn?: () => void;
 }
 
-const SignUpCard: React.FC<SignUpCardProps> = ({ onClose, onSwitchToSignIn }) => {
+const SignUpCard: React.FC<SignUpCardProps> = ({
+  onClose,
+  onSwitchToSignIn,
+}) => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +32,8 @@ const SignUpCard: React.FC<SignUpCardProps> = ({ onClose, onSwitchToSignIn }) =>
     if (!/[A-Z]/.test(pwd)) messages.push("an uppercase letter");
     if (!/[a-z]/.test(pwd)) messages.push("a lowercase letter");
     if (!/\d/.test(pwd)) messages.push("a number");
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) messages.push("a special character");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd))
+      messages.push("a special character");
 
     if (messages.length === 0) return ""; // Hide if all rules met
     return "Password must include " + messages.join(", ") + ".";
@@ -97,8 +101,16 @@ const SignUpCard: React.FC<SignUpCardProps> = ({ onClose, onSwitchToSignIn }) =>
         Create your account
       </h1>
 
-      {success && <p className="text-green-600 text-center mb-3 text-sm sm:text-base">{success}</p>}
-      {error && <p className="text-red-500 text-center mb-3 text-sm sm:text-base">{error}</p>}
+      {success && (
+        <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
+          {success}
+        </p>
+      )}
+      {error && (
+        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
+          {error}
+        </p>
+      )}
 
       <input
         type="text"
@@ -172,12 +184,22 @@ const SignUpCard: React.FC<SignUpCardProps> = ({ onClose, onSwitchToSignIn }) =>
 
       <div className="flex items-center my-4 sm:my-6">
         <hr className="flex-1 border-gray-300" />
-        <span className="px-2 sm:px-3 text-gray-500 text-xs sm:text-sm">OR</span>
+        <span className="px-2 sm:px-3 text-gray-500 text-xs sm:text-sm">
+          OR
+        </span>
         <hr className="flex-1 border-gray-300" />
       </div>
 
-      <button className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 text-black font-medium text-sm sm:text-base">
-        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
+      <button
+        onClick={() => apiClient.signInWithGoogle()}
+        className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 text-black font-medium text-sm sm:text-base"
+      >
+        <Image
+          src="/images/google.png"
+          width={24}
+          height={24}
+          alt="Google Logo"
+        />
         Continue with Google
       </button>
 
