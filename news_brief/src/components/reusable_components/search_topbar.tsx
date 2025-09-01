@@ -55,7 +55,7 @@ export default function TopBar() {
               className="rounded-lg px-3 py-1 text-sm"
               onClick={() => {
                 setOpen(true);
-                setView("signup"); 
+                setView("signin"); 
               }}
             >
               {token ? "Logout" : "Login"}
