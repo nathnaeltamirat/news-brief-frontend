@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { apiClient } from "../../lib/api"; 
+import { apiClient } from "../../lib/api";
 
 interface SignInCardProps {
   onClose?: () => void;
@@ -30,13 +30,16 @@ const SignInCard: React.FC<SignInCardProps> = ({
     try {
       const data = await apiClient.signIn(email, password);
       console.log("Login success:", data);
-      localStorage.setItem("token", data.token);
+      setTimeout(() => {
+        window.location.href = "/news";
+      }, 1000);
 
       if (onClose) onClose(); // close modal after login
     } catch (err: unknown) {
       if (err instanceof Error) {
-        if (err.message.includes("401")) {
-          setError("Verify Your Email");
+        const statusError = err as Error & { statusCode?: number };
+        if (statusError.statusCode === 401) {
+          setError(statusError.message || "Invalid Credentials");
         } else {
           setError(err.message);
         }
@@ -47,6 +50,9 @@ const SignInCard: React.FC<SignInCardProps> = ({
       setLoading(false);
     }
   };
+  useEffect(() => {
+    localStorage.removeItem("person");
+  }, []);
 
   return (
     <div className="relative w-full max-w-md rounded-2xl shadow-xl p-8 bg-gray-50">

@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { apiClient } from "../../lib/api";
-import { useRouter } from "next/navigation";
 
 interface SignUpCardProps {
   onClose?: () => void;
@@ -15,6 +14,9 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   onClose,
   onSwitchToSignIn,
 }) => {
+  useEffect(() => {
+    localStorage.removeItem("person");
+  }, []);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +27,6 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPasswordMessage, setShowPasswordMessage] = useState(false);
-  const router = useRouter();
   // Password validation message
   const getPasswordMessage = (pwd: string) => {
     const messages: string[] = [];
@@ -73,7 +74,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
       // Delay transition to Sign In
       setTimeout(() => {
-        router.push("/");
+        window.location.href = "/news";
       }, 1000);
     } catch (err: unknown) {
       if (err instanceof Error) {

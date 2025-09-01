@@ -93,12 +93,13 @@ class ApiClient {
 
     const data = await res.json();
     if (status_code == 201) {
-      alert("hello");
+
       const methods = {
         method: "POST",
         body: JSON.stringify({ email, password }),
       };
       const logged_res = await fetch(`${this.baseURL}/auth/login`, methods);
+          
       const logged_val = await logged_res.json();
       localStorage.setItem("person", JSON.stringify(logged_val));
       console.log(logged_val);
@@ -108,15 +109,25 @@ class ApiClient {
       status_code,
     };
   }
-  // Fetch dummy data
+
   async signIn(email: string, password: string) {
-    return this.request<{ token: string; refresh_token: string; user: User }>(
-      "/auth/login",
-      {
+      const methods = {
         method: "POST",
         body: JSON.stringify({ email, password }),
-      }
-    );
+      };
+      const logged_res = await fetch(`${this.baseURL}/auth/login`, methods);
+      const logged_val = await logged_res.json();
+      const status_code = logged_res.status;
+      if (status_code != 200) {
+      const error = new Error("Invalid Credential") as Error & {
+        statusCode?: number;
+      };
+      error.statusCode = 401;
+      throw error;
+    }
+
+      localStorage.setItem("person", JSON.stringify(logged_val));
+      console.log(logged_val);
   }
 
   // Forgot Password - request reset link
