@@ -1,0 +1,98 @@
+{
+   "appName":  "አጭር ዜና or የዜና ማጠቃለያ",
+  "sidebar-main": {
+    "home": "መነሻ",
+    "forYou": "ለእርስዎ",
+    "subscribed": "ተመዝጋቢ",
+    "savedNews": "የተቀመጡ ዜናዎች",
+    "setting": "ቅንብር",
+    "profile": " የግል ገጽ"
+  },
+  "sidebar-profile": {
+    "home": "መነሻ",
+      "account": "መለያ",
+      "categories": "ምድቦች",
+      "subscription": "ተመዝጋቢነት",
+      "notifications": "ማሳወቂያዎች",
+      "savedNews": "የተቀመጡ ዜናዎች",
+      "logout": "ውጣ"
+    
+  },
+   "sidebar-setting": {
+    "home": "መነሻ",
+    "language": "ቋንቋ ",
+    "voice": "ድምጽ",
+    "content": "ይዘት ",
+    "accessibility": "ተደራሽነት",
+    "general": "አጠቃላይ",
+    "account": "መለያ"
+  },
+  "NewsComponent":{
+      "Top Story": "ዋና ዜና",
+      "your briefing ": "አጭር መግለጫዎ",
+      "Source" : "ምንጭ"
+  },
+  "foryou":
+  {
+    "For You Feed":"ለእርስዎ የቀረበ",
+    "Source" : "ምንጭ"
+  },
+   "subscription":
+  {
+    "Subscribed Feed":"የተመዘገቡበት ዝርዝር",
+    "Source" : "ምንጭ"
+  },
+   "signup": {
+    "title": "መለያዎን ይፍጠሩ",
+    "fullName": "ሙሉ ስም",
+    "email": "ኢሜይል",
+    "password": "የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+    "signUp": "መመዝገብ",
+    "signingUp": "በመመዝገብ ላይ...",
+    "or": "ወይም",
+    "continueGoogle": "በGoogle ይቀጥሉ",
+    "alreadyAccount": "መለያ አለዎት?",
+    "signIn": "ይግቡ",
+    "success": "ተጠቃሚ በተሳካ ሁኔታ ተፈጥሯል። ኢሜይልዎን ያረጋግጡ ✅",
+    "errorPasswordMismatch": "የይለፍ ቃሎች አይዛመዱም ❌",
+    "errorPasswordRules": "የይለፍ ቃል ሁሉንም መስፈርቶች አልተሟላም ❌"
+    
+  },
+  "signin": {
+    "title": "እንኳን ደህና መጡ",
+    "email": "ኢሜይል",
+    "password": "የይለፍ ቃል",
+    "forgotPassword": "የይለፍ ቃል ረሱ?",
+    "signIn": "ግባ",
+    "signingIn": "በመግባት ላይ...",
+    "or": "ወይም",
+    "continueGoogle": "በGoogle ይቀጥሉ",
+    "noAccount": "መለያ የለዎትም?",
+    "signUp": "ይመዝገቡ",
+    "errorInvalid": "ያስገቡት ትክክል አይደለም"
+  }, 
+    "resetPassword": {
+    "title": "የይለፍ ቃልዎን ይቀይሩ",
+    "newPassword": "አዲስ የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃልን ያረጋግጡ",
+    "resetPassword": "የይለፍ ቃል ይቀይሩ",
+    "resetting": "በመቀየር ላይ...",
+    "success": "የይለፍ ቃል በትክክል ተቀይሯል ✅",
+    "errorInvalidLink": "የተሳሳተ ወይም የጎደለ ሊንክ ❌",
+    "errorMissingCredentials": "የማስተካከያ መረጃ ጎድሏል ❌",
+    "errorMismatch": "የይለፍ ቃሎች አይመሳሰሉም ❌",
+    "errorRequirements": "የይለፍ ቃል ሁሉንም መመሪያዎች አልተሟላም ❌",
+    "passwordMustInclude": "የይለፍ ቃል ከዚህ መካከል አንዱን መካተት አለበት፡ {{rules}}."
+  },
+  "forgotPassword": {
+    "title": "የይለፍ ቃልን ረሱአት?",
+    "description": "ኢሜል አድራሻዎን ያስገቡ፣ እኛም የይለፍ ቃል ለመቀየር ሊንክ እንልክልዎታለን።",
+    "email": "ኢሜል",
+    "sending": "በመላክ ላይ...",
+    "sendLink": "የመቀየር ሊንክ ይላኩ",
+    "success": "የይለፍ ቃል ለመቀየር ሊንክ ወደ ኢሜልዎ ተልኳል ✅",
+    "error": "የመቀየር ሊንክ ማስተላለፍ አልተሳካም ❌",
+    "backToSignIn": "← ወደ መግቢያ ተመለስ"
+  }
+}
