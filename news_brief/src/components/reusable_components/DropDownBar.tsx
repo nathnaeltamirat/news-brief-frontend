@@ -20,7 +20,7 @@ function ProfileDropdown() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-gray-800 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 text-sm font-medium hover:bg-gray-200"
         onClick={() => setOpen((prev) => !prev)}
       >
         <User size={16} />
@@ -28,32 +28,32 @@ function ProfileDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-gray-50  border border-gray-200  rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-52 bg-gray-100  border border-gray-200  rounded-lg shadow-lg z-50 overflow-hidden">
           <ul className="text-sm">
             <li>
-              <Link href="/foryou" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="/foryou" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
                 <User size={14} /> For You
               </Link>
             </li>
             <li>
-              <Link href="news/saved" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="news/saved" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
                 <Bookmark size={14} /> Saved
               </Link>
             </li>
             <li>
-              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
                 <Settings size={14} /> Settings
               </Link>
             </li>
             <li>
-              <Link href="/subscriptions" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="/subscriptions" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
                 <Bell size={14} /> Subscriptions
               </Link>
             </li>
             <li>
               <Link
                 href="/logout"
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
+                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 "
               >
                 <LogOut size={14} className="text-red-600" /> Logout
               </Link>
