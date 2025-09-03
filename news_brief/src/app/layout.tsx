@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-
 import "./globals.css";
 import ThemeProvider from "./contexts/ThemeContext";
-import Footer from "@/components/Footer/Footer";
+import { I18nProvider } from "@/components/I18nProvider";
+// adjust path if needed
 
 export const metadata: Metadata = {
   title: "News Brief",
@@ -17,8 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
-        <Footer />
+        <I18nProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

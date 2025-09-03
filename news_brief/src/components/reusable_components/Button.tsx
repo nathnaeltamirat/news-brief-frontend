@@ -1,5 +1,6 @@
 "use client";
-import React, { ButtonHTMLAttributes } from "react";
+import React, { ButtonHTMLAttributes, useContext } from "react";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "tertiary";
@@ -8,18 +9,32 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button: React.FC<ButtonProps> = ({ variant = "primary", children, className = "", ...props }) => {
-  const baseClasses = "font-medium transition-colors duration-200";
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("Button must be used inside ThemeProvider");
+  const { theme } = context;
+
+  const baseClasses = "font-medium transition-colors duration-200 rounded-md px-4 py-2";
 
   let variantClasses = "";
+
   switch (variant) {
     case "primary":
-      variantClasses = "bg-black text-white hover:bg-white hover:text-black border border-black";
+      variantClasses =
+        theme === "dark"
+          ? "bg-gray-100 text-black border border-gray-100 hover:bg-gray-200 hover:text-black"
+          : "bg-black text-white border border-black hover:bg-gray-600 hover:text-white";
       break;
     case "secondary":
-      variantClasses = "bg-white text-black border border-black hover:bg-black hover:text-white";
+      variantClasses =
+        theme === "dark"
+          ? "bg-gray-800 text-white border border-gray-700 hover:bg-gray-700 hover:text-white"
+          : "bg-white text-black border border-black hover:bg-gray-100 hover:text-black";
       break;
     case "tertiary":
-      variantClasses = "bg-gray-200 text-black hover:bg-gray-300";
+      variantClasses =
+        theme === "dark"
+          ? "bg-gray-700 text-white hover:bg-gray-600"
+          : "bg-gray-200 text-black hover:bg-gray-300";
       break;
   }
 

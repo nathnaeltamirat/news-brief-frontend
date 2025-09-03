@@ -3,7 +3,6 @@ import Image from "next/image";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "next/navigation";
 import { apiClient, News } from "../../../lib/api";
-import Sidebar from "../../../components/siderbar/main";
 import ChatBot from "../../../components/reusable_components/chatbot";
 import { ThemeContext } from "../../contexts/ThemeContext";
 
@@ -121,7 +120,6 @@ export default function NewsDetailPage() {
     <>
       <ChatBot defaultOpen={true} />
       <div className={`min-h-screen flex ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
-        <Sidebar />
 
         <div className="flex-1 flex flex-col lg:ml-0 mt-20 lg:mt-0">
           <header className="flex items-center p-4">

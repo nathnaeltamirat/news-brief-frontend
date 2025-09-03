@@ -1,88 +1,46 @@
 {
-  "appName": "News Brief",
-  "sidebar-main": {
-    "home": "Home",
-    "forYou": "For you",
-    "subscribed": "Subscribed",
-    "savedNews": "Saved News",
-    "setting": "Setting",
-    "profile": "Profile"
-  },
-  "sidebar-profile": {
-     "home": "Home",
-      "account": "Account",
-      "categories": "Categories",
-      "subscription": "Subscription",
-      "notifications": "Notifications",
-      "savedNews": "Saved News",
-      "logout": "Logout"
-    },
-     "sidebar-setting": {
-    "home": "Home",
-    "language": "Language & Translation",
-    "voice": "Voice Settings",
-    "content": "Content Preferences",
-    "accessibility": "Accessibility",
-    "general": "General",
-    "account": "Account"
-  },
-  "signup": {
-    "title": "Create your account",
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "forgotPassword": "Forgot Password?",
+    "welcomeBack": "Welcome Back",
+    "signingIn": "Signing In...",
+    "signingUp": "Signing Up...",
+    "invalidCredentials": "Invalid Credentials",
+    "somethingWentWrong": "Something went wrong ❌",
+    "continueWithGoogle": "Continue with Google",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
     "fullName": "Full Name",
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "signUp": "Sign Up",
-    "signingUp": "Signing Up...",
-    "or": "OR",
-    "continueGoogle": "Continue with Google",
-    "alreadyAccount": "Already have an account?",
-    "signIn": "Sign In",
-    "success": "User created successfully. Check your email to verify ✅",
-    "errorPasswordMismatch": "Passwords do not match ❌",
-    "errorPasswordRules": "Password does not meet all requirements ❌",
-    "errorAlreadyExists": "Account already registered ❌",
-    "errorGeneric": "Something went wrong ❌"
+    "passwordRequirements": "Password must include at least 8 characters, an uppercase letter, a lowercase letter, a number, a special character."
   },
-  "signin": {
-    "title": "Welcome Back",
-    "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot Password?",
-    "signIn": "Sign In",
-    "signingIn": "Signing In...",
-    "or": "OR",
-    "continueGoogle": "Continue with Google",
-    "noAccount": "Don't have an account?",
-    "signUp": "Sign Up",
-    "errorInvalid": "Invalid Credentials",
-    "errorGeneric": "Something went wrong ❌"
-  }, 
-  "resetPassword": {
-    "title": "Reset Your Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password",
-    "resetPassword": "Reset Password",
-    "resetting": "Resetting...",
-    "success": "Password reset successfully ✅",
-    "errorInvalidLink": "Invalid or missing reset link ❌",
-    "errorMissingCredentials": "Missing reset credentials ❌",
-    "errorMismatch": "Passwords do not match ❌",
-    "errorRequirements": "Password does not meet all requirements ❌",
-    "errorGeneric": "Something went wrong ❌",
-    "passwordMustInclude": "Password must include {{rules}}."
+  "languages": {
+    "english": "English",
+    "amharic": "Amharic"
   },
-   "forgotPassword": {
-    "title": "Forgot Password",
-    "description": "Enter your email address and we’ll send you a link to reset your password.",
-    "email": "Email",
-    "sending": "Sending...",
-    "sendLink": "Send Reset Link",
-    "success": "Password reset link sent to your email ✅",
-    "error": "Error sending reset link ❌",
-    "backToSignIn": "← Back to Sign In"
+  "search": {
+    "placeholder": "Search news, topics, or people..."
+  },
+  "categories": {
+    "all": "All",
+    "world": "World",
+    "national": "National",
+    "politics": "Politics",
+    "business": "Business",
+    "economy": "Economy",
+    "finance": "Finance",
+    "technology": "Technology",
+    "science": "Science",
+    "health": "Health",
+    "environment": "Environment",
+    "education": "Education",
+    "law": "Law",
+    "crime": "Crime",
+    "weather": "Weather",
+    "opinion": "Opinion",
+    "sport": "Sport"
   }
 }
-
-  
-
