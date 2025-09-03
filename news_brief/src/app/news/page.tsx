@@ -7,6 +7,7 @@ import Sidebar from "@/components/siderbar/main";
 import ChatBot from "@/components/reusable_components/chatbot";
 import { ThemeContext } from "../contexts/ThemeContext";
 import Footer from "../Footer/page";
+import ProfileDropdown from "@/components/reusable_components/DropDownBar";
 
 const News = () => {
   const context = useContext(ThemeContext);
@@ -18,6 +19,7 @@ const News = () => {
 
   return (
     <>
+ 
       <ChatBot />
       <div
         className={`flex flex-col lg:flex-row gap-5 min-h-screen w-full transition-colors ${
