@@ -9,6 +9,7 @@ import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { getAccessToken } from "@/lib/api";
 import DarkMode from "../dark_mode/DarkMode";
 import ProfileDropdown from "./DropDownBar";
+import Link from "next/link";
 
 const token = getAccessToken();
 
@@ -55,7 +56,7 @@ export default function TopBar() {
   return (
     <>
       <header
-        className={`w-full sticky top-0 z-50 transition-colors ${
+        className={`w-full sticky  top-0 z-20 transition-colors ${
           theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
         }`}
       >
@@ -63,10 +64,10 @@ export default function TopBar() {
           {/* 🔹 First Row: Logo + Right Actions */}
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2">
               <img src="/logo.png" className="w-6" alt="logo" />
               <p className="font-semibold ">News Brief</p>
-            </div>
+            </Link>
 
             {/* Right Actions */}
             <div className="flex items-center gap-3 flex-shrink-0">
@@ -109,13 +110,12 @@ export default function TopBar() {
                   Login
                 </Button>
               ) : (
-             <ProfileDropdown 
-  onLogoutClick={() => {
-    setView("signin"); 
-    setOpen(true);     
-  }}
-/>
-
+                <ProfileDropdown
+                  onLogoutClick={() => {
+                    setView("signin");
+                    setOpen(true);
+                  }}
+                />
               )}
             </div>
           </div>
