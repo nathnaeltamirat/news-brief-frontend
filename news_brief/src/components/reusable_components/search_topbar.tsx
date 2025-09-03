@@ -8,6 +8,7 @@ import ForgotPasswordCard from "../../components/forgotpassword_components/forgo
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { getAccessToken } from "@/lib/api";
 import DarkMode from "../dark_mode/DarkMode";
+import ProfileDropdown from "./DropDownBar";
 
 const token = getAccessToken();
 
@@ -95,17 +96,21 @@ export default function TopBar() {
                 />
               </div>
 
-              {/* Login / Logout */}
-              <Button
-                variant="primary"
-                className="rounded-lg px-4 py-1.5 text-sm"
-                onClick={() => {
-                  setOpen(true);
-                  setView("signin");
-                }}
-              >
-                {token ? "Logout" : "Login"}
-              </Button>
+              {/* Login / Profile Dropdown */}
+              {!token ? (
+                <Button
+                  variant="primary"
+                  className="rounded-lg px-4 py-1.5 text-sm"
+                  onClick={() => {
+                    setOpen(true);
+                    setView("signin");
+                  }}
+                >
+                  Login
+                </Button>
+              ) : (
+                <ProfileDropdown />
+              )}
             </div>
           </div>
 
