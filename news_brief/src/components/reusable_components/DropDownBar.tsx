@@ -2,7 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { LogOut, User, Bookmark, Settings, Bell } from "lucide-react";
 
-function ProfileDropdown() {
+interface ProfileDropdownProps {
+  onLogoutClick: () => void;
+}
+
+function ProfileDropdown({ onLogoutClick }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +32,7 @@ function ProfileDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-gray-100  border border-gray-200  rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-52 bg-gray-100 border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
           <ul className="text-sm">
             <li>
               <Link href="/foryou" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
@@ -41,22 +45,23 @@ function ProfileDropdown() {
               </Link>
             </li>
             <li>
-              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
-                <Settings size={14} /> Settings
-              </Link>
-            </li>
-            <li>
               <Link href="/subscriptions" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
                 <Bell size={14} /> Subscriptions
               </Link>
             </li>
             <li>
-              <Link
-                href="/logout"
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 "
-              >
-                <LogOut size={14} className="text-red-600" /> Logout
+              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+                <Settings size={14} /> Settings
               </Link>
+            </li>
+            <li>
+              {/* Call the handler instead of navigating */}
+              <button
+                onClick={onLogoutClick}
+                className="w-full text-left flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50"
+              >
+                <LogOut size={14} /> Logout
+              </button>
             </li>
           </ul>
         </div>
