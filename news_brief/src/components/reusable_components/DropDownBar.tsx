@@ -28,15 +28,15 @@ function ProfileDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-52 bg-gray-50  border border-gray-200  rounded-lg shadow-lg z-50 overflow-hidden">
           <ul className="text-sm">
             <li>
-              <Link href="/for-you" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="/foryou" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
                 <User size={14} /> For You
               </Link>
             </li>
             <li>
-              <Link href="/saved" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+              <Link href="news/saved" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800">
                 <Bookmark size={14} /> Saved
               </Link>
             </li>
