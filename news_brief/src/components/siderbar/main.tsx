@@ -1,20 +1,32 @@
 "use client";
-import { useState, useContext } from "react";
+
+import { useState, useContext, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import DarkMode from "../dark_mode/DarkMode";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, Menu, Bell, LogIn } from "lucide-react";
 
 const Sidebar = () => {
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useState(true); // expanded by default
-  const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   const context = useContext(ThemeContext);
   if (!context) throw new Error("Sidebar must be used inside ThemeProvider");
   const { theme } = context;
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsExpanded(window.innerWidth >= 768); // Collapse sidebar on mobile
+    };
+
+    handleResize(); // Initial check
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const navItems = [
     {
@@ -88,37 +100,11 @@ const Sidebar = () => {
           fill="currentColor"
           viewBox="0 0 24 24"
         >
-          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.007 7.007 0 0 0-1.63-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.14.55-1.63.94l-2.39-.96a.5.5 0 0 0-.61.22L2.7 8.84a.5.5 0 0 0 .12.64l2.03 1.58c-.04.3-.06.62-.06.94s.02.64.06.94L2.82 14.52a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.68.22l2.39-.96c.49.39 1.04.7 1.63.94l.36 2.54c.05.25.25.42.5.42h3.84c.25 0 .45-.17.5-.42l.36-2.54c.59-.24 1.14-.55 1.63-.94l2.39.96c.25.12.54.02.68-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z" />
         </svg>
       ),
-    },
-    {
-      name: "Profile",
-      href: "/profile",
-      icon: (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-        </svg>
-      ),
-      children: [
-        { name: "Account", href: "/profile/account" },
-        { name: "Categories", href: "/profile/categories" },
-        { name: "Subscription", href: "/profile/subscription" },
-        { name: "Notifications", href: "/profile/notifications" },
-        { name: "Saved News", href: "/profile/saved" },
-      ],
     },
   ];
-
-  const toggleSubMenu = (name: string) => {
-    setOpenSubMenu(openSubMenu === name ? null : name);
-  };
 
   const sidebarBg =
     theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white";
@@ -127,76 +113,98 @@ const Sidebar = () => {
     theme === "light" ? "bg-gray-200 text-black" : "bg-gray-800 text-white";
 
   return (
-    <div
-      className={`${sidebarBg} min-h-screen shadow-md transition-all duration-300 ${
-        isExpanded ? "w-64" : "w-20"
-      }`}
-    >
-      <div className="flex items-center justify-between p-4">
-        <Image src="/logo.png" alt="Logo" width={36} height={36} />
-        {isExpanded && <h1 className="ml-2 text-2xl font-bold">News Brief</h1>}
+    <>
+      {/* Top Navbar on mobile */}
+      {isMobile && (
+        <div className="flex items-center justify-between p-3 border-b shadow-sm md:hidden">
+          {/* Left: Menu + NB Logo */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <Menu size={22} />
+            </button>
+            <div className="rounded bg-black text-white font-bold px-2 py-1 text-sm">
+              NB
+            </div>
+          </div>
 
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={`p-2 rounded-full transition-colors ${
-            theme === "light" ? "hover:bg-gray-200" : "hover:bg-gray-700"
-          }`}
-          title={isExpanded ? "Collapse sidebar" : "Expand sidebar"} // 👈 tooltip
-        >
-          {isExpanded ? (
-            <ChevronLeft size={20} className="text-gray-600" />
-          ) : (
-            <ChevronRight size={20} className="text-gray-600" />
-          )}
-        </button>
-      </div>
+          {/* Right: Icons + Login */}
+          <div className="flex items-center gap-2">
+            <button className="rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <Bell size={18} />
+            </button>
+            <button className="rounded-full p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+              <span className="text-sm font-medium">文A</span>
+            </button>
+            <Link href="/login">
+              <button className="bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-full flex items-center gap-1 text-sm font-medium shadow-sm">
+                <LogIn size={16} />
+                <span>Login</span>
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
 
-      <nav className="flex-1">
-        <ul className="mt-4">
-          {navItems.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.children && item.children.some((c) => pathname === c.href));
-            return (
-              <li key={item.name}>
+      {/* Sidebar */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ x: isMobile ? -260 : 0 }}
+            animate={{ x: 0 }}
+            exit={{ x: -260 }}
+            transition={{ duration: 0.3 }}
+            className={`${sidebarBg} fixed md:relative z-50 top-0 left-0 h-screen w-[260px] shadow-lg flex flex-col`}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-300">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-black text-white text-xs font-bold flex items-center justify-center rounded">
+                  NB
+                </div>
+                {!isMobile && <h1 className="text-xl font-bold">News Brief</h1>}
+              </div>
+              {!isMobile && (
                 <button
-                  onClick={() => item.children && toggleSubMenu(item.name)}
-                  className={`flex items-center w-full p-3 rounded-md transition-colors ${
-                    isActive ? activeBg : hoverBg
-                  }`}
+                  onClick={() => setIsExpanded(false)}
+                  className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                 >
-                  <span className="w-5 h-5 flex items-center justify-center">
-                    {item.icon}
-                  </span>
-                  {isExpanded && <span className="ml-3">{item.name}</span>}
+                  <ChevronLeft size={20} />
                 </button>
+              )}
+            </div>
 
-                {/* Submenu */}
-                {item.children && isExpanded && openSubMenu === item.name && (
-                  <ul className="ml-8 mt-1 space-y-1">
-                    {item.children.map((child) => {
-                      const isChildActive = pathname === child.href;
-                      return (
-                        <li key={child.name}>
-                          <Link
-                            href={child.href}
-                            className={`block px-4 py-2 rounded-md transition-colors ${
-                              isChildActive ? activeBg : hoverBg
-                            }`}
-                          >
-                            {child.name}
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    </div>
+            {/* Nav */}
+            <nav className="flex-1 overflow-y-auto p-2">
+              <ul className="space-y-1">
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center w-full p-3 rounded-lg transition-colors duration-200 ${
+                          isActive ? activeBg : hoverBg
+                        }`}
+                      >
+                        <span className="w-5 h-5 flex items-center justify-center">
+                          {item.icon}
+                        </span>
+                        <span className="ml-3 text-sm font-medium">
+                          {item.name}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

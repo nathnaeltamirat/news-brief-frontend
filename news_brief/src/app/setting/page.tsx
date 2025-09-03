@@ -1,285 +1,378 @@
 "use client";
-import React, { useContext, useState } from "react";
-import Navbar from "../../components/siderbar/setting";
-import { useRouter } from "next/navigation";
-import { ThemeContext } from "../contexts/ThemeContext";
+import Sidebar from "@/components/siderbar/main";
+import React, { useState } from "react";
+import { Newspaper, Podcast, Rss } from "lucide-react";
 
-export default function Settings() {
-  const [voiceType, setVoiceType] = useState("Male");
-  const [speed, setSpeed] = useState("Normal");
-  const [feedType, setFeedType] = useState("Feed");
-  const [autoTranslate, setAutoTranslate] = useState(false);
-  const [globalSources, setGlobalSources] = useState(false);
-  const [textSize, setTextSize] = useState("Medium");
-  const [highContrast, setHighContrast] = useState(false);
-  const [offlineMode, setOfflineMode] = useState(false);
+const SettingsPage = () => {
+  const [activeTab, setActiveTab] = useState<
+    "customization" | "account" | "categories" | "subscriptions"
+  >("account");
 
-  const [user, setUser] = useState<{ name: string } | null>({ name: "Meki" });
-  const context = useContext(ThemeContext);
-  if (!context)
-    throw new Error("ToggleButton must be used inside ThemeProvider");
-  const { theme } = context;
-  const router = useRouter();
+  const [tags, setTags] = useState(["Technology", "Climate", "AI"]);
+  const [newTag, setNewTag] = useState("");
 
-  const handleLogout = () => {
-    setUser(null);
-    router.push("/");
+  const [subscriptions, setSubscriptions] = useState([
+    {
+      id: 1,
+      name: "The Daily Journal",
+      icon: <Newspaper className="w-5 h-5" />,
+    },
+    { id: 2, name: "Tech Brief Weekly", icon: <Podcast className="w-5 h-5" /> },
+    { id: 3, name: "Global News RSS", icon: <Rss className="w-5 h-5" /> },
+  ]);
+  const [newSubscription, setNewSubscription] = useState("");
+
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const tabs = [
+    { id: "customization", label: "Customization" },
+    { id: "account", label: "Account" },
+    { id: "categories", label: "Categories" },
+    { id: "subscriptions", label: "Subscriptions" },
+  ];
+
+  const addTag = () => {
+    if (newTag.trim() !== "" && !tags.includes(newTag)) {
+      setTags([...tags, newTag]);
+      setNewTag("");
+    }
   };
 
-  // Toggle button helpers
-  const toggleButtonClasses = (isOn: boolean) =>
-    `relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-      isOn
-        ? theme === "light"
-          ? "bg-teal-500"
-          : "bg-sky-400"
-        : theme === "light"
-        ? "bg-gray-300"
-        : "bg-gray-700"
-    }`;
-
-  const toggleKnobClasses = (isOn: boolean) =>
-    `inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
-      isOn ? "translate-x-6" : "translate-x-1"
-    }`;
-
-  // Selection buttons
-  const selectionButtonClasses = (selected: boolean) =>
-    selected
-      ? theme === "light"
-        ? "bg-teal-500 text-white shadow hover:shadow-md border-transparent"
-        : "bg-sky-400 text-white shadow hover:shadow-md border-transparent"
-      : theme === "light"
-      ? "bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:shadow-sm"
-      : "bg-gray-700 text-white border-transparent hover:bg-gray-600 hover:shadow-sm";
+  const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
+  const addSubscription = () => {
+    if (newSubscription.trim() !== "") {
+      setSubscriptions([
+        ...subscriptions,
+        {
+          id: Date.now(),
+          name: newSubscription,
+          icon: <Newspaper className="w-5 h-5" />,
+        },
+      ]);
+      setNewSubscription("");
+    }
+  };
+  const removeSubscription = (id: number) =>
+    setSubscriptions(subscriptions.filter((s) => s.id !== id));
 
   return (
-    <div
-      className={`flex transition-colors ${
-        theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"
-      }`}
-    >
-      <Navbar />
-
-      <main
-        className={`lg:ml-65 w-full p-4 lg:p-8 space-y-10 scroll-smooth min-h-screen lg:mt-0 mt-20 transition-colors ${
-          theme === "light" ? "bg-gray-50 text-black" : "bg-gray-800 text-white"
-        }`}
-      >
-        {/* Language & Translation */}
-        <section
-          id="language"
-          className={`p-6 rounded-2xl max-w-3xl space-y-4 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">Language & Translation</h2>
+    <div className="flex flex-col md:flex-row min-h-screen bg-white">
+      <Sidebar />
+      <div className="flex-1 pt-6 md:pt-10 px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4 md:gap-0">
           <div>
-            <label className="block text-sm font-medium">App Language</label>
-            <select className="mt-2 p-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
-              <option>English</option>
-              <option>Amharic</option>
-            </select>
+            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+              Settings
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Manage your preferences, account details, categories, and
+              subscriptions.
+            </p>
           </div>
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="text-sm font-medium">Auto-translate summaries</p>
-              <p className="text-xs text-gray-500">
-                Automatically translate news summaries to your preferred language
-              </p>
-            </div>
+          <button className="bg-[#1E5A47] text-white px-5 py-2 rounded-lg hover:bg-[#174536] transition w-full md:w-auto">
+            Save changes
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex overflow-x-auto space-x-3 mb-6 bg-gray-100 p-2 rounded-xl">
+          {tabs.map((tab) => (
             <button
-              onClick={() => setAutoTranslate(!autoTranslate)}
-              className={toggleButtonClasses(autoTranslate)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition flex-shrink-0 ${
+                activeTab === tab.id
+                  ? "bg-white text-black shadow-sm"
+                  : "text-gray-600 hover:text-black"
+              }`}
             >
-              <span className={toggleKnobClasses(autoTranslate)} />
+              {tab.label}
             </button>
-          </div>
-        </section>
+          ))}
+        </div>
 
-        {/* Voice Settings */}
-        <section
-          id="voice"
-          className={`p-6 rounded-2xl max-w-3xl space-y-6 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">Voice Settings</h2>
-          <div>
-            <p className="text-sm font-medium mb-2">Voice Type</p>
-            <div className="grid grid-cols-3 gap-3">
-              {["Male", "Female", "Neutral"].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setVoiceType(t)}
-                  className={`w-full py-3 rounded-lg border transition ${selectionButtonClasses(
-                    voiceType === t
-                  )}`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-2">Speaking Speed</p>
-            <div className="grid grid-cols-3 gap-3">
-              {["Slow", "Normal", "Fast"].map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSpeed(s)}
-                  className={`w-full py-3 rounded-lg border transition ${selectionButtonClasses(
-                    speed === s
-                  )}`}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Customization Tab */}
+        {activeTab === "customization" && (
+          <div className="space-y-6">
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
+              <h2 className="text-lg font-medium text-gray-900">
+                Customization
+              </h2>
 
-        {/* Content Preferences */}
-        <section
-          id="content"
-          className={`p-6 rounded-2xl max-w-3xl space-y-6 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">Content Preferences</h2>
-          <div>
-            <p className="text-sm font-medium mb-2">Default Feed Type</p>
-            <div className="grid grid-cols-2 gap-3">
-              {["Feed", "For You"].map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFeedType(f)}
-                  className={`w-full py-3 rounded-lg border transition ${selectionButtonClasses(
-                    feedType === f
-                  )}`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="text-sm font-medium">Include Global Sources</p>
-              <p className="text-xs text-gray-500">
-                Show international news alongside local sources
-              </p>
-            </div>
-            <button
-              onClick={() => setGlobalSources(!globalSources)}
-              className={toggleButtonClasses(globalSources)}
-            >
-              <span className={toggleKnobClasses(globalSources)} />
-            </button>
-          </div>
-        </section>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Theme
+                </label>
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30">
+                  <option value="system">System Default</option>
+                  <option value="light">Light</option>
+                  <option value="dark">Dark</option>
+                </select>
+              </div>
 
-        {/* Accessibility */}
-        <section
-          id="accessibility"
-          className={`p-6 rounded-2xl max-w-3xl space-y-6 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">Accessibility</h2>
-          <div>
-            <p className="text-sm font-medium mb-2">Text Size</p>
-            <div className="grid grid-cols-3 gap-3">
-              {["Small", "Medium", "Large"].map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setTextSize(size)}
-                  className={`w-full py-3 rounded-lg border transition ${selectionButtonClasses(
-                    textSize === size
-                  )}`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="text-sm font-medium">High contrast mode</p>
-              <p className="text-xs text-gray-500">
-                Improve text readability with higher contrast
-              </p>
-            </div>
-            <button
-              onClick={() => setHighContrast(!highContrast)}
-              className={toggleButtonClasses(highContrast)}
-            >
-              <span className={toggleKnobClasses(highContrast)} />
-            </button>
-          </div>
-        </section>
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Layout
+                </label>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <label className="flex items-center space-x-2">
+                    <input type="radio" name="layout" value="compact" />
+                    <span className="text-sm text-gray-700 accent-[#1E5A47]">
+                      Compact
+                    </span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input type="radio" name="layout" value="comfortable" />
+                    <span className="text-sm text-gray-700 accent-[#1E5A47]">
+                      Comfortable
+                    </span>
+                  </label>
+                </div>
+              </div> */}
 
-        {/* General */}
-        <section
-          id="general"
-          className={`p-6 rounded-2xl max-w-3xl space-y-4 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          <h2 className="text-lg font-semibold">General</h2>
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="text-sm font-medium">Offline mode</p>
-              <p className="text-xs text-gray-500">
-                Download articles for offline reading
-              </p>
-            </div>
-            <button
-              onClick={() => setOfflineMode(!offlineMode)}
-              className={toggleButtonClasses(offlineMode)}
-            >
-              <span className={toggleKnobClasses(offlineMode)} />
-            </button>
-          </div>
-        </section>
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Font Size
+                </label>
+                <input
+                  type="range"
+                  min="12"
+                  max="20"
+                  defaultValue="16"
+                  className="w-full accent-[#1E5A47]"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Adjust UI font size
+                </p>
+              </div> */}
 
-        {/* Account / User */}
-        <section
-          id="account"
-          className={`p-6 rounded-2xl max-w-3xl space-y-4 transition-colors ${
-            theme === "light"
-              ? "bg-white text-black shadow-lg"
-              : "bg-gray-900 text-white shadow-[0_10px_25px_rgba(0,0,0,0.5)]"
-          }`}
-        >
-          {user ? (
-            <>
-              <h2 className="text-lg font-semibold">User Full Name</h2>
-              <div className="flex justify-between items-center p-4 border rounded-lg bg-red-100">
-                <span className="text-gray-800 font-medium">{user.name}</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">Show Avatars</span>
+                <input
+                  type="checkbox"
+                  className="form-checkbox h-5 w-5 text-black rounded"
+                />
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* Account Tab */}
+        {activeTab === "account" && (
+          <div className="space-y-6">
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
+                Account Details
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Full Name
+                  </label>
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Enter full name"
+                      className="w-full focus:outline-none"
+                    />
+                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter email"
+                      className="w-full focus:outline-none"
+                    />
+                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Username
+                  </label>
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                    <input
+                      type="text"
+                      placeholder="Enter username"
+                      className="w-full focus:outline-none"
+                    />
+                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
+                  </div>
+                </div>
+
+                {/* <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone Number
+                  </label>
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                    <input
+                      type="tel"
+                      placeholder="+251 912 345 678"
+                      className="w-full focus:outline-none"
+                    />
+                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
+                  </div>
+                </div> */}
+
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full focus:outline-none"
+                    />
+                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <span className="font-medium text-gray-800">
+                  Account Created:
+                </span>{" "}
+                Jan 12, 2023
+              </div>
+
+              <div className="border border-gray-200 bg-gray-50 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-semibold text-red-600">
+                    Danger Zone
+                  </h3>
+                  <button className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm">
+                    Delete Account
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600">
+                  This action is irreversible
+                </p>
+              </div>
+            </section>
+          </div>
+        )}
+
+        {/* Categories Tab */}
+        {activeTab === "categories" && (
+          <div className="space-y-6">
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Favorited Tags
+              </h2>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-2 bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full text-sm font-medium"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => removeTag(tag)}
+                      className="text-gray-500 hover:text-gray-800"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </section>
+
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h3 className="text-md font-medium text-gray-900 mb-3">
+                Add New Tags
+              </h3>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Search tags"
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30"
+                />
                 <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                  onClick={addTag}
+                  className="bg-[#1E5A47] text-white px-4 py-2 rounded-lg hover:bg-[#174536] transition w-full sm:w-auto"
                 >
-                  Logout
+                  + Add
                 </button>
               </div>
-            </>
-          ) : (
-            <p className="text-gray-500">No user logged in.</p>
-          )}
-        </section>
-      </main>
+            </section>
+          </div>
+        )}
+
+        {/* Subscriptions Tab */}
+        {activeTab === "subscriptions" && (
+          <div className="space-y-6">
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Your Subscriptions
+              </h2>
+              <div className="space-y-3">
+                {subscriptions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border border-gray-200 rounded-xl px-4 py-3 gap-2 sm:gap-0"
+                  >
+                    <div className="flex items-center gap-3">
+                      {sub.icon}
+                      <span className="text-gray-800 font-medium">
+                        {sub.name}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => removeSubscription(sub.id)}
+                      className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-100 w-full sm:w-auto"
+                    >
+                      – Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="border border-gray-200 bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+              <h3 className="text-md font-medium text-gray-900 mb-3">
+                Search New News Media
+              </h3>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <input
+                  type="text"
+                  value={newSubscription}
+                  onChange={(e) => setNewSubscription(e.target.value)}
+                  placeholder="Search publications, podcasts, RSS"
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30"
+                />
+                <button
+                  onClick={addSubscription}
+                  className="bg-[#1E5A47] text-white px-4 py-2 rounded-lg hover:bg-[#174536] transition w-full sm:w-auto"
+                >
+                  + Add
+                </button>
+              </div>
+            </section>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default SettingsPage;
