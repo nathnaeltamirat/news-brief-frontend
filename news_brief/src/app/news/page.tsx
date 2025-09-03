@@ -31,7 +31,7 @@ const News = () => {
             <TopBar />
           </div>
           <NewsComponent />
-          <ProfileDropdown/>
+     
           {/* <Footer /> */}
         </div>
       </div>
