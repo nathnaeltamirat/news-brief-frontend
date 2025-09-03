@@ -74,7 +74,7 @@ const SettingsPage = () => {
               subscriptions.
             </p>
           </div>
-          <button className="bg-[#1E5A47] text-white px-5 py-2 rounded-lg hover:bg-[#174536] transition w-full md:w-auto">
+          <button className="bg-[#0B66FF] text-white px-5 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full md:w-auto">
             Save changes
           </button>
         </div>
@@ -87,7 +87,7 @@ const SettingsPage = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition flex-shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-white text-black shadow-sm"
+                  ? "bg-[#EAF2FF] text-black shadow-sm hover:bg-[#EAF2FF] hover:text-black"
                   : "text-gray-600 hover:text-black"
               }`}
             >
@@ -108,7 +108,7 @@ const SettingsPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Theme
                 </label>
-                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30">
+                <select className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]">
                   <option value="system">System Default</option>
                   <option value="light">Light</option>
                   <option value="dark">Dark</option>
@@ -145,7 +145,7 @@ const SettingsPage = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Enter full name"
-                      className="w-full focus:outline-none"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                     />
                     <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
                   </div>
@@ -161,7 +161,7 @@ const SettingsPage = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter email"
-                      className="w-full focus:outline-none"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                     />
                     <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
                   </div>
@@ -175,7 +175,7 @@ const SettingsPage = () => {
                     <input
                       type="text"
                       placeholder="Enter username"
-                      className="w-full focus:outline-none"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                     />
                     <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
                   </div>
@@ -191,7 +191,7 @@ const SettingsPage = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full focus:outline-none"
+                      className="w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                     />
                     <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
                   </div>
@@ -257,11 +257,11 @@ const SettingsPage = () => {
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
                   placeholder="Search tags"
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30"
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                 />
                 <button
                   onClick={addTag}
-                  className="bg-[#1E5A47] text-white px-4 py-2 rounded-lg hover:bg-[#174536] transition w-full sm:w-auto"
+                  className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
                 >
                   + Add
                 </button>
@@ -291,7 +291,7 @@ const SettingsPage = () => {
                     </div>
                     <button
                       onClick={() => removeSubscription(sub.id)}
-                      className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-gray-100 w-full sm:w-auto"
+                      className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-[#EAF2FF] w-full sm:w-auto"
                     >
                       – Remove
                     </button>
@@ -310,11 +310,11 @@ const SettingsPage = () => {
                   value={newSubscription}
                   onChange={(e) => setNewSubscription(e.target.value)}
                   placeholder="Search publications, podcasts, RSS"
-                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#1E5A47]/30"
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#EAF2FF]"
                 />
                 <button
                   onClick={addSubscription}
-                  className="bg-[#1E5A47] text-white px-4 py-2 rounded-lg hover:bg-[#174536] transition w-full sm:w-auto"
+                  className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
                 >
                   + Add
                 </button>
