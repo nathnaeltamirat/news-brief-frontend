@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import DarkMode from "../dark_mode/DarkMode";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -137,9 +138,16 @@ const Sidebar = () => {
 
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="p-2 rounded hover:bg-gray-300"
+          className={`p-2 rounded-full transition-colors ${
+            theme === "light" ? "hover:bg-gray-200" : "hover:bg-gray-700"
+          }`}
+          title={isExpanded ? "Collapse sidebar" : "Expand sidebar"} // 👈 tooltip
         >
-          {isExpanded ? "<" : ">"}
+          {isExpanded ? (
+            <ChevronLeft size={20} className="text-gray-600" />
+          ) : (
+            <ChevronRight size={20} className="text-gray-600" />
+          )}
         </button>
       </div>
 

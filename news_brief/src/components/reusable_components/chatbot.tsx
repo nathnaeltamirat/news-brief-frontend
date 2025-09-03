@@ -1,5 +1,6 @@
 "use client";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { MessageCircle } from "lucide-react";
 import { useState, useEffect, useContext } from "react";
 
 interface ChatBotProps {
@@ -79,24 +80,11 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
     <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6 z-50">
       {!isOpen && (
         <button
+          className="fixed bottom-6 right-6 flex items-center gap-2 text-white rounded-full px-5 py-3 shadow-lg transition hover:opacity-90"
+          style={{ backgroundColor: "#1E5A47" }}
           onClick={() => setIsOpen(true)}
-          className="bg-black text-white px-3 py-2 lg:px-4 lg:py-3 rounded-full hover:bg-gray-800 transition-all duration-300 flex items-center justify-center shadow-xl hover:shadow-2xl text-sm font-medium"
-          aria-label="Open chat"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 lg:h-8 lg:w-8"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
+          <MessageCircle size={18} /> Chatbot
         </button>
       )}
 
@@ -149,8 +137,6 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
               </button>
             </div>
           </div>
-
-          {/* Messages Container - More height for messages */}
           <div className="flex-1 p-3 overflow-y-auto bg-gray-50">
             <div className="space-y-3">
               {messages.map((message) => (
