@@ -3,10 +3,10 @@ import Sidebar from "@/components/siderbar/main";
 import React, { useState } from "react";
 import { Newspaper, Podcast, Rss } from "lucide-react";
 
+type TabId = "customization" | "account" | "categories" | "subscriptions";
+
 const SettingsPage = () => {
-  const [activeTab, setActiveTab] = useState<
-    "customization" | "account" | "categories" | "subscriptions"
-  >("account");
+  const [activeTab, setActiveTab] = useState<TabId>("account");
 
   const [tags, setTags] = useState(["Technology", "Climate", "AI"]);
   const [newTag, setNewTag] = useState("");
@@ -26,7 +26,7 @@ const SettingsPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const tabs = [
+  const tabs: { id: TabId; label: string }[] = [
     { id: "customization", label: "Customization" },
     { id: "account", label: "Account" },
     { id: "categories", label: "Categories" },
@@ -41,6 +41,7 @@ const SettingsPage = () => {
   };
 
   const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
+
   const addSubscription = () => {
     if (newSubscription.trim() !== "") {
       setSubscriptions([
@@ -54,6 +55,7 @@ const SettingsPage = () => {
       setNewSubscription("");
     }
   };
+
   const removeSubscription = (id: number) =>
     setSubscriptions(subscriptions.filter((s) => s.id !== id));
 
@@ -82,7 +84,7 @@ const SettingsPage = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 text-sm font-medium rounded-lg transition flex-shrink-0 ${
                 activeTab === tab.id
                   ? "bg-white text-black shadow-sm"
@@ -112,42 +114,6 @@ const SettingsPage = () => {
                   <option value="dark">Dark</option>
                 </select>
               </div>
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Layout
-                </label>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                  <label className="flex items-center space-x-2">
-                    <input type="radio" name="layout" value="compact" />
-                    <span className="text-sm text-gray-700 accent-[#1E5A47]">
-                      Compact
-                    </span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="radio" name="layout" value="comfortable" />
-                    <span className="text-sm text-gray-700 accent-[#1E5A47]">
-                      Comfortable
-                    </span>
-                  </label>
-                </div>
-              </div> */}
-
-              {/* <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Font Size
-                </label>
-                <input
-                  type="range"
-                  min="12"
-                  max="20"
-                  defaultValue="16"
-                  className="w-full accent-[#1E5A47]"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Adjust UI font size
-                </p>
-              </div> */}
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-700">Show Avatars</span>
@@ -214,20 +180,6 @@ const SettingsPage = () => {
                     <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
                   </div>
                 </div>
-
-                {/* <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2">
-                    <input
-                      type="tel"
-                      placeholder="+251 912 345 678"
-                      className="w-full focus:outline-none"
-                    />
-                    <span className="ml-2 text-gray-500 cursor-pointer">✎</span>
-                  </div>
-                </div> */}
 
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
