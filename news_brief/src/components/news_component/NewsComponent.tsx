@@ -42,8 +42,52 @@ export default function NewsComponent() {
 
   const handleNewsClick = (newsId: string) => router.push(`/news/${newsId}`);
 
-  if (loading) return <p className="text-center py-10">Loading news...</p>;
-  if (errorMessage) return <p className="text-center py-10 text-red-500">Error: {errorMessage}</p>;
+  if (loading)
+    return (
+      <div className="w-full max-w-7xl mx-auto px-4 space-y-12">
+        {/* Today Section */}
+        <SectionHeader title="Today" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10">
+          <div className="md:col-span-2">
+            <FeaturedTodaySkeleton />
+          </div>
+          <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-200">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SmallStorySkeleton key={i} />
+            ))}
+          </div>
+        </div>
+
+        {/* Trending Section */}
+        <SectionHeader title="Trending" />
+        <div className="flex gap-6 overflow-x-auto">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <TrendingCardSkeleton key={i} />
+          ))}
+        </div>
+
+        {/* Arts Section */}
+        <SectionHeader title="Arts" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+          <FeaturedTodaySkeleton />
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SmallStorySkeleton key={i} />
+          ))}
+        </div>
+
+        {/* Business Section */}
+        <SectionHeader title="Business" />
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+          <FeaturedTodaySkeleton />
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SmallStorySkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    );
+
+  if (errorMessage)
+    return <p className="text-center py-10 text-red-500">Error: {errorMessage}</p>;
 
   return (
     <div
@@ -51,18 +95,9 @@ export default function NewsComponent() {
         theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-white text-gray-900"
       }`}
     >
-      {/* === Breaking Bar ===
-      {news?.[0] && (
-        <div className="bg-gray-900 text-white text-sm py-2 px-4 rounded-md shadow-md">
-          <span className="font-semibold text-red-400">Breaking:</span>{" "}
-          {news[0].title}
-        </div>
-      )} */}
-
       {/* === Today Section === */}
       <SectionHeader title="Today" />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 border-b border-gray-200 dark:border-gray-700 pb-10">
-        {/* Featured big story */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 border-b border-gray-200 dark:border-gray-200 pb-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -71,9 +106,7 @@ export default function NewsComponent() {
         >
           <FeaturedToday news={topNews?.[0]} onClick={handleNewsClick} />
         </motion.div>
-
-        {/* Stacked smaller stories */}
-        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-200">
           {topNews?.slice(1, 4).map((story, i) => (
             <motion.div
               key={story.id}
@@ -89,7 +122,7 @@ export default function NewsComponent() {
 
       {/* === Trending Section === */}
       <SectionHeader title="Trending" />
-      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 border-b border-gray-200 dark:border-gray-700 pb-10">
+      <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 border-b border-gray-200 dark:border-gray-200 pb-10">
         <div className="flex gap-6 min-w-max">
           {news?.slice(0, 6).map((item) => (
             <div key={item.id} className="w-64 flex-shrink-0">
@@ -104,6 +137,44 @@ export default function NewsComponent() {
 
       {/* === Business Section === */}
       <NewsGrid title="Business" data={businessNews} onClick={handleNewsClick} />
+    </div>
+  );
+}
+
+/* --- Skeleton Loader Components --- */
+function Skeleton({ className }: { className?: string }) {
+  return (
+    <div className={`bg-gray-100 dark:bg-gray-200 rounded-md ${className}`} />
+  );
+}
+
+function FeaturedTodaySkeleton() {
+  return (
+    <div className="space-y-4">
+      <Skeleton className="w-full h-80 rounded-lg" />
+      <Skeleton className="w-3/4 h-6" />
+      <Skeleton className="w-full h-4" />
+      <Skeleton className="w-2/3 h-4" />
+    </div>
+  );
+}
+
+function SmallStorySkeleton() {
+  return (
+    <div className="py-4 space-y-2">
+      <Skeleton className="w-1/3 h-3" />
+      <Skeleton className="w-2/3 h-4" />
+      <Skeleton className="w-full h-3" />
+    </div>
+  );
+}
+
+function TrendingCardSkeleton() {
+  return (
+    <div className="w-64 flex-shrink-0 space-y-2">
+      <Skeleton className="w-full h-28 rounded-lg" />
+      <Skeleton className="w-3/4 h-4" />
+      <Skeleton className="w-full h-3" />
     </div>
   );
 }
@@ -141,7 +212,7 @@ function FeaturedToday({ news, onClick }: { news?: News; onClick: (id: string) =
         </p>
         <h2 className="text-2xl font-bold mb-3 hover:text-blue-600">{news.title}</h2>
         <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3 leading-relaxed">
-          {news.description} 
+          {news.description}
         </p>
         <p className="mt-3 text-blue-600 text-xs font-medium">Continue Reading...</p>
       </div>
@@ -249,16 +320,16 @@ function NewsGrid({
   return (
     <>
       <SectionHeader title={title} />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 border-b border-gray-200 dark:border-gray-700 pb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 border-b border-gray-200 dark:border-gray-400 pb-8">
         <div className="md:col-span-2 lg:col-span-1">
           <FeaturedStory news={data?.[0]} onClick={onClick} />
         </div>
-        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-400">
           {data?.slice(1, 4).map((story) => (
             <SmallStory key={story.id} story={story} onClick={onClick} />
           ))}
         </div>
-        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="flex flex-col divide-y divide-gray-200 dark:divide-gray-400">
           {data?.slice(4, 7).map((story) => (
             <SmallStory key={story.id} story={story} onClick={onClick} />
           ))}
