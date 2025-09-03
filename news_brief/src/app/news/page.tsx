@@ -6,7 +6,7 @@ import TopBar from "@/components/reusable_components/search_topbar";
 import Sidebar from "@/components/siderbar/main";
 import ChatBot from "@/components/reusable_components/chatbot";
 import { ThemeContext } from "../contexts/ThemeContext";
-import Footer from "../Footer/page";
+
 import ProfileDropdown from "@/components/reusable_components/DropDownBar";
 import DarkMode from "@/components/dark_mode/DarkMode";
 
@@ -32,7 +32,7 @@ const News = () => {
           </div>
           <NewsComponent />
      
-          {/* <Footer /> */}
+          
         </div>
       </div>
     </>
