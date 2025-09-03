@@ -1,13 +1,15 @@
 "use client";
 import React, { useContext, useState } from "react";
-import { Search, Mic, Bell, Globe } from "lucide-react";
+import { Bell, Globe, Search, Mic } from "lucide-react";
 import Button from "./Button";
 import SignInCard from "../signin_components/siginCard";
 import SignUpCard from "../signup_components/signupCard";
 import ForgotPasswordCard from "../../components/forgotpassword_components/forgotpassCard";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { getAccessToken } from "@/lib/api";
+
 const token = getAccessToken();
+
 export default function TopBar() {
   const context = useContext(ThemeContext);
   if (!context) throw new Error("ToggleButton must be used inside ThemeProvider");
@@ -15,72 +17,124 @@ export default function TopBar() {
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"signin" | "signup" | "forgot">("signin");
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const categories = [
+    "All",
+    "World",
+    "National",
+    "Politics",
+    "Business",
+    "Economy",
+    "Finance",
+    "Technology",
+    "Science",
+    "Health",
+    "Environment",
+    "Education",
+    "Law",
+    "Crime",
+    "Weather",
+    "Opinion",
+  ];
 
   const bgInput =
-    theme === "light" ? "bg-gray-100 text-black" : "bg-gray-800 text-white";
+    theme === "light"
+      ? "bg-gray-100 text-black placeholder-gray-500"
+      : "bg-gray-800 text-white placeholder-gray-400";
+
   const bgBtn =
     theme === "light"
-      ? "bg-gray-100 hover:bg-gray-200 text-black"
-      : "bg-gray-700 hover:bg-gray-600 text-white";
+      ? "hover:bg-gray-100 text-black"
+      : "hover:bg-gray-700 text-white";
 
   return (
     <>
       <header
-        className={`w-full transition-colors ${
+        className={`w-full sticky top-0 z-50 transition-colors ${
           theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
         }`}
       >
-        <div className="max-w-7xl mx-auto flex flex-col px-2 py-1 gap-2">
-          <div className="flex items-center justify-end gap-2">
-            <button className={`p-1.5 sm:p-2 rounded-full ${bgBtn}`}>
-              <Bell size={16} />
-            </button>
-
-            <div
-              className={`flex items-center border rounded px-1.5 sm:px-2 py-0.5 sm:py-1 ${bgInput}`}
-            >
-              <Globe className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1 flex-shrink-0" />
-              <select
-                className={`bg-transparent outline-none text-xs sm:text-sm ${
-                  theme === "light" ? "text-black" : "text-white"
-                }`}
-              >
-                <option value="English">English</option>
-                <option value="Amharic">Amharic</option>
-              </select>
+        <div className="max-w-7xl mx-auto px-4 py-3 space-y-3">
+          {/* 🔹 First Row: Topics + Right Actions */}
+          <div className="flex items-center justify-between">
+            {/* Topics (Scrollable Tabs) */}
+            <div className="flex gap-6 text-sm font-medium overflow-x-auto scrollbar-hide">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`relative whitespace-nowrap pb-2 transition-colors ${
+                    activeCategory === cat
+                      ? "text-blue-600 font-semibold"
+                      : "text-gray-500 hover:text-blue-500"
+                  }`}
+                >
+                  {cat}
+                  {activeCategory === cat && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
+                  )}
+                </button>
+              ))}
             </div>
-              
-            <Button
-              variant="primary"
-              className="rounded-lg px-3 py-1 text-sm"
-              onClick={() => {
-                setOpen(true);
-                setView("signin"); 
-              }}
-            >
-              {token ? "Logout" : "Login"}
-              
-            </Button>
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-3 ml-6 flex-shrink-0">
+              {/* Notifications */}
+              <button
+                className={`p-2 rounded-full ${bgBtn}`}
+                aria-label="Notifications"
+              >
+                <Bell size={18} />
+              </button>
+
+              {/* Language dropdown (with globe) */}
+              <div className="relative">
+                <select
+                  className={`appearance-none bg-transparent pr-6 cursor-pointer text-sm outline-none ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
+                  defaultValue="eng"
+                >
+                  <option value="eng">English</option>
+                  <option value="amh">Amharic</option>
+                </select>
+                <Globe
+                  size={16}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none"
+                />
+              </div>
+
+              {/* Login / Logout */}
+              <Button
+                variant="primary"
+                className="rounded-lg px-4 py-1.5 text-sm"
+                onClick={() => {
+                  setOpen(true);
+                  setView("signin");
+                }}
+              >
+                {token ? "Logout" : "Login"}
+              </Button>
+            </div>
           </div>
 
-          {/* Bottom row - Search bar */}
-          <div className="w-full mt-2">
-            <div
-              className={`flex items-center rounded-full px-3 sm:px-4 py-2 sm:py-1.5 ${bgInput}`}
-            >
-              <Search size={16} className="text-gray-500 mr-2 flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Search topics, people, places ..."
-                className="bg-transparent outline-none flex-1 text-xs sm:text-sm"
-              />
-              <Mic size={16} className="text-gray-500 cursor-pointer flex-shrink-0" />
-            </div>
+          {/* 🔹 Second Row: Search Bar */}
+          <div
+            className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
+          >
+            <Search size={18} className="mr-2 text-gray-500 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Search news, topics, or people..."
+              className="bg-transparent outline-none flex-1 text-sm"
+            />
+            <Mic size={18} className="text-gray-500 cursor-pointer flex-shrink-0" />
           </div>
         </div>
       </header>
 
-      {/* Modal */}
+      {/* Auth Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           {view === "signin" && (

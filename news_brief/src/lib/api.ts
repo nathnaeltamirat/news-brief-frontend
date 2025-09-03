@@ -10,6 +10,7 @@ export interface News {
   topics: string[];
   source: string;
   posted_at: string;
+  image_url:string
 }
 
 export interface User {
@@ -147,24 +148,213 @@ class ApiClient {
     // Redirect user to backend Google login route
     window.location.href = `${this.baseURL}/auth/google/login`;
   }
-  async getTopNews(): Promise<News[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: "1",
-            title:
-              "Global markets rally as major central banks signal steady policy",
-            description:
-              "What’s happening here: A synchronized stance on rates boosted investor confidence, with energy and tech leading gains.",
-            topics: ["Tech", "AI"],
-            source: "Reuters",
-            posted_at: "just Now",
-          },
-        ]);
-      }, 500);
-    });
+
+  async getArtsNews(): Promise<News[]> {
+    const news = await this.getDummyNews();
+    return news.filter((n) => n.topics.includes("Arts"));
   }
+
+  async getBusinessNews(): Promise<News[]> {
+    const news = await this.getDummyNews();
+    return news.filter((n) => n.topics.includes("Business"));
+  }
+  async  getTopNews(): Promise<News[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          id: "1",
+          title: "Indonesia football crush: How the disaster unfolded",
+          description:
+            "Indonesia’s worst sports disaster left scores dead after chaos erupted at a football match.",
+          topics: ["Arts"],
+          source: "BBC",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/football/600/400",
+        },
+        {
+          id: "2",
+          title: "Philippines lottery: Questions raised as hundreds win jackpot",
+          description:
+            "A lottery in the Philippines with 433 jackpot winners has sparked widespread suspicion.",
+          topics: ["Business"],
+          source: "Reuters",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/lottery/600/400",
+        },
+        {
+          id: "3",
+          title: "Biden tells Al Sharpton he will run for president again in 2024",
+          description:
+            "President Biden has privately confirmed his intention to run for reelection.",
+          topics: ["Arts"],
+          source: "AP News",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/biden/600/400",
+        },
+        {
+          id: "4",
+          title: "Covid hospitalization hot spots across the U.S., in five charts",
+          description:
+            "Covid-19 hospitalizations are climbing again, with sharp increases in several states.",
+          topics: ["HArts"],
+          source: "NY Times",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/covid/600/400",
+        },
+      ]);
+    }, 500);
+  });
+}
+
+async getDummyNews(): Promise<News[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([
+        // === Trending ===
+        {
+          id: "5",
+          title: "Fall back into fitness with this 31-day walking plan",
+          description:
+            "A change of seasons is the perfect time to start fresh — a simple 30-minute daily walk can improve your health.",
+          topics: ["Arts"],
+          source: "Healthline",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/fitness/600/400",
+        },
+        {
+          id: "6",
+          title: "Apple will manufacture iPhone 14 in India",
+          description:
+            "Apple will make its iPhone 14 in India, expanding production outside China.",
+          topics: ["Arts"],
+          source: "TechCrunch",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/iphone/600/400",
+        },
+        {
+          id: "7",
+          title: "Virgin Atlantic adopts gender-neutral uniform policy",
+          description:
+            "Virgin Atlantic will allow cabin crew to choose which uniform to wear, regardless of gender.",
+          topics: ["Business"],
+          source: "CNN",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/virgin/600/400",
+        },
+        {
+          id: "8",
+          title: "Next year’s Met Gala theme revealed",
+          description:
+            "Organizers announced the 2023 Met Gala theme: celebrating the works of Karl Lagerfeld.",
+          topics: ["Arts","Business"],
+          source: "Vogue",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/metgala/600/400",
+        },
+
+        // === Arts ===
+        {
+          id: "9",
+          title: "Vermeer at the National Gallery in Washington, DC declared a fake",
+          description:
+            "Art experts discovered that a painting long attributed to Vermeer is not authentic.",
+          topics: ["Arts"],
+          source: "Guardian",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/vermeer/600/400",
+        },
+        {
+          id: "10",
+          title: "10 most famous paintings in the world",
+          description:
+            "From Mona Lisa to The Starry Night — discover the world’s most iconic masterpieces.",
+          topics: ["Arts"],
+          source: "History Today",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/paintings/600/400",
+        },
+        {
+          id: "11",
+          title: "Jurassic dinosaur fossil will go up for auction in Paris",
+          description:
+            "A rare Jurassic fossil is expected to fetch millions at an upcoming Paris auction.",
+          topics: ["Science", "Arts"],
+          source: "Smithsonian",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/dinosaur/600/400",
+        },
+
+        // === Business ===
+        {
+          id: "12",
+          title: "Elon Musk: Twitter won’t ‘take yes for an answer’",
+          description:
+            "Elon Musk continues to clash with Twitter ahead of the acquisition deal deadline.",
+          topics: ["Business","Arts"],
+          source: "WSJ",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/musk/600/400",
+        },
+        {
+          id: "13",
+          title: "Samsung warns of 32% hit to profits on chip slump",
+          description:
+            "Global chip demand slowdown impacts Samsung’s earnings outlook.",
+          topics: ["Business", "Technology"],
+          source: "Bloomberg",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/samsung/600/400",
+        },
+        {
+          id: "14",
+          title:
+            "UK declines climate warnings with new oil and gas licences approval",
+          description:
+            "The UK government approved new oil drilling licences despite climate concerns.",
+          topics: ["Business", "Politics"],
+          source: "Financial Times",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/oil/600/400",
+        },
+
+        // === Redundant / Repeated to simulate feed ===
+        {
+          id: "15",
+          title: "Philippines lottery: Questions raised as hundreds win jackpot",
+          description:
+            "A lottery in the Philippines with 433 jackpot winners has sparked widespread suspicion.",
+          topics: ["Business"],
+          source: "Reuters",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/lottery/600/400",
+        },
+        {
+          id: "16",
+          title: "Philippines lottery: Questions raised as hundreds win jackpot",
+          description:
+            "A lottery in the Philippines with 433 jackpot winners has sparked widespread suspicion.",
+          topics: ["Business"],
+          source: "Reuters",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/lottery2/600/400",
+        },
+        {
+          id: "17",
+          title: "Philippines lottery: Questions raised as hundreds win jackpot",
+          description:
+            "A lottery in the Philippines with 433 jackpot winners has sparked widespread suspicion.",
+          topics: ["Business"],
+          source: "Reuters",
+          posted_at: "8 October 2022",
+          image_url: "https://picsum.photos/seed/lottery3/600/400",
+        },
+      ]);
+    }, 500);
+  });
+}
+
+
   async getTopic(): Promise<Category[]> {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -184,41 +374,7 @@ class ApiClient {
     });
   }
 
-  async getDummyNews(): Promise<News[]> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve([
-          {
-            id: "1",
-            title: "AI chips set new efficiency record amid surging demand",
-            description:
-              "Researchers hit a milestone in power-per-watt, enabling cheaper, greener inference.",
-            topics: ["Tech", "AI"],
-            source: "TechCrunch",
-            posted_at: "just Now",
-          },
-          {
-            id: "2",
-            title: "Breakthrough in quantum computing",
-            description:
-              "Quantum processors achieve error correction at scale.",
-            topics: ["Science"],
-            source: "ScienceDaily",
-            posted_at: "2h ago",
-          },
-          {
-            id: "3",
-            title: "Global warming hits record highs",
-            description:
-              "Climate scientists issue new warnings as temperatures soar.",
-            topics: ["Environment"],
-            source: "BBC Earth",
-            posted_at: "1d ago",
-          },
-        ]);
-      });
-    });
-  }
+  
 
   async getTopicFeed(): Promise<News[]> {
     const [user, news] = await Promise.all([
