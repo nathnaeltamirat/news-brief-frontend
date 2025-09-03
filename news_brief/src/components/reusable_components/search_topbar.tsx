@@ -109,13 +109,12 @@ export default function TopBar() {
                   Login
                 </Button>
               ) : (
-             <ProfileDropdown 
-  onLogoutClick={() => {
-    setView("signin"); 
-    setOpen(true);     
-  }}
-/>
-
+                <ProfileDropdown
+                  onLogoutClick={() => {
+                    setView("signin");
+                    setOpen(true);
+                  }}
+                />
               )}
             </div>
           </div>

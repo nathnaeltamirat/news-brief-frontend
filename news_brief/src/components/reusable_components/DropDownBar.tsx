@@ -10,10 +10,12 @@ function ProfileDropdown({ onLogoutClick }: ProfileDropdownProps) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -35,22 +37,34 @@ function ProfileDropdown({ onLogoutClick }: ProfileDropdownProps) {
         <div className="absolute right-0 mt-2 w-52 bg-gray-100 border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
           <ul className="text-sm">
             <li>
-              <Link href="/foryou" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+              <Link
+                href="/foryou"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50"
+              >
                 <User size={14} /> For You
               </Link>
             </li>
             <li>
-              <Link href="news/saved" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+              <Link
+                href="news/saved"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50"
+              >
                 <Bookmark size={14} /> Saved
               </Link>
             </li>
             <li>
-              <Link href="/subscriptions" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+              <Link
+                href="/subscriptions"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50"
+              >
                 <Bell size={14} /> Subscriptions
               </Link>
             </li>
             <li>
-              <Link href="/settings" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50">
+              <Link
+                href="/setting"
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50"
+              >
                 <Settings size={14} /> Settings
               </Link>
             </li>
