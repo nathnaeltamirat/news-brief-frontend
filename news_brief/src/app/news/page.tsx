@@ -24,12 +24,11 @@ const News = () => {
           theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
         }`}
       >
-        <Sidebar />
-        <div className="flex-1 lg:ml-0 lg:mt-1 mt-16 px-4 lg:px-6 lg:mr-10 w-full overflow-hidden">
+     
+        <div className="flex-1 lg:ml-0 lg:mt-1  px-4 lg:px-6 lg:mr-10 w-full overflow-hidden">
           <div className="flex justify-between w-full mb-4">
             <TopBar />
           </div>
-         
           <NewsComponent />
           {/* <Footer /> */}
         </div>

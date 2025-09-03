@@ -7,12 +7,14 @@ import SignUpCard from "../signup_components/signupCard";
 import ForgotPasswordCard from "../../components/forgotpassword_components/forgotpassCard";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { getAccessToken } from "@/lib/api";
+import DarkMode from "../dark_mode/DarkMode";
 
 const token = getAccessToken();
 
 export default function TopBar() {
   const context = useContext(ThemeContext);
-  if (!context) throw new Error("ToggleButton must be used inside ThemeProvider");
+  if (!context)
+    throw new Error("ToggleButton must be used inside ThemeProvider");
   const { theme } = context;
 
   const [open, setOpen] = useState(false);
@@ -36,6 +38,7 @@ export default function TopBar() {
     "Crime",
     "Weather",
     "Opinion",
+    "Sport",
   ];
 
   const bgInput =
@@ -56,31 +59,18 @@ export default function TopBar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 py-3 space-y-3">
-          {/* 🔹 First Row: Topics + Right Actions */}
+          {/* 🔹 First Row: Logo + Right Actions */}
           <div className="flex items-center justify-between">
-            {/* Topics (Scrollable Tabs) */}
-            <div className="flex gap-6 text-sm font-medium overflow-x-auto scrollbar-hide">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`relative whitespace-nowrap pb-2 transition-colors ${
-                    activeCategory === cat
-                      ? "text-blue-600 font-semibold"
-                      : "text-gray-500 hover:text-blue-500"
-                  }`}
-                >
-                  {cat}
-                  {activeCategory === cat && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
-                  )}
-                </button>
-              ))}
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" className="w-6" alt="logo" />
+              <p className="font-semibold ">News Brief</p>
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-3 ml-6 flex-shrink-0">
+            <div className="flex items-center gap-3 flex-shrink-0">
               {/* Notifications */}
+              <DarkMode />
               <button
                 className={`p-2 rounded-full ${bgBtn}`}
                 aria-label="Notifications"
@@ -88,8 +78,8 @@ export default function TopBar() {
                 <Bell size={18} />
               </button>
 
-              {/* Language dropdown (with globe) */}
-              <div className="relative">
+              {/* Language dropdown */}
+              <div className="relative hidden sm:block">
                 <select
                   className={`appearance-none bg-transparent pr-6 cursor-pointer text-sm outline-none ${
                     theme === "light" ? "text-black" : "text-white"
@@ -119,7 +109,27 @@ export default function TopBar() {
             </div>
           </div>
 
-          {/* 🔹 Second Row: Search Bar */}
+          {/* 🔹 Second Row: Topics (Below on mobile, inline on desktop) */}
+          <div className="flex gap-6 text-sm font-medium overflow-x-auto scrollbar-hide border-b border-gray-200 sm:border-none pb-1 sm:pb-0">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`relative whitespace-nowrap pb-2 transition-colors ${
+                  activeCategory === cat
+                    ? "text-blue-600 font-semibold"
+                    : "text-gray-500 hover:text-blue-500"
+                }`}
+              >
+                {cat}
+                {activeCategory === cat && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* 🔹 Third Row: Search Bar */}
           <div
             className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
           >
@@ -129,7 +139,10 @@ export default function TopBar() {
               placeholder="Search news, topics, or people..."
               className="bg-transparent outline-none flex-1 text-sm"
             />
-            <Mic size={18} className="text-gray-500 cursor-pointer flex-shrink-0" />
+            <Mic
+              size={18}
+              className="text-gray-500 cursor-pointer flex-shrink-0"
+            />
           </div>
         </div>
       </header>

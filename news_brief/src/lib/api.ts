@@ -149,15 +149,24 @@ class ApiClient {
     window.location.href = `${this.baseURL}/auth/google/login`;
   }
 
-  async getArtsNews(): Promise<News[]> {
-    const news = await this.getDummyNews();
-    return news.filter((n) => n.topics.includes("Arts"));
-  }
+async getArtsNews(): Promise<News[]> {
+  const news = await this.getDummyNews();
 
-  async getBusinessNews(): Promise<News[]> {
-    const news = await this.getDummyNews();
-    return news.filter((n) => n.topics.includes("Business"));
-  }
+  // simulate 2s delay
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  return news.filter((n) => n.topics.includes("Arts"));
+}
+
+async getBusinessNews(): Promise<News[]> {
+  const news = await this.getDummyNews();
+
+  // simulate 2s delay
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  return news.filter((n) => n.topics.includes("Business"));
+}
+
   async  getTopNews(): Promise<News[]> {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -203,7 +212,7 @@ class ApiClient {
           image_url: "https://picsum.photos/seed/covid/600/400",
         },
       ]);
-    }, 500);
+    }, 100);
   });
 }
 
@@ -350,7 +359,7 @@ async getDummyNews(): Promise<News[]> {
           image_url: "https://picsum.photos/seed/lottery3/600/400",
         },
       ]);
-    }, 500);
+    }, 100);
   });
 }
 
