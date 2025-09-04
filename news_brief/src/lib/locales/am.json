@@ -1,0 +1,106 @@
+{
+  "auth": {
+    "login": "መግቢያ",
+    "signup": "መመዝገቢያ",
+    "forgotPassword": "የይለፍ ቃል ረሱ?",
+    "welcomeBack": "እንኳን በደህና መጡ",
+    "signingIn": "በመግባት ላይ...",
+    "signingUp": "በመመዝገብ ላይ...",
+    "invalidCredentials": "የተሳሳተ መረጃ",
+    "somethingWentWrong": "አንዳንድ ችግር ተፈጥሯል ❌",
+    "continueWithGoogle": "በ Google ይቀጥሉ",
+    "dontHaveAccount": "መለያ የለዎትም?",
+    "alreadyHaveAccount": "መለያ አለዎት?",
+    "fullName": "ሙሉ ስም",
+    "email": "ኢሜይል",
+    "password": "የይለፍ ቃል",
+    "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+    "passwordRequirements": "የይለፍ ቃል ቢያንስ 8 ቁምፊ፣ አንድ የትልቅ ፊደል፣ አንድ የትንሽ ፊደል፣ አንድ ቁጥር፣ እና የልዩ ምልክት መያዝ አለበት።"
+  },
+  "languages": {
+    "english": "እንግሊዝኛ",
+    "amharic": "አማርኛ"
+  },
+  "search": {
+    "placeholder": "ዜና፣ ጉዳዮች፣ ወይም ሰዎችን ፈልግ..."
+  },
+  "categories": {
+    "all": "ሁሉም",
+    "world": "ዓለም",
+    "national": "ብሔራዊ",
+    "politics": "ፖለቲካ",
+    "business": "ንግድ",
+    "economy": "ኢኮኖሚ",
+    "finance": "ፋይናንስ",
+    "technology": "ቴክኖሎጂ",
+    "science": "ሳይንስ",
+    "health": "ጤና",
+    "environment": "አካባቢ",
+    "education": "ትምህርት",
+    "law": "ህግ",
+    "crime": "ወንጀል",
+    "weather": "የአየር ጠባይ",
+    "opinion": "አስተያየት",
+    "sport": "ስፖርት"
+  },
+ 
+  "settings": {
+    "title": "ቅንብሮች",
+    "saveChanges": "ለውጦችን አስቀምጥ",
+    "tabs": {
+      "customization": "ማበጀት",
+      "account": "መለያ",
+      "categories": "ምድቦች",
+      "subscriptions": "ተመዝጋቢዎች"
+    },
+    "customization": {
+      "title": "ማበጀት",
+      "theme": "ገጽታ",
+      "showAvatars": "አቫታሮችን አሳይ"
+    },
+    "themes": {
+      "system": "የስርዓት ነባር",
+      "light": "ብርሃን",
+      "dark": "ጨለማ"
+    },
+    "account": {
+      "title": "የመለያ ዝርዝሮች",
+      "username": "ተጠቃሚ ስም",
+      "placeholders": {
+        "fullName": "ሙሉ ስም ያስገቡ",
+        "email": "ኢሜይል ያስገቡ",
+        "username": "ተጠቃሚ ስም ያስገቡ",
+        "password": "የይለፍ ቃል ያስገቡ"
+      },
+      "created": "መለያ ተፈጥሯል",
+      "dangerZone": {
+        "title": "አደጋ ቦታ",
+        "delete": "መለያ አጥፋ",
+        "warning": "ይህ እርምጃ የማይቀለበስ ነው"
+      }
+    },
+    "categories": {
+      "title": "የተወደዱ መለዮዎች",
+      "add": "አዲስ መለዮዎች ያክሉ",
+      "placeholder": "መለዮዎችን ፈልግ",
+      "addButton": "አክል"
+    },
+    "subscriptions": {
+      "title": "የእርስዎ ተመዝጋቢዎች",
+      "remove": "አስወግድ",
+      "search": "አዲስ የዜና ሚዲያ ፈልግ",
+      "placeholder": "የህትመት፣ ፖድካስት፣ RSS ፈልግ",
+      "addButton": "አክል"
+    }
+  },
+    "profile": {
+    "menuTitle": "መገለጫ",
+    "forYou": "ለእርስዎ",
+    "saved": "ተቀምጧል",
+    "subscriptions": "የተመዘገቡ",
+    "settings": "ማስተካከያ",
+    "logout": "ውጣ"
+  }
+
+
+}
