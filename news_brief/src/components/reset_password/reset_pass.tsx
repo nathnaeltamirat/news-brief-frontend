@@ -86,25 +86,25 @@ export default function ResetPasswordForm() {
   };
 
 return (
-  <div className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-2xl shadow-xl p-6 sm:p-8 bg-gray-50 transition-all duration-300">
-    <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-6">
+  <div className="relative w-full max-w-xs mx-auto rounded-lg shadow-md p-4 bg-white transition-all duration-300">
+    <h1 className="text-lg font-bold text-center text-gray-900 mb-3">
       Reset Your Password
     </h1>
 
     {/* Success / Error */}
     {success && (
-      <p className="text-green-600 text-center mb-4 text-sm sm:text-base">
+      <p className="text-green-600 text-center mb-2 text-xs">
         {success}
       </p>
     )}
     {error && (
-      <p className="text-red-500 text-center mb-4 text-sm sm:text-base">
+      <p className="text-red-500 text-center mb-2 text-xs">
         {error}
       </p>
     )}
 
     {/* New Password */}
-    <div className="relative mb-4">
+    <div className="relative mb-2">
       <input
         id="new-password"
         type={showPassword ? "text" : "password"}
@@ -112,7 +112,7 @@ return (
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onFocus={() => setShowPasswordMessage(true)}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black/50"
+        className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white pr-10 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
       {password && (
         <button
@@ -120,7 +120,7 @@ return (
           onClick={() => setShowPassword(!showPassword)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
         >
-          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
         </button>
       )}
     </div>
@@ -128,7 +128,7 @@ return (
     {/* Live password validation */}
     {showPasswordMessage && passwordMessage && (
       <p
-        className={`text-sm mb-4 ${
+        className={`text-xs mb-2 ${
           passwordMessage.includes("strong")
             ? "text-green-600"
             : "text-red-500"
@@ -139,14 +139,14 @@ return (
     )}
 
     {/* Confirm Password */}
-    <div className="relative mb-6">
+    <div className="relative mb-3">
       <input
         id="confirm-password"
         type={showConfirmPassword ? "text" : "password"}
         placeholder="Confirm Password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-black/50"
+        className="w-full px-3 py-2 rounded-md border border-gray-200 bg-white pr-10 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
       />
       {confirmPassword && (
         <button
@@ -154,7 +154,7 @@ return (
           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
         >
-          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
         </button>
       )}
     </div>
@@ -163,11 +163,13 @@ return (
     <button
       onClick={handleSubmit}
       disabled={loading}
-      className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 disabled:opacity-50 text-sm sm:text-base"
+      className="w-full bg-blue-600 text-white py-2 rounded-full font-medium hover:bg-blue-700 disabled:opacity-50 text-xs"
     >
       {loading ? "Resetting..." : "Reset Password"}
     </button>
   </div>
 );
+
+
 
 }

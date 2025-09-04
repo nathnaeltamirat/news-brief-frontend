@@ -26,22 +26,22 @@ const ForgotPasswordCard: React.FC<ForgotPasswordCardProps> = ({ onClose, onBack
   };
 
 return (
-  <div className="w-full max-w-md rounded-2xl shadow-xl p-8 bg-white relative">
+  <div className="relative w-full max-w-xs mx-auto rounded-lg shadow-md p-4 bg-white">
     {onClose && (
       <button
         onClick={onClose}
-        className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl font-bold"
+        className="absolute top-2 right-2 text-gray-500 hover:text-black text-sm font-bold"
       >
         ✕
       </button>
     )}
 
-    <h1 className="text-3xl font-bold text-center text-gray-900 mb-6">
+    <h1 className="text-lg font-bold text-center text-gray-900 mb-3">
       Forgot Password
     </h1>
 
-    <p className="text-gray-600 mb-6 text-center">
-      Enter your email address and we’ll send you a link to reset your password.
+    <p className="text-gray-600 mb-3 text-center text-xs">
+      Enter your email address and we'll send you a link to reset your password.
     </p>
 
     {/* Email input */}
@@ -54,14 +54,14 @@ return (
       value={email}
       onChange={(e) => setEmail(e.target.value)}
       placeholder="Email"
-      className="w-full px-4 py-3 mb-4 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black text-sm sm:text-base"
+      className="w-full px-3 py-2 mb-2 rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
     />
 
     {/* Submit */}
     <button
       onClick={handleSubmit}
       disabled={loading}
-      className="w-full py-3 rounded-[30px] bg-black text-white font-semibold hover:bg-gray-900 transition disabled:opacity-50 text-sm sm:text-base"
+      className="w-full py-2 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition disabled:opacity-50 text-xs"
     >
       {loading ? "Sending..." : "Send Reset Link"}
     </button>
@@ -69,7 +69,7 @@ return (
     {/* Feedback message */}
     {message && (
       <p
-        className={`mt-4 text-center text-sm ${
+        className={`mt-2 text-center text-xs ${
           message.toLowerCase().includes("error")
             ? "text-red-500"
             : "text-green-600"
@@ -80,16 +80,17 @@ return (
     )}
 
     {/* Back to Sign In */}
-    <div className="mt-6 text-center">
+    <div className="mt-3 text-center">
       <button
         onClick={onBackToSignIn}
-        className="text-sm font-medium text-black hover:underline"
+        className="text-xs font-medium text-blue-600 hover:underline"
       >
         ← Back to Sign In
       </button>
     </div>
   </div>
 );
+
 
 };
 
