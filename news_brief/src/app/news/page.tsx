@@ -3,7 +3,8 @@ import React, { useContext } from "react";
 import Button from "@/components/reusable_components/Button";
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
-import Sidebar from "@/components/siderbar/main";
+
+
 import ChatBot from "@/components/reusable_components/chatbot";
 import { ThemeContext } from "../contexts/ThemeContext";
 

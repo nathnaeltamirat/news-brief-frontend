@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { apiClient } from "../../lib/api";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 interface SignUpCardProps {
   onClose?: () => void;
@@ -14,9 +16,12 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   onClose,
   onSwitchToSignIn,
 }) => {
-  useEffect(() => {
-    localStorage.removeItem("person");
-  }, []);
+  const { t } = useTranslation();
+
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("SignUpCard must be used inside ThemeProvider");
+  const { theme } = context;
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,28 +32,29 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showPasswordMessage, setShowPasswordMessage] = useState(false);
-  // Password validation message
+
+  useEffect(() => {
+    localStorage.removeItem("person");
+  }, []);
+
+  // Password validation
   const getPasswordMessage = (pwd: string) => {
     const messages: string[] = [];
-    if (pwd.length < 8) messages.push("at least 8 characters");
-    if (!/[A-Z]/.test(pwd)) messages.push("an uppercase letter");
-    if (!/[a-z]/.test(pwd)) messages.push("a lowercase letter");
-    if (!/\d/.test(pwd)) messages.push("a number");
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd))
-      messages.push("a special character");
-
-    if (messages.length === 0) return ""; // Hide if all rules met
-    return "Password must include " + messages.join(", ") + ".";
+    if (pwd.length < 8) messages.push(t("auth.passwordRequirements").split(",")[0]);
+    if (!/[A-Z]/.test(pwd)) messages.push(t("auth.passwordRequirements").split(",")[1]);
+    if (!/[a-z]/.test(pwd)) messages.push(t("auth.passwordRequirements").split(",")[2]);
+    if (!/\d/.test(pwd)) messages.push(t("auth.passwordRequirements").split(",")[3]);
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) messages.push(t("auth.passwordRequirements").split(",")[4]);
+    return messages.length ? t("auth.passwordRequirements").split(":")[0] + " " + messages.join(", ") + "." : "";
   };
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      setError("Passwords do not match ❌");
+      setError(t("auth.passwordsDoNotMatch"));
       return;
     }
-
     if (getPasswordMessage(password) !== "") {
-      setError("Password does not meet all requirements ❌");
+      setError(t("auth.passwordDoesNotMeetRequirements"));
       return;
     }
 
@@ -58,36 +64,21 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
     try {
       const res = await apiClient.signUp(fullName, email, password);
-      if (res.status_code == 201) {
-        setSuccess(
-          res.message ||
-            "User created successfully Check your email to Verify ✅"
-        );
+      if (res.status_code === 201) {
+        setSuccess(res.message || t("auth.userCreatedSuccess"));
       }
-
-      // Clear inputs immediately
       setFullName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
       setShowPasswordMessage(false);
-
-      // Delay transition to Sign In
-      setTimeout(() => {
-        window.location.href = "/news";
-      }, 1000);
+      setTimeout(() => (window.location.href = "/news"), 1000);
     } catch (err: unknown) {
       if (err instanceof Error) {
         const statusError = err as Error & { statusCode?: number };
-
-        if (statusError.statusCode === 409) {
-          setError("Account already registered ❌");
-        } else {
-          setError(statusError.message);
-        }
-      } else {
-        setError("Something went wrong ❌");
-      }
+        if (statusError.statusCode === 409) setError(t("auth.accountAlreadyRegistered"));
+        else setError(statusError.message);
+      } else setError(t("auth.somethingWentWrong"));
     } finally {
       setLoading(false);
     }
@@ -95,19 +86,41 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
   const passwordMessage = getPasswordMessage(password);
 
+  // Theme-based classes
+  const bgCard = theme === "light" ? "bg-gray-50" : "bg-gray-900";
+  const textMain = theme === "light" ? "text-gray-900" : "text-gray-100";
+  const textSecondary = theme === "light" ? "text-gray-500" : "text-gray-400";
+  const inputBase = `w-full mb-3 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
+  const inputBg =
+    theme === "light"
+      ? "bg-gray-50 border-gray-200 text-black placeholder-gray-500"
+      : "bg-gray-800 border-gray-700 text-white placeholder-gray-400";
+  const btnPrimary =
+    theme === "light"
+      ? "bg-black text-white hover:bg-gray-800"
+      : "bg-white text-black hover:bg-gray-200";
+  const btnGoogle =
+    theme === "light"
+      ? "text-black border border-gray-300 hover:bg-gray-100"
+      : "text-white border border-gray-600 hover:bg-gray-700";
+
   return (
-    <div className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-2xl shadow-xl p-6 sm:p-8 bg-gray-50 transition-all duration-300">
+    <div
+      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
+    >
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl font-bold"
+          className={`absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold`}
         >
           ✕
         </button>
       )}
 
-      <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-6">
-        Create your account
+      <h1
+        className={`text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
+      >
+        {t("auth.signup")}
       </h1>
 
       {success && (
@@ -123,29 +136,27 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
       <input
         type="text"
-        placeholder="Full Name"
+        placeholder={t("auth.fullName")}
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
-        className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm sm:text-base"
+        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
       />
-
       <input
         type="email"
-        placeholder="Email"
+        placeholder={t("auth.email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full mb-2 px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm sm:text-base"
+        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
       />
 
-      {/* Password */}
-      <div className="relative mb-2">
+      <div className="relative">
         <input
           type={showPassword ? "text" : "password"}
-          placeholder="Password"
+          placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onFocus={() => setShowPasswordMessage(true)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
+          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
         />
         {password && (
           <button
@@ -157,20 +168,17 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
           </button>
         )}
       </div>
-
-      {/* Live password message */}
       {showPasswordMessage && passwordMessage && (
-        <p className="text-red-500 text-sm mb-4">{passwordMessage}</p>
+        <p className="text-red-500 text-xs sm:text-sm mb-4">{passwordMessage}</p>
       )}
 
-      {/* Confirm Password */}
-      <div className="relative mb-6">
+      <div className="relative mb-4 sm:mb-6">
         <input
           type={showConfirmPassword ? "text" : "password"}
-          placeholder="Confirm Password"
+          placeholder={t("auth.confirmPassword")}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
+          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
         />
         {confirmPassword && (
           <button
@@ -186,40 +194,33 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
       <button
         onClick={handleSignUp}
         disabled={loading}
-        className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 disabled:opacity-50 text-sm sm:text-base"
+        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 text-sm sm:text-base mb-4`}
       >
-        {loading ? "Signing Up..." : "Sign Up"}
+        {loading ? t("auth.signingUp") : t("auth.signup")}
       </button>
 
-      <div className="flex items-center my-4 sm:my-6">
-        <hr className="flex-1 border-gray-300" />
-        <span className="px-2 sm:px-3 text-gray-500 text-xs sm:text-sm">
-          OR
-        </span>
-        <hr className="flex-1 border-gray-300" />
+      <div className="flex items-center my-3 sm:my-6">
+        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+        <span className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}>OR</span>
+        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
       </div>
 
       <button
         onClick={() => apiClient.signInWithGoogle()}
-        className="w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 text-black font-medium text-sm sm:text-base"
+        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
       >
-        <Image
-          src="/images/google.png"
-          width={24}
-          height={24}
-          alt="Google Logo"
-        />
-        Continue with Google
+        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
+        {t("auth.continueWithGoogle")}
       </button>
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500">
-          Already have an account?{" "}
+      <div className="mt-4 sm:mt-6 text-center">
+        <p className={`text-sm sm:text-base ${textSecondary}`}>
+          {t("auth.alreadyHaveAccount")}{" "}
           <button
-            onClick={() => setTimeout(() => onSwitchToSignIn?.(), 1000)}
-            className="text-black font-medium hover:underline"
+            onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
+            className={`font-medium hover:underline ${textMain}`}
           >
-            Sign In
+            {t("auth.login")}
           </button>
         </p>
       </div>
