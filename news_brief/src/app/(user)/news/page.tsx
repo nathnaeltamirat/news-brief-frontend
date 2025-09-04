@@ -17,7 +17,7 @@ const News = () => {
   
   if (!activeCategoryContext)
     throw new Error("News must be used inside ActiveCategoryProvider");
-  const { activeCategory, setActiveCategory } = activeCategoryContext;
+  const { activeCategory,  } = activeCategoryContext;
 
   if (!context)
     throw new Error("ToggleButton must be used inside ThemeProvider");

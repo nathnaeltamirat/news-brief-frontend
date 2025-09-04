@@ -11,6 +11,7 @@ const ForgotPasswordCard: React.FC<ForgotPasswordCardProps> = ({ onClose, onBack
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const forgot = "Enter your email address and we'll send you a link to reset your password.";
 
   const handleSubmit = async () => {
     try {
@@ -41,7 +42,9 @@ return (
     </h1>
 
     <p className="text-gray-600 mb-3 text-center text-xs">
-      Enter your email address and we'll send you a link to reset your password.
+      <p className="text-gray-600 mb-3 text-center text-xs">
+     {forgot}
+</p>
     </p>
 
     {/* Email input */}

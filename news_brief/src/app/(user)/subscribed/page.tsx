@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/reusable_components/Button";
-import TopBar from "@/components/reusable_components/search_topbar";
+// import TopBar from "@/components/reusable_components/search_topbar";
 import { apiClient } from "@/lib/api";
 import { useContext, useEffect, useState } from "react";
 import SubscribedComponent from "@/components/news_component/subscribedComponent";

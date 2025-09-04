@@ -52,7 +52,7 @@ const SkeletonNewsGrid = ({ title }: { title: string }) => {
   );
 };
 
-const handleNewsClick = (newsId: string) => router.push(`/news/${newsId}`);
+// const handleNewsClick = (newsId: string) => router.push(`/news/${newsId}`);
 
 const ForYouComponent: React.FC<ForYouProps> = ({ handleNewsClick }) => {
   const context = useContext(ThemeContext);
