@@ -2,7 +2,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Tag, Newspaper, Shield, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard,
+  FileText,
+  Tag,
+  Newspaper,
+  Shield,
+  Menu,
+  X,
+} from "lucide-react";
 
 const AdminTopBar = () => {
   const pathname = usePathname();
@@ -10,7 +18,9 @@ const AdminTopBar = () => {
 
   const linkClasses = (href: string) =>
     `flex items-center gap-1 px-2 py-1 rounded-full transition ${
-      pathname === href ? "bg-gray-100 shadow-sm" : "text-gray-600 hover:text-blue-600"
+      pathname === href
+        ? "bg-gray-100 shadow-sm"
+        : "text-gray-600 hover:text-blue-600"
     }`;
 
   const navLinks = [
@@ -23,20 +33,27 @@ const AdminTopBar = () => {
   return (
     <header className="w-full bg-white shadow-md px-6 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Left: Logo + Title */}
-      <div className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <img src="/logo.png" alt="logo" className="w-6 h-6" />
         <span className="font-bold text-lg">News Brief</span>
-      </div>
+      </Link>
 
       {/* Desktop Navigation */}
       <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
         {navLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={linkClasses(link.href)}>
+          <Link
+            key={link.href}
+            href={link.href}
+            className={linkClasses(link.href)}
+          >
             {link.icon}
             {link.label}
           </Link>
         ))}
-        <Link href="/admin" className={`${linkClasses("/admin")} text-blue-600`}>
+        <Link
+          href="/admin"
+          className={`bg-gray-100 shadow-sm flex items-center gap-1 px-2 py-1 rounded-full transition  text-blue-600`}
+        >
           <Shield size={16} />
           Admin
         </Link>
