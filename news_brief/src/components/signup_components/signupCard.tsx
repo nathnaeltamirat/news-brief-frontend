@@ -105,126 +105,125 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
       : "text-white border border-gray-600 hover:bg-gray-700";
 
   return (
-    <div
-      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
+   <div
+  className={`relative w-full max-w-sm mx-3 sm:mx-auto rounded-xl shadow-lg p-6 ${bgCard} transition-all duration-300`}
+>
+  {onClose && (
+    <button
+      onClick={onClose}
+      className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg font-bold"
     >
-      {onClose && (
-        <button
-          onClick={onClose}
-          className={`absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold`}
-        >
-          ✕
-        </button>
-      )}
+      ✕
+    </button>
+  )}
 
-      <h1
-        className={`text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
-      >
-        {t("auth.signup")}
-      </h1>
+  <h1
+    className={`text-xl sm:text-2xl font-bold text-center mb-3 ${textMain}`}
+  >
+    {t("auth.signup")}
+  </h1>
 
-      {success && (
-        <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
-          {success}
-        </p>
-      )}
-      {error && (
-        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
-          {error}
-        </p>
-      )}
+  {success && (
+    <p className="text-green-600 text-center mb-2 text-sm">{success}</p>
+  )}
+  {error && (
+    <p className="text-red-500 text-center mb-2 text-sm">{error}</p>
+  )}
 
-      <input
-        type="text"
-        placeholder={t("auth.fullName")}
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
-      />
-      <input
-        type="email"
-        placeholder={t("auth.email")}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
-      />
+  <input
+    type="text"
+    placeholder={t("auth.fullName")}
+    value={fullName}
+    onChange={(e) => setFullName(e.target.value)}
+    className={`${inputBase} ${inputBg} text-sm`}
+  />
+  <input
+    type="email"
+    placeholder={t("auth.email")}
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className={`${inputBase} ${inputBg} text-sm`}
+  />
 
-      <div className="relative">
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder={t("auth.password")}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onFocus={() => setShowPasswordMessage(true)}
-          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
-        />
-        {password && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        )}
-      </div>
-      {showPasswordMessage && passwordMessage && (
-        <p className="text-red-500 text-xs sm:text-sm mb-4">{passwordMessage}</p>
-      )}
-
-      <div className="relative mb-4 sm:mb-6">
-        <input
-          type={showConfirmPassword ? "text" : "password"}
-          placeholder={t("auth.confirmPassword")}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
-        />
-        {confirmPassword && (
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-          >
-            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        )}
-      </div>
-
+  {/* Password */}
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder={t("auth.password")}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      onFocus={() => setShowPasswordMessage(true)}
+      className={`${inputBase} ${inputBg} pr-9 text-sm`}
+    />
+    {password && (
       <button
-        onClick={handleSignUp}
-        disabled={loading}
-        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 text-sm sm:text-base mb-4`}
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
       >
-        {loading ? t("auth.signingUp") : t("auth.signup")}
+        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
+    )}
+  </div>
+  {showPasswordMessage && passwordMessage && (
+    <p className="text-red-500 text-xs mb-2">{passwordMessage}</p>
+  )}
 
-      <div className="flex items-center my-3 sm:my-6">
-        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-        <span className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}>OR</span>
-        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-      </div>
-
+  {/* Confirm Password */}
+  <div className="relative mb-3">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      placeholder={t("auth.confirmPassword")}
+      value={confirmPassword}
+      onChange={(e) => setConfirmPassword(e.target.value)}
+      className={`${inputBase} ${inputBg} pr-9 text-sm`}
+    />
+    {confirmPassword && (
       <button
-        onClick={() => apiClient.signInWithGoogle()}
-        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
+        type="button"
+        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
       >
-        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
-        {t("auth.continueWithGoogle")}
+        {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
+    )}
+  </div>
 
-      <div className="mt-4 sm:mt-6 text-center">
-        <p className={`text-sm sm:text-base ${textSecondary}`}>
-          {t("auth.alreadyHaveAccount")}{" "}
-          <button
-            onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
-            className={`font-medium hover:underline ${textMain}`}
-          >
-            {t("auth.login")}
-          </button>
-        </p>
-      </div>
-    </div>
+  <button
+    onClick={handleSignUp}
+    disabled={loading}
+    className={`w-full py-2.5 rounded-full font-semibold ${btnPrimary} disabled:opacity-50 text-sm mb-3`}
+  >
+    {loading ? t("auth.signingUp") : t("auth.signup")}
+  </button>
+
+  <div className="flex items-center my-3">
+    <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+    <span className={`px-2 text-xs ${textSecondary}`}>OR</span>
+    <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+  </div>
+
+  <button
+    onClick={() => apiClient.signInWithGoogle()}
+    className={`w-full border py-2.5 rounded-full flex items-center justify-center gap-2 font-medium ${btnGoogle} text-sm`}
+  >
+    <Image src="/images/google.png" width={18} height={18} alt="Google Logo" />
+    {t("auth.continueWithGoogle")}
+  </button>
+
+  <div className="mt-3 text-center">
+    <p className={`text-xs ${textSecondary}`}>
+      {t("auth.alreadyHaveAccount")}{" "}
+      <button
+        onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
+        className={`font-medium hover:underline ${textMain}`}
+      >
+        {t("auth.login")}
+      </button>
+    </p>
+  </div>
+</div>
+
   );
 };
 

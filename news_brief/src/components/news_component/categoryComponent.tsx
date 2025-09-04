@@ -102,7 +102,7 @@ export default function CategoryComponent({
           : "bg-white text-gray-900"
       }`}
     >
-      <SectionHeader title={activeCategory} theme={theme} />
+      
 
       {/* Featured + Small Stories */}
       <div
@@ -146,7 +146,7 @@ export default function CategoryComponent({
       </div>
 
       {/* Trending Section */}
-      <SectionHeader title="Trending" theme={theme} />
+      
       <div
         className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 border-b pb-10 ${
           theme === "dark" ? "border-gray-700" : "border-gray-200"
@@ -214,23 +214,7 @@ function TrendingCardSkeleton({ theme }: { theme: string }) {
 }
 
 /* --- Helper Components --- */
-function SectionHeader({ title, theme }: { title: string; theme: string }) {
-  return (
-    <div className="flex items-center justify-between mb-6">
-      <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-        <span className="w-1.5 h-6 bg-blue-600 rounded-full"></span>
-        {title}
-      </h2>
-      <button
-        className={`text-xs ${
-          theme === "dark" ? "text-gray-200" : "text-blue-600"
-        } hover:underline`}
-      >
-        View All
-      </button>
-    </div>
-  );
-}
+
 
 function TopicTag({ text, theme }: { text: string; theme: string }) {
   return (
@@ -486,7 +470,7 @@ export function NewsGrid({
 }) {
   return (
     <>
-      <SectionHeader title={title} theme={theme} />
+    
       <div
         className={`grid md:grid-cols-2 lg:grid-cols-3 gap-6 border-b pb-8 ${
           theme === "dark" ? "border-gray-700" : "border-gray-200"

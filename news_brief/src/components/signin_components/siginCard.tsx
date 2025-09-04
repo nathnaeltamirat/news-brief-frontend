@@ -72,102 +72,99 @@ const SignInCard: React.FC<SignInCardProps> = ({
       : "text-white border border-gray-600 hover:bg-gray-700";
 
   return (
-    <div
-      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
+   <div
+  className={`relative w-full max-w-sm mx-3 sm:mx-auto rounded-xl shadow-lg p-6 ${bgCard} transition-all duration-300`}
+>
+  {onClose && (
+    <button
+      onClick={onClose}
+      className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-lg font-bold"
     >
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold"
-        >
-          ✕
-        </button>
-      )}
+      ✕
+    </button>
+  )}
 
-      <h1
-        className={`text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
-      >
-        {t("auth.welcomeBack")}
-      </h1>
+  <h1
+    className={`text-xl sm:text-2xl font-bold text-center mb-3 ${textMain}`}
+  >
+    {t("auth.welcomeBack")}
+  </h1>
 
-      {error && (
-        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
-          {error}
-        </p>
-      )}
+  {error && (
+    <p className="text-red-500 text-center mb-2 text-sm">{error}</p>
+  )}
 
-      <input
-        type="email"
-        placeholder={t("auth.email")}
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className={`w-full mb-3 px-4 py-3 rounded-xl border ${inputBg} text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none`}
-      />
+  <input
+    type="email"
+    placeholder={t("auth.email")}
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className={`w-full mb-2.5 px-3 py-2.5 rounded-lg border ${inputBg} text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+  />
 
-      <div className="relative mb-4">
-        <input
-          type={showPassword ? "text" : "password"}
-          placeholder={t("auth.password")}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={`w-full px-4 py-3 rounded-xl border ${inputBg} pr-10 text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none`}
-        />
-        {password && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        )}
-      </div>
-
-      <div className="mb-4 text-right">
-        <button
-          onClick={onSwitchToForgot}
-          className={`hover:underline font-medium text-xs sm:text-sm ${textMain}`}
-        >
-          {t("auth.forgotPassword")}
-        </button>
-      </div>
-
+  <div className="relative mb-3">
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder={t("auth.password")}
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      className={`w-full px-3 py-2.5 rounded-lg border ${inputBg} pr-9 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+    />
+    {password && (
       <button
-        onClick={handleSignIn}
-        disabled={loading}
-        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 mb-4 text-sm sm:text-base`}
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
       >
-        {loading ? t("auth.signingIn") : t("auth.login")}
+        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
+    )}
+  </div>
 
-      <div className="flex items-center my-4 sm:my-6">
-        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-        <span className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}>
-          OR
-        </span>
-        <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-      </div>
+  <div className="mb-3 text-right">
+    <button
+      onClick={onSwitchToForgot}
+      className={`hover:underline font-medium text-xs ${textMain}`}
+    >
+      {t("auth.forgotPassword")}
+    </button>
+  </div>
 
+  <button
+    onClick={handleSignIn}
+    disabled={loading}
+    className={`w-full py-2.5 rounded-full font-semibold ${btnPrimary} disabled:opacity-50 mb-3 text-sm`}
+  >
+    {loading ? t("auth.signingIn") : t("auth.login")}
+  </button>
+
+  <div className="flex items-center my-3">
+    <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+    <span className={`px-2 text-xs ${textSecondary}`}>OR</span>
+    <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+  </div>
+
+  <button
+    onClick={() => apiClient.signInWithGoogle()}
+    className={`w-full border py-2.5 rounded-full flex items-center justify-center gap-2 font-medium ${btnGoogle} text-sm`}
+  >
+    <Image src="/images/google.png" width={18} height={18} alt="Google Logo" />
+    {t("auth.continueWithGoogle")}
+  </button>
+
+  <div className="mt-3 text-center">
+    <p className={`text-xs ${textSecondary}`}>
+      {t("auth.dontHaveAccount")}{" "}
       <button
-        onClick={() => apiClient.signInWithGoogle()}
-        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
+        onClick={onSwitchToSignUp}
+        className={`hover:underline font-medium ${textMain}`}
       >
-        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
-        {t("auth.continueWithGoogle")}
+        {t("auth.signup")}
       </button>
+    </p>
+  </div>
+</div>
 
-      <div className="mt-4 sm:mt-6 text-center">
-        <p className={`text-sm sm:text-base ${textSecondary}`}>
-          {t("auth.dontHaveAccount")}{" "}
-          <button
-            onClick={onSwitchToSignUp}
-            className={`hover:underline font-medium ${textMain}`}
-          >
-            {t("auth.signup")}
-          </button>
-        </p>
-      </div>
-    </div>
   );
 };
 
