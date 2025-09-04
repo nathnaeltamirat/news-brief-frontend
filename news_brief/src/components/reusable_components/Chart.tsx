@@ -19,24 +19,22 @@ const pieData = [
   { name: "NDP", value: 6.2 },
 ];
 
-// 🎨 Shades of blue for pie chart
 const PIE_COLORS = ["#1E3A8A", "#2563EB", "#3B82F6", "#93C5FD"];
 
-// 🎨 Expanded shades of black/gray for bar chart
 const barData = [
-  { name: "A", value: 500, fill: "#000000" }, // pure black
-  { name: "B", value: 380, fill: "#1C1C1C" }, // very dark gray
-  { name: "C", value: 900, fill: "#2F2F2F" }, // charcoal
-  { name: "D", value: 750, fill: "#4B4B4B" }, // dark gray
-  { name: "E", value: 620, fill: "#6B6B6B" }, // medium gray
-  { name: "F", value: 460, fill: "#8C8C8C" }, // light charcoal
+  { name: "A", value: 500, fill: "#000000" },
+  { name: "B", value: 380, fill: "#1C1C1C" },
+  { name: "C", value: 900, fill: "#2F2F2F" },
+  { name: "D", value: 750, fill: "#4B4B4B" },
+  { name: "E", value: 620, fill: "#6B6B6B" },
+  { name: "F", value: 460, fill: "#8C8C8C" },
 ];
 
 export function Charts() {
   return (
-    <div className="flex justify-center items-center gap-6">
+    <div className="flex flex-col md:flex-row justify-center items-center gap-6 w-full">
       {/* Pie Chart */}
-      <div className="rounded-xl bg-white p-4 border border-gray-100 w-100">
+      <div className="rounded-xl bg-white p-4 border border-gray-100 w-full md:w-[500px]">
         <h3 className="text-sm font-medium mb-2">News by Topic</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -61,7 +59,7 @@ export function Charts() {
       </div>
 
       {/* Bar Chart */}
-      <div className="rounded-xl bg-white p-4 border border-gray-100 w-150">
+      <div className="rounded-xl bg-white p-4 border border-gray-100 w-full md:w-[500px]">
         <h3 className="text-sm font-medium mb-2">News by Source</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={barData} barCategoryGap="30%">
