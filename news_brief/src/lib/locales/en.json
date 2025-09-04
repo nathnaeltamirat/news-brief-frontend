@@ -42,5 +42,64 @@
     "weather": "Weather",
     "opinion": "Opinion",
     "sport": "Sport"
-  }
+  },
+
+  "settings": {
+    "title": "Settings",
+    "saveChanges": "Save changes",
+    "tabs": {
+      "customization": "Customization",
+      "account": "Account",
+      "categories": "Categories",
+      "subscriptions": "Subscriptions"
+    },
+    "customization": {
+      "title": "Customization",
+      "theme": "Theme",
+      "showAvatars": "Show Avatars"
+    },
+    "themes": {
+      "system": "System Default",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "account": {
+      "title": "Account Details",
+      "username": "Username",
+      "placeholders": {
+        "fullName": "Enter full name",
+        "email": "Enter email",
+        "username": "Enter username",
+        "password": "Enter password"
+      },
+      "created": "Account Created",
+      "dangerZone": {
+        "title": "Danger Zone",
+        "delete": "Delete Account",
+        "warning": "This action is irreversible"
+      }
+    },
+    "categories": {
+      "title": "Favorited Tags",
+      "add": "Add New Tags",
+      "placeholder": "Search tags",
+      "addButton": "Add"
+    },
+    "subscriptions": {
+      "title": "Your Subscriptions",
+      "remove": "Remove",
+      "search": "Search New News Media",
+      "placeholder": "Search publications, podcasts, RSS",
+      "addButton": "Add"
+    }
+  },
+  "profile": {
+  "menuTitle": "Profile",
+  "forYou": "For You",
+  "saved": "Saved",
+  "subscriptions": "Subscriptions",
+  "settings": "Settings",
+  "logout": "Logout"
+}
+
 }

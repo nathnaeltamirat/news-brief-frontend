@@ -2,9 +2,9 @@
 import Image from "next/image";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "next/navigation";
-import { apiClient, News } from "../../../lib/api";
-import ChatBot from "../../../components/reusable_components/chatbot";
-import { ThemeContext } from "../../contexts/ThemeContext";
+import { apiClient, News } from "../../../../lib/api";
+import ChatBot from "../../../../components/reusable_components/chatbot";
+import { ThemeContext } from "../../../contexts/ThemeContext";
 
 function Card({ children }: { children: React.ReactNode }) {
   const context = useContext(ThemeContext);
@@ -14,7 +14,9 @@ function Card({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={`rounded-xl border shadow-sm p-4 mb-4 ${
-        theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+        theme === "dark"
+          ? "bg-gray-800 border-gray-700"
+          : "bg-white border-gray-200"
       }`}
     >
       {children}
@@ -79,7 +81,7 @@ export default function NewsDetailPage() {
     utterance.onend = () => {
       const nextIndex = index + 1;
       setCurrentChunkIndex(nextIndex);
-      setProgress(((nextIndex) / chunksRef.current.length) * 100);
+      setProgress((nextIndex / chunksRef.current.length) * 100);
       if (isPlaying) speakChunk(nextIndex);
     };
 
@@ -89,7 +91,8 @@ export default function NewsDetailPage() {
 
   // --- Play / Pause ---
   const handlePlay = () => {
-    if (!window.speechSynthesis) return alert("Speech Synthesis not supported!");
+    if (!window.speechSynthesis)
+      return alert("Speech Synthesis not supported!");
 
     if (isPlaying) {
       window.speechSynthesis.pause();
@@ -119,8 +122,11 @@ export default function NewsDetailPage() {
   return (
     <>
       <ChatBot defaultOpen={true} />
-      <div className={`min-h-screen flex ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
-
+      <div
+        className={`min-h-screen flex ${
+          theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
+        }`}
+      >
         <div className="flex-1 flex flex-col lg:ml-0 mt-20 lg:mt-0">
           <header className="flex items-center p-4">
             <div className="relative w-full max-w-xl mx-auto">
@@ -134,27 +140,50 @@ export default function NewsDetailPage() {
 
           <div className="flex flex-1 space-x-4 lg:space-x-17">
             <div className="flex-1 p-4 lg:p-6 space-y-6">
-              <button onClick={() => history.back()} className="text-md text-gray-500 hover:underline">
+              <button
+                onClick={() => history.back()}
+                className="text-md text-gray-500 hover:underline"
+              >
                 Back
               </button>
 
-              <h1 className="text-xl lg:text-2xl font-bold leading-snug">{news.title}</h1>
-              <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>{news.description}</p>
+              <h1 className="text-xl lg:text-2xl font-bold leading-snug">
+                {news.title}
+              </h1>
+              <p
+                className={`${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                {news.description}
+              </p>
 
-              <h2 className="text-xl lg:text-2xl font-bold mb-2">Listening Mode</h2>
+              <h2 className="text-xl lg:text-2xl font-bold mb-2">
+                Listening Mode
+              </h2>
               <div
                 className={`flex flex-col lg:flex-row items-stretch gap-4 rounded-xl shadow-lg p-4 ${
                   theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                 }`}
               >
                 <div className="relative w-full lg:w-1/2 h-32 lg:h-40 rounded-lg overflow-hidden">
-                  <Image src="/photo.png" alt="News" fill style={{ objectFit: "cover" }} />
+                  <Image
+                    src="/photo.png"
+                    alt="News"
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
                 </div>
 
                 <div className="flex flex-col justify-between flex-1 mt-2 lg:mt-0 lg:ml-4">
                   <h3 className="text-lg font-bold">{news.title}</h3>
-                  <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-500"} text-sm mb-2`}>
-                    Listen to this article like a podcast. The text will be read continuously.
+                  <p
+                    className={`${
+                      theme === "dark" ? "text-gray-300" : "text-gray-500"
+                    } text-sm mb-2`}
+                  >
+                    Listen to this article like a podcast. The text will be read
+                    continuously.
                   </p>
 
                   <div className="flex items-center space-x-2">
