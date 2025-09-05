@@ -12,6 +12,16 @@ export interface News {
   posted_at: string;
   image_url:string
 }
+export interface Source {
+  slug: string;
+  name: string;
+  description: string;
+  url: string;
+  logo_url: string;
+  languages: string;
+  topics: string[];
+  reliability_score: number;
+}
 interface Topic {
   id: string;
   slug: string;
@@ -56,13 +66,13 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
 
     const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      typeof window !== "undefined" ? getAccessToken : null;
 
     const config: RequestInit = {
       ...options,
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(token && { Authorization: `Bearer ${getAccessToken()}` }),
         ...(options.headers || {}),
       },
     };
@@ -82,6 +92,36 @@ class ApiClient {
   async getProfile(): Promise<User> {
     return this.request<User>("/auth/me", { method: "GET" });
   }
+
+  async getSources(): Promise<Source[]> {
+    const res = await this.request<{ sources: Source[] }>("/sources", {
+      method: "GET",
+    });
+    console.log("getting source",res)
+    return res.sources;
+  }
+  async getSubscriptions(): Promise<Source[]> {
+    const res = await this.request<{ subscriptions: Source[] }>(
+      "/me/subscriptions",
+      { method: "GET" }
+    );
+    console.log("getting subscription",res)
+    return res.subscriptions;
+  }
+
+  async addSubscription(sourceSlug: string): Promise<void> {
+    await this.request(`/me/subscriptions`, {
+      method: "POST",
+      body: JSON.stringify({ source_key: sourceSlug }),
+    });
+  }
+
+  async removeSubscription(sourceSlug: string): Promise<void> {
+    await this.request(`/me/subscriptions/${sourceSlug}`, {
+      method: "DELETE",
+    });
+  }
+
   async updateProfile(data: {
     full_name?: string;
     email?: string;
@@ -105,7 +145,6 @@ class ApiClient {
   }
 
   async signUp(fullname: string, email: string, password: string) {
-
     const options = {
       method: "POST",
       body: JSON.stringify({ fullname, email, password }),
@@ -178,7 +217,7 @@ class ApiClient {
     // Redirect user to backend Google login route
     window.location.href = `${this.baseURL}/auth/google/login`;
   }
-async loadTopics() {
+  async loadTopics() {
     try {
       const res = await fetch(`${this.baseURL}/topics`, {
         method: "GET",
@@ -196,7 +235,7 @@ async loadTopics() {
       const data: TopicsResponse = await res.json();
 
       this.topicsCache = data.topics;
-    localStorage.setItem("all_topics", JSON.stringify(this.topicsCache));
+      localStorage.setItem("all_topics", JSON.stringify(this.topicsCache));
       return {
         message: "Topics loaded successfully",
         status_code,
