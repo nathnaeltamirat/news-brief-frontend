@@ -5,6 +5,7 @@ import Button from "../reusable_components/Button";
 import { Bookmark, ThumbsDown } from "lucide-react";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 
+
 export default function ForyouComponent() {
   const [news, setNews] = useState<News[] | null>(null);
   const [loading, setLoading] = useState(true);

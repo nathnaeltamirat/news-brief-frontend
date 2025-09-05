@@ -197,6 +197,32 @@ class ApiClient {
     // localStorage.setItem("topics", JSON.stringify(this.topicsCache))
     console.log(logged_val);
   }
+  async getSubscribedNews(): Promise<News[]> {
+  try {
+    // First get the user's subscriptions
+    const subscriptions = await this.getSubscriptions();
+    
+    // If no subscriptions, return empty array
+    if (!subscriptions || subscriptions.length === 0) {
+      return [];
+    }
+    
+    // Get all news
+    const allNews = await this.getDummyNews();
+    
+    // Filter news to only include items from subscribed sources
+    const subscribedSources = subscriptions.map(sub => sub.slug);
+    const subscribedNews = allNews.filter(news => 
+      subscribedSources.includes(news.source.toLowerCase())
+    );
+    
+    return subscribedNews;
+    
+  } catch (error) {
+    console.error("Error fetching subscribed news:", error);
+    throw new Error("Failed to fetch news from your subscriptions");
+  }
+}
 
   async forgotPassword(email: string) {
     return this.request<{ message: string }>("/auth/forgot-password", {
