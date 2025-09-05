@@ -7,21 +7,20 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call delay
     const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-22 py-6">
-      <h1 className="text-lg font-semibold mb-4">Admin Analytics</h1>
+    <div className="min-h-screen bg-gray-50 px-4 sm:px-6 lg:px-12 py-6">
+      <h1 className="text-lg sm:text-xl font-semibold mb-4">Admin Analytics</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="rounded-xl bg-white p-4 border border-gray-100 w-70"
+            className="rounded-xl bg-white p-4 border border-gray-100 w-full sm:w-auto"
           >
             {loading ? (
               <div className="animate-pulse space-y-3">
@@ -81,7 +80,7 @@ export default function Dashboard() {
       </div>
 
       {/* Charts */}
-      <div className="">
+      <div className="w-full overflow-x-auto">
         {loading ? (
           <div className="animate-pulse h-72 w-full bg-gray-200 rounded-lg"></div>
         ) : (
