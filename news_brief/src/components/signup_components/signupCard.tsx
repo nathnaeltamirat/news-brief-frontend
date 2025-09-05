@@ -10,153 +10,332 @@ interface SignUpCardProps {
   onClose?: () => void;
   onSwitchToSignIn?: () => void;
 }
-
-interface Topic {
-  label?: { en?: string; [key: string]: string | undefined };
+type Topic = {
+  label?: {
+    en?: string;
+    [key: string]: string | undefined;
+  };
   slug: string;
-}
+};
 
 const STORAGE_KEY = "selectedInterests";
 
-const SignUpCard: React.FC<SignUpCardProps> = ({ onClose, onSwitchToSignIn }) => {
+const SignUpCard: React.FC<SignUpCardProps> = ({
+  onClose,
+  onSwitchToSignIn,
+}) => {
   const { t } = useTranslation();
-  const { theme } = useContext(ThemeContext) || {};
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", confirmPassword: "" });
-  const [show, setShow] = useState({ password: false, confirm: false, message: false, interest: false });
-  const [status, setStatus] = useState({ loading: false, error: "", success: "" });
-  const [topics, setTopics] = useState<string[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("SignUpCard must be used inside ThemeProvider");
+  const { theme } = context;
 
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showPasswordMessage, setShowPasswordMessage] = useState(false);
+  const [showInterestSelection, setShowInterestSelection] = useState(false);
+
+  const [topics, setTopics] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
+  // Remove old user data on mount
   useEffect(() => {
     localStorage.removeItem("person");
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) setInterests(JSON.parse(stored));
   }, []);
 
-  const getPasswordMsg = (pwd: string) => {
+  const getPasswordMessage = (pwd: string) => {
+    const messages: string[] = [];
     const parts = t("auth.passwordRequirements").split(",");
-    const checks = [
-      pwd.length < 8 && parts[0],
-      !/[A-Z]/.test(pwd) && parts[1],
-      !/[a-z]/.test(pwd) && parts[2],
-      !/\d/.test(pwd) && parts[3],
-      !/[!@#$%^&*(),.?":{}|<>]/.test(pwd) && parts[4]
-    ].filter(Boolean) as string[];
-    return checks.length ? `${t("auth.passwordRequirements").split(":")[0]} ${checks.join(", ")}.` : "";
+    if (pwd.length < 8) messages.push(parts[0]);
+    if (!/[A-Z]/.test(pwd)) messages.push(parts[1]);
+    if (!/[a-z]/.test(pwd)) messages.push(parts[2]);
+    if (!/\d/.test(pwd)) messages.push(parts[3]);
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) messages.push(parts[4]);
+    return messages.length
+      ? t("auth.passwordRequirements").split(":")[0] +
+          " " +
+          messages.join(", ") +
+          "."
+      : "";
   };
 
   const handleSignUp = async () => {
-    if (form.password !== form.confirmPassword) return setStatus({ ...status, error: t("auth.passwordsDoNotMatch") });
-    if (getPasswordMsg(form.password)) return setStatus({ ...status, error: t("auth.passwordDoesNotMeetRequirements") });
+    if (password !== confirmPassword) {
+      setError(t("auth.passwordsDoNotMatch"));
+      return;
+    }
+    if (getPasswordMessage(password) !== "") {
+      setError(t("auth.passwordDoesNotMeetRequirements"));
+      return;
+    }
 
-    setStatus({ ...status, loading: true, error: "" });
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
     try {
-      const res = await apiClient.signUp(form.fullName, form.email, form.password);
+      const res = await apiClient.signUp(fullName, email, password);
+
       if (res.status_code === 201) {
-        setStatus({ ...status, success: res.message || t("auth.userCreatedSuccess") });
+        setSuccess(res.message || t("auth.userCreatedSuccess"));
+
+        // Load topics
         await apiClient.loadTopics();
+
         const allTopics = localStorage.getItem("all_topics");
         if (allTopics) {
-          const parsedTopics: Topic[] = JSON.parse(allTopics);
-          setTopics(parsedTopics.map(t => t.label?.en || t.slug));
+          const parsed = JSON.parse(allTopics);
+          const names = parsed.map((t: Topic) => t.label?.en || t.slug); // ✅ correct
+          setTopics(names);
         }
-        setShow({ ...show, interest: true });
+
+        setShowInterestSelection(true);
       }
-      setForm({ fullName: "", email: "", password: "", confirmPassword: "" });
-      setShow({ ...show, message: false });
-    } catch (err) {
-      const error = err as Error & { statusCode?: number };
-      const msg = error.statusCode === 409 ? t("auth.accountAlreadyRegistered") : error.message || t("auth.somethingWentWrong");
-      setStatus({ ...status, error: msg });
+
+      setFullName("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      setShowPasswordMessage(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        const statusError = err as Error & { statusCode?: number };
+        if (statusError.statusCode === 409)
+          setError(t("auth.accountAlreadyRegistered"));
+        else setError(statusError.message);
+      } else setError(t("auth.somethingWentWrong"));
     } finally {
-      setStatus({ ...status, loading: false });
+      setLoading(false);
     }
   };
 
   const toggleInterest = (interest: string) => {
-    const updated = interests.includes(interest) ? interests.filter(i => i !== interest) : [...interests, interest];
-    setInterests(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    setSelectedInterests((prev) => {
+      const updated = prev.includes(interest)
+        ? prev.filter((i) => i !== interest)
+        : [...prev, interest];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
   };
 
-  const isDark = theme === "dark";
-  const bgCard = isDark ? "bg-gray-900" : "bg-gray-50";
-  const textMain = isDark ? "text-gray-100" : "text-gray-900";
-  const inputBg = isDark ? "bg-gray-800 border-gray-700 text-white" : "bg-gray-50 border-gray-200 text-black";
-  const btnPrimary = isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-gray-800";
-  const interestBtn = (selected: boolean) => 
-    selected ? (isDark ? "bg-white text-black border-white" : "bg-black text-white border-black") : 
-    (isDark ? "bg-gray-800 text-gray-300 border-gray-700" : "bg-gray-100 text-gray-700 border-gray-300");
+  // Tailwind theme classes
+  const bgCard = theme === "light" ? "bg-gray-50" : "bg-gray-900";
+  const textMain = theme === "light" ? "text-gray-900" : "text-gray-100";
+  const textSecondary = theme === "light" ? "text-gray-500" : "text-gray-400";
+  const inputBase = `w-full mb-2 px-3 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
+  const inputBg =
+    theme === "light"
+      ? "bg-gray-50 border-gray-200 text-black placeholder-gray-500"
+      : "bg-gray-800 border-gray-700 text-white placeholder-gray-400";
+  const btnPrimary =
+    theme === "light"
+      ? "bg-black text-white hover:bg-gray-800"
+      : "bg-white text-black hover:bg-gray-200";
+  const btnGoogle =
+    theme === "light"
+      ? "text-black border border-gray-300 hover:bg-gray-100"
+      : "text-white border border-gray-600 hover:bg-gray-700";
+
+  const passwordMessage = getPasswordMessage(password);
+
+// Interest button styles
+const interestBase =
+  "cursor-pointer px-3 py-1 rounded-2xl border-2 text-center font-medium transition-all w-[120px] text-xs";
+
+// Dark mode: selected = black bg, white text; hover = dark gray
+// Light mode: selected = white bg, black text; hover = light gray
+const selectedClasses =
+  theme === "dark"
+    ? "bg-white text-black border-white hover:bg-gray-200"
+    : "bg-black text-white border-black hover:bg-gray-800";
+
+const unselectedClasses =
+  theme === "dark"
+    ? "bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700"
+    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200";
 
   return (
-    <div className={`relative w-80 mx-auto rounded-xl shadow p-4 ${bgCard}`}>
-      {!show.interest ? (
+    <div
+      className={`relative w-full max-w-xs sm:max-w-sm mx-2 sm:mx-auto rounded-xl shadow-lg p-3 sm:p-5 ${bgCard} transition-all duration-300`}
+    >
+      {!showInterestSelection ? (
         <>
-          {onClose && <button onClick={onClose} className="absolute top-2 right-2 text-gray-500">✕</button>}
-          <h1 className={`text-lg font-bold text-center mb-4 ${textMain}`}>{t("auth.signup")}</h1>
-          
-          {status.success && <p className="text-green-600 text-center mb-2 text-sm">{status.success}</p>}
-          {status.error && <p className="text-red-500 text-center mb-2 text-sm">{status.error}</p>}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-lg font-bold"
+            >
+              ✕
+            </button>
+          )}
 
-          {["fullName", "email"].map(field => (
+          <h1
+            className={`text-lg sm:text-xl font-bold text-center mb-3 sm:mb-4 ${textMain}`}
+          >
+            {t("auth.signup")}
+          </h1>
+
+          {success && (
+            <p className="text-green-600 text-center mb-2 text-xs sm:text-sm">
+              {success}
+            </p>
+          )}
+          {error && (
+            <p className="text-red-500 text-center mb-2 text-xs sm:text-sm">
+              {error}
+            </p>
+          )}
+
+          <input
+            type="text"
+            placeholder={t("auth.fullName")}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className={`${inputBase} ${inputBg} text-xs sm:text-sm`}
+          />
+          <input
+            type="email"
+            placeholder={t("auth.email")}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={`${inputBase} ${inputBg} text-xs sm:text-sm`}
+          />
+
+          <div className="relative">
             <input
-              key={field}
-              type={field === "email" ? "email" : "text"}
-              placeholder={t(`auth.${field}`)}
-              value={form[field as keyof typeof form]}
-              onChange={e => setForm({ ...form, [field]: e.target.value })}
-              className={`w-full p-2 mb-2 rounded border ${inputBg} text-sm`}
+              type={showPassword ? "text" : "password"}
+              placeholder={t("auth.password")}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setShowPasswordMessage(true)}
+              className={`${inputBase} ${inputBg} pr-10 text-xs sm:text-sm`}
             />
-          ))}
+            {password && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            )}
+          </div>
+          {showPasswordMessage && passwordMessage && (
+            <p className="text-red-500 text-xs mb-3">
+              {passwordMessage}
+            </p>
+          )}
 
-          {["password", "confirmPassword"].map((field, i) => (
-            <div key={field} className="relative mb-2">
-              <input
-                type={show[field === "password" ? "password" : "confirm"] ? "text" : "password"}
-                placeholder={t(`auth.${field === "password" ? "password" : "confirmPassword"}`)}
-                value={form[field as keyof typeof form]}
-                onChange={e => setForm({ ...form, [field]: e.target.value })}
-                onFocus={() => field === "password" && setShow({ ...show, message: true })}
-                className={`w-full p-2 rounded border ${inputBg} pr-8 text-sm`}
-              />
-              {form[field as keyof typeof form] && (
-                <button onClick={() => setShow({ ...show, [field === "password" ? "password" : "confirm"]: !show[field === "password" ? "password" : "confirm"] })} className="absolute right-2 top-2 text-gray-500">
-                  {show[field === "password" ? "password" : "confirm"] ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
-              )}
-            </div>
-          ))}
-
-          {show.message && getPasswordMsg(form.password) && <p className="text-red-500 text-xs mb-2">{getPasswordMsg(form.password)}</p>}
-
-          <button onClick={handleSignUp} disabled={status.loading} className={`w-full p-2 rounded font-medium ${btnPrimary} disabled:opacity-50 text-sm mb-2`}>
-            {status.loading ? t("auth.signingUp") : t("auth.signup")}
-          </button>
-
-          <div className="flex items-center my-3">
-            <hr className="flex-1 border-gray-300" /><span className="px-2 text-xs text-gray-500">OR</span><hr className="flex-1 border-gray-300" />
+          <div className="relative mb-3 sm:mb-4">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder={t("auth.confirmPassword")}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`${inputBase} ${inputBg} pr-10 text-xs sm:text-sm`}
+            />
+            {confirmPassword && (
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            )}
           </div>
 
-          <button onClick={() => apiClient.signInWithGoogle()} className="w-full border p-2 rounded flex items-center justify-center gap-2 text-sm mb-3">
-            <Image src="/images/google.png" width={16} height={16} alt="Google" />
+          <button
+            onClick={handleSignUp}
+            disabled={loading}
+            className={`w-full py-2 rounded-[20px] font-semibold ${btnPrimary} disabled:opacity-50 text-xs sm:text-sm mb-3`}
+          >
+            {loading ? t("auth.signingUp") : t("auth.signup")}
+          </button>
+
+          <div className="flex items-center my-2 sm:my-3">
+            <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+            <span
+              className={`px-2 text-xs ${textSecondary}`}
+            >
+              OR
+            </span>
+            <hr className="flex-1 border-gray-300 dark:border-gray-700" />
+          </div>
+
+          <button
+            onClick={() => apiClient.signInWithGoogle()}
+            className={`w-full border py-2 rounded-[20px] flex items-center justify-center gap-2 font-medium ${btnGoogle} text-xs sm:text-sm`}
+          >
+            <Image
+              src="/images/google.png"
+              width={20}
+              height={20}
+              alt="Google Logo"
+            />
             {t("auth.continueWithGoogle")}
           </button>
 
-          <p className="text-xs text-center text-gray-500">
-            {t("auth.alreadyHaveAccount")} <button onClick={() => onSwitchToSignIn?.()} className="font-medium hover:underline">{t("auth.login")}</button>
-          </p>
+          <div className="mt-3 sm:mt-4 text-center">
+            <p className={`text-xs sm:text-sm ${textSecondary}`}>
+              {t("auth.alreadyHaveAccount")}{" "}
+              <button
+                onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
+                className={`font-medium hover:underline ${textMain}`}
+              >
+                {t("auth.login")}
+              </button>
+            </p>
+          </div>
         </>
       ) : (
-        <div>
-          <h2 className={`text-md font-semibold mb-3 ${textMain}`}>{t("auth.selectYourInterests")}</h2>
-          <div className="flex flex-wrap gap-2 mb-3">
-            {topics.length > 0 ? topics.map(topic => (
-              <div key={topic} onClick={() => toggleInterest(topic)} className={`cursor-pointer px-3 py-1 rounded-full border text-xs ${interestBtn(interests.includes(topic))}`}>
-                {topic}
-              </div>
-            )) : <p className={`text-xs ${isDark ? "text-gray-400" : "text-gray-500"}`}>Loading topics...</p>}
+        <div className="mt-4">
+          <h2 className={`text-base font-semibold mb-2 ${textMain}`}>
+            {t("auth.selectYourInterests")}
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {topics.length > 0 ? (
+              topics.map((topic) => {
+                const isSelected = selectedInterests.includes(topic);
+                return (
+                  <div
+                    key={topic}
+                    onClick={() => toggleInterest(topic)}
+                    className={`${interestBase} ${
+                      isSelected ? selectedClasses : unselectedClasses
+                    }`}
+                  >
+                    {topic}
+                  </div>
+                );
+              })
+            ) : (
+              <p
+                className={`text-xs ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-500"
+                }`}
+              >
+                Loading topics...
+              </p>
+            )}
           </div>
-          <button onClick={() => (window.location.href = "/news")} className={`w-full p-2 rounded font-medium ${btnPrimary}`}>
+          <button
+            onClick={() => (window.location.href = "/news")}
+            className={`mt-3 w-full py-2 rounded-[20px] font-semibold ${btnPrimary} text-xs sm:text-sm`}
+          >
             {t("auth.continue")}
           </button>
         </div>
