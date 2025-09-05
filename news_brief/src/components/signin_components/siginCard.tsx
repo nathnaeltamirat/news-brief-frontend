@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { apiClient } from "../../lib/api";
+import { apiClient, getUserRole } from "../../lib/api";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +38,13 @@ const SignInCard: React.FC<SignInCardProps> = ({
     setError("");
     try {
       await apiClient.signIn(email, password);
-      setTimeout(() => (window.location.href = "/news"), 1000);
+      const role = getUserRole();
+      if (role == "user") {
+        setTimeout(() => (window.location.href = "/news"), 1000);
+      } else {
+        setTimeout(() => (window.location.href = "/admin"), 1000);
+      }
+
       if (onClose) onClose();
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -152,7 +158,12 @@ const SignInCard: React.FC<SignInCardProps> = ({
         onClick={() => apiClient.signInWithGoogle()}
         className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
       >
-        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
+        <Image
+          src="/images/google.png"
+          width={24}
+          height={24}
+          alt="Google Logo"
+        />
         {t("auth.continueWithGoogle")}
       </button>
 
