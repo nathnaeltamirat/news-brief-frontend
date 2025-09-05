@@ -101,7 +101,7 @@ const SettingsPage = () => {
             const user = parsed.user;
             data = {
               id: user?.id ?? "",
-              name: user?.fullname ?? "",
+              fullname: user?.fullname ?? "",
               email: user?.email ?? user?.username ?? "",
               role: user?.role ?? "user",
               subscribed: [],
@@ -112,7 +112,7 @@ const SettingsPage = () => {
         }
         if (data) {
           setProfile(data);
-          setFullName(data.name);
+          setFullName(data.fullname);
           setEmail(data.email);
         } else {
           setError("No profile data found.");
@@ -133,8 +133,7 @@ const SettingsPage = () => {
 
     try {
       const updated = await apiClient.updateProfile({
-        full_name: fullName,
-        email: email,
+        fullname: fullName,
         ...(editingPassword && password ? { password } : {}),
       });
 
@@ -149,7 +148,7 @@ const SettingsPage = () => {
         const parsed = JSON.parse(stored);
         parsed.user = {
           ...parsed.user,
-          full_name: updated.name,
+          fullname: updated.fullname,
           email: updated.email,
         };
         localStorage.setItem("person", JSON.stringify(parsed));
@@ -328,13 +327,13 @@ const SettingsPage = () => {
                         disabled={!editingEmail}
                         placeholder={t("settings.account.placeholders.email")}
                       />
-                      <button
+                      {/* <button
                         type="button"
                         onClick={() => setEditingEmail(true)}
                         className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
                       >
                         <Edit2 size={16} />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                   {/* Password */}

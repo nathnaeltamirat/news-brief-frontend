@@ -10,7 +10,7 @@ export interface News {
   topics: string[];
   source: string;
   posted_at: string;
-  image_url:string
+  image_url: string;
 }
 export interface Source {
   slug: string;
@@ -39,7 +39,7 @@ interface TopicsResponse {
 }
 export interface User {
   id: string;
-  name: string;
+  fullname: string;
   email: string;
   role?: "admin" | "user";
   subscribed: string[]; // news sources / publishers user follows
@@ -90,7 +90,7 @@ class ApiClient {
   }
   // authenticated profile
   async getProfile(): Promise<User> {
-    return this.request<User>("/auth/me", { method: "GET" });
+    return this.request<User>("/me", { method: "GET" });
   }
 
   async getSources(): Promise<Source[]> {
@@ -123,19 +123,21 @@ class ApiClient {
   }
 
   async updateProfile(data: {
-    full_name?: string;
-    email?: string;
+    fullname?: string;
   }): Promise<User> {
-    return this.request<User>("/auth/me", {
+    return this.request<User>("/me", {
+      headers:{
+        Authorization: `Bearer ${getAccessToken()}`,  
+      },
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
-
+  //  get user
   async getUser(): Promise<User> {
     return {
       id: "u123",
-      name: "John Doe",
+      fullname: "John Doe",
       email: "john@example.com",
       role: "user", // add this
       subscribed: ["TechCrunch"],
@@ -569,8 +571,6 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
-
-
 export function getUserRole(): "admin" | "user" | null {
   if (typeof window !== "undefined") {
     const data = localStorage.getItem("person");
