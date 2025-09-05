@@ -2,6 +2,9 @@
   "auth": {
     "login": "Login",
     "signup": "Sign Up",
+    
+"selectYourInterests":"Select Your Interests",
+"continue":"Continue",
     "forgotPassword": "Forgot Password?",
     "welcomeBack": "Welcome Back",
     "signingIn": "Signing In...",
@@ -15,7 +18,7 @@
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm Password",
-    "passwordRequirements": "Password must include at least 8 characters, an uppercase letter, a lowercase letter, a number, a special character."
+    "passwordRequirements": "Password must include at least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character."
   },
   "languages": {
     "english": "English",
@@ -43,7 +46,6 @@
     "opinion": "Opinion",
     "sport": "Sport"
   },
-
   "settings": {
     "title": "Settings",
     "saveChanges": "Save changes",
@@ -94,12 +96,11 @@
     }
   },
   "profile": {
-  "menuTitle": "Profile",
-  "forYou": "For You",
-  "saved": "Saved",
-  "subscriptions": "Subscriptions",
-  "settings": "Settings",
-  "logout": "Logout"
-}
-
+    "menuTitle": "Profile",
+    "forYou": "For You",
+    "saved": "Saved",
+    "subscriptions": "Subscriptions",
+    "settings": "Settings",
+    "logout": "Logout"
+  }
 }

@@ -12,7 +12,21 @@ export interface News {
   posted_at: string;
   image_url: string;
 }
+interface Topic {
+  id: string;
+  slug: string;
+  topic_name: string;
+  label: {
+    en: string;
+    am: string;
+  };
+  story_count: number;
+}
 
+interface TopicsResponse {
+  topics: Topic[];
+  total_topics: number;
+}
 export interface User {
   id: string;
   fullname: string;
@@ -29,6 +43,7 @@ export interface Category {
 }
 class ApiClient {
   private baseURL: string;
+  private topicsCache: Topic[] = [];
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
@@ -114,7 +129,6 @@ async createSource(data: {
       body: JSON.stringify(data),
     });
   }
-
   //  get user
   async getUser(): Promise<User> {
     return {
@@ -176,8 +190,10 @@ async createSource(data: {
       error.statusCode = 401;
       throw error;
     }
+    this.loadTopics();
 
     localStorage.setItem("person", JSON.stringify(logged_val));
+    // localStorage.setItem("topics", JSON.stringify(this.topicsCache))
     console.log(logged_val);
   }
 
@@ -199,7 +215,40 @@ async createSource(data: {
     // Redirect user to backend Google login route
     window.location.href = `${this.baseURL}/auth/google/login`;
   }
+async loadTopics() {
+    try {
+      const res = await fetch(`${this.baseURL}/topics`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
 
+      const status_code = res.status;
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch topics, status: ${status_code}`);
+      }
+
+      const data: TopicsResponse = await res.json();
+
+      this.topicsCache = data.topics;
+    localStorage.setItem("all_topics", JSON.stringify(this.topicsCache));
+      return {
+        message: "Topics loaded successfully",
+        status_code,
+      };
+    } catch (err) {
+      console.error("Error loading topics:", err);
+      throw err;
+    }
+  }
+
+  // Get topic name by id from local cache
+  getTopicNameById(id: string): string | undefined {
+    const topic = this.topicsCache.find((t) => t.id === id);
+    return topic ? topic.topic_name : undefined;
+  }
   async getArtsNews(): Promise<News[]> {
     const news = await this.getDummyNews();
 
@@ -518,3 +567,4 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
+
