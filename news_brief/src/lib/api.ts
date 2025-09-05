@@ -10,7 +10,7 @@ export interface News {
   topics: string[];
   source: string;
   posted_at: string;
-  image_url:string
+  image_url: string;
 }
 interface Topic {
   id: string;
@@ -29,7 +29,7 @@ interface TopicsResponse {
 }
 export interface User {
   id: string;
-  name: string;
+  fullname: string;
   email: string;
   role?: "admin" | "user";
   subscribed: string[]; // news sources / publishers user follows
@@ -80,32 +80,22 @@ class ApiClient {
   }
   // authenticated profile
   async getProfile(): Promise<User> {
-    return this.request<User>("/auth/me", { method: "GET" });
+    return this.request<User>("/me", { method: "GET" });
   }
   async updateProfile(data: {
-    full_name?: string;
-    email?: string;
+    fullname?: string;
   }): Promise<User> {
-    return this.request<User>("/auth/me", {
+    return this.request<User>("/me", {
+      headers:{
+        Authorization: `Bearer ${getAccessToken()}`,  
+      },
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
 
-  async getUser(): Promise<User> {
-    return {
-      id: "u123",
-      name: "John Doe",
-      email: "john@example.com",
-      role: "user", // add this
-      subscribed: ["TechCrunch"],
-      topic_interest: ["AI", "Tech", "Science"], // topics user cares about
-      saved_news: ["1", "3"],
-    };
-  }
 
   async signUp(fullname: string, email: string, password: string) {
-
     const options = {
       method: "POST",
       body: JSON.stringify({ fullname, email, password }),
@@ -532,6 +522,7 @@ export function getAccessToken(): string | null {
 }
 
 
+
 export function getUserRole(): "admin" | "user" | null {
   if (typeof window !== "undefined") {
     const data = localStorage.getItem("person");
@@ -546,3 +537,4 @@ export function getUserRole(): "admin" | "user" | null {
   }
   return null;
 }
+
