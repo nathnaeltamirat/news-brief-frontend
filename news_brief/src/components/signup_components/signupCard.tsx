@@ -135,7 +135,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   const bgCard = theme === "light" ? "bg-gray-50" : "bg-gray-900";
   const textMain = theme === "light" ? "text-gray-900" : "text-gray-100";
   const textSecondary = theme === "light" ? "text-gray-500" : "text-gray-400";
-  const inputBase = `w-full mb-3 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
+  const inputBase = `w-full mb-2 px-3 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
   const inputBg =
     theme === "light"
       ? "bg-gray-50 border-gray-200 text-black placeholder-gray-500"
@@ -153,7 +153,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
 // Interest button styles
 const interestBase =
-  "cursor-pointer px-4 py-2 rounded-3xl border-2 text-center font-medium transition-all w-[140px]";
+  "cursor-pointer px-3 py-1 rounded-2xl border-2 text-center font-medium transition-all w-[120px] text-xs";
 
 // Dark mode: selected = black bg, white text; hover = dark gray
 // Light mode: selected = white bg, black text; hover = light gray
@@ -169,32 +169,32 @@ const unselectedClasses =
 
   return (
     <div
-      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
+      className={`relative w-full max-w-xs sm:max-w-sm mx-2 sm:mx-auto rounded-xl shadow-lg p-3 sm:p-5 ${bgCard} transition-all duration-300`}
     >
       {!showInterestSelection ? (
         <>
           {onClose && (
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold"
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-lg font-bold"
             >
               ✕
             </button>
           )}
 
           <h1
-            className={`text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
+            className={`text-lg sm:text-xl font-bold text-center mb-3 sm:mb-4 ${textMain}`}
           >
             {t("auth.signup")}
           </h1>
 
           {success && (
-            <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
+            <p className="text-green-600 text-center mb-2 text-xs sm:text-sm">
               {success}
             </p>
           )}
           {error && (
-            <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
+            <p className="text-red-500 text-center mb-2 text-xs sm:text-sm">
               {error}
             </p>
           )}
@@ -204,14 +204,14 @@ const unselectedClasses =
             placeholder={t("auth.fullName")}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className={`${inputBase} ${inputBg} text-sm sm:text-base`}
+            className={`${inputBase} ${inputBg} text-xs sm:text-sm`}
           />
           <input
             type="email"
             placeholder={t("auth.email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`${inputBase} ${inputBg} text-sm sm:text-base`}
+            className={`${inputBase} ${inputBg} text-xs sm:text-sm`}
           />
 
           <div className="relative">
@@ -221,7 +221,7 @@ const unselectedClasses =
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onFocus={() => setShowPasswordMessage(true)}
-              className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
+              className={`${inputBase} ${inputBg} pr-10 text-xs sm:text-sm`}
             />
             {password && (
               <button
@@ -229,23 +229,23 @@ const unselectedClasses =
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             )}
           </div>
           {showPasswordMessage && passwordMessage && (
-            <p className="text-red-500 text-xs sm:text-sm mb-4">
+            <p className="text-red-500 text-xs mb-3">
               {passwordMessage}
             </p>
           )}
 
-          <div className="relative mb-4 sm:mb-6">
+          <div className="relative mb-3 sm:mb-4">
             <input
               type={showConfirmPassword ? "text" : "password"}
               placeholder={t("auth.confirmPassword")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
+              className={`${inputBase} ${inputBg} pr-10 text-xs sm:text-sm`}
             />
             {confirmPassword && (
               <button
@@ -253,7 +253,7 @@ const unselectedClasses =
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             )}
           </div>
@@ -261,15 +261,15 @@ const unselectedClasses =
           <button
             onClick={handleSignUp}
             disabled={loading}
-            className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 text-sm sm:text-base mb-4`}
+            className={`w-full py-2 rounded-[20px] font-semibold ${btnPrimary} disabled:opacity-50 text-xs sm:text-sm mb-3`}
           >
             {loading ? t("auth.signingUp") : t("auth.signup")}
           </button>
 
-          <div className="flex items-center my-3 sm:my-6">
+          <div className="flex items-center my-2 sm:my-3">
             <hr className="flex-1 border-gray-300 dark:border-gray-700" />
             <span
-              className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}
+              className={`px-2 text-xs ${textSecondary}`}
             >
               OR
             </span>
@@ -278,19 +278,19 @@ const unselectedClasses =
 
           <button
             onClick={() => apiClient.signInWithGoogle()}
-            className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
+            className={`w-full border py-2 rounded-[20px] flex items-center justify-center gap-2 font-medium ${btnGoogle} text-xs sm:text-sm`}
           >
             <Image
               src="/images/google.png"
-              width={24}
-              height={24}
+              width={20}
+              height={20}
               alt="Google Logo"
             />
             {t("auth.continueWithGoogle")}
           </button>
 
-          <div className="mt-4 sm:mt-6 text-center">
-            <p className={`text-sm sm:text-base ${textSecondary}`}>
+          <div className="mt-3 sm:mt-4 text-center">
+            <p className={`text-xs sm:text-sm ${textSecondary}`}>
               {t("auth.alreadyHaveAccount")}{" "}
               <button
                 onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
@@ -302,11 +302,11 @@ const unselectedClasses =
           </div>
         </>
       ) : (
-        <div className="mt-6">
-          <h2 className={`text-lg font-semibold mb-3 ${textMain}`}>
+        <div className="mt-4">
+          <h2 className={`text-base font-semibold mb-2 ${textMain}`}>
             {t("auth.selectYourInterests")}
           </h2>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {topics.length > 0 ? (
               topics.map((topic) => {
                 const isSelected = selectedInterests.includes(topic);
@@ -324,7 +324,7 @@ const unselectedClasses =
               })
             ) : (
               <p
-                className={`text-sm ${
+                className={`text-xs ${
                   theme === "dark" ? "text-gray-400" : "text-gray-500"
                 }`}
               >
@@ -334,7 +334,7 @@ const unselectedClasses =
           </div>
           <button
             onClick={() => (window.location.href = "/news")}
-            className={`mt-4 w-full py-3 rounded-[30px] font-semibold ${btnPrimary}`}
+            className={`mt-3 w-full py-2 rounded-[20px] font-semibold ${btnPrimary} text-xs sm:text-sm`}
           >
             {t("auth.continue")}
           </button>
