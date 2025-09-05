@@ -1,120 +1,97 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { apiClient } from "../../lib/api"; // adjust path if needed
+import { apiClient } from "../../lib/api";
+import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
-export default function ResetPasswordForm() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+interface SignInCardProps {
+  onClose?: () => void;
+  onSwitchToSignUp?: () => void;
+  onSwitchToForgot?: () => void;
+}
 
-  const token = searchParams.get("token") || "";
-  const verifier = searchParams.get("verifier") || "";
-
+const SignInCard: React.FC<SignInCardProps> = ({ onClose, onSwitchToSignUp, onSwitchToForgot }) => {
+  const { t } = useTranslation();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showPasswordMessage, setShowPasswordMessage] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  // ✅ Password validation rules
-  const getPasswordMessage = (pwd: string) => {
-    const messages: string[] = [];
-    if (pwd.length < 8) messages.push("at least 8 characters");
-    if (!/[A-Z]/.test(pwd)) messages.push("an uppercase letter");
-    if (!/[a-z]/.test(pwd)) messages.push("a lowercase letter");
-    if (!/\d/.test(pwd)) messages.push("a number");
-    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(pwd))
-      messages.push("a special character");
-
-    if (messages.length === 0) return "";
-    return "Password must include " + messages.join(", ") + ".";
-  };
-
-  const passwordMessage = getPasswordMessage(password);
+  const context = useContext(ThemeContext);
+  if (!context) throw new Error("SignInCard must be used inside ThemeProvider");
+  const { theme } = context;
 
   useEffect(() => {
-    if (!token || !verifier) {
-      setError("Invalid or missing reset link ❌");
-    }
-  }, [token, verifier]);
+    localStorage.removeItem("person");
+  }, []);
 
-  const handleSubmit = async () => {
-    if (!token || !verifier) {
-      setError("Missing reset credentials ❌");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match ❌");
-      return;
-    }
-
-    if (passwordMessage !== "") {
-      setError("Password does not meet all requirements ❌");
-      return;
-    }
-
+  const handleSignIn = async () => {
     setLoading(true);
     setError("");
-    setSuccess("");
-
     try {
-      const res = await apiClient.resetPassword(verifier, token, password);
-      setSuccess(res.message || "Password reset successfully ✅");
-
-      // clear input fields
-      setPassword("");
-      setConfirmPassword("");
-      setShowPasswordMessage(false);
-
-      setTimeout(() => router.push("/"), 1500);
+      await apiClient.signIn(email, password);
+      setTimeout(() => (window.location.href = "/news"), 1000);
+      onClose?.();
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong ❌");
-      }
+        const statusError = err as Error & { statusCode?: number };
+        setError(statusError.statusCode === 401 ? t("auth.invalidCredentials") : err.message);
+      } else setError(t("auth.somethingWentWrong"));
     } finally {
       setLoading(false);
     }
   };
 
+  // Theme-based classes
+  const bgCard = theme === "light" ? "bg-gray-50" : "bg-gray-900";
+  const textMain = theme === "light" ? "text-gray-900" : "text-gray-100";
+  const textSecondary = theme === "light" ? "text-gray-500" : "text-gray-400";
+  const inputBase = `w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none`;
+  const inputBg = theme === "light" 
+    ? "bg-gray-50 border-gray-200 text-black placeholder-gray-500" 
+    : "bg-gray-800 border-gray-700 text-white placeholder-gray-400";
+  const btnPrimary = theme === "light" 
+    ? "bg-black text-white hover:bg-gray-800" 
+    : "bg-white text-black hover:bg-gray-200";
+  const btnGoogle = theme === "light" 
+    ? "text-black border border-gray-300 hover:bg-gray-100" 
+    : "text-white border border-gray-600 hover:bg-gray-700";
+
   return (
-    <div className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-2xl shadow-xl p-6 sm:p-8 bg-gray-50 transition-all duration-300">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-6">
-        Reset Your Password
+    <div className={`relative w-full max-w-md mx-auto rounded-2xl shadow-xl p-6 ${bgCard}`}>
+      {onClose && (
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl">
+          ✕
+        </button>
+      )}
+
+      <h1 className={`text-2xl font-bold text-center mb-6 ${textMain}`}>
+        {t("auth.welcomeBack")}
       </h1>
 
-      {success && (
-        <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
-          {success}
-        </p>
-      )}
-      {error && (
-        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-500 text-center mb-3 text-sm">{error}</p>}
 
-      {/* Password */}
-      <div className="relative mb-2">
+      <input
+        type="email"
+        placeholder={t("auth.email")}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className={`${inputBase} ${inputBg} mb-3 text-sm`}
+      />
+
+      <div className="relative mb-4">
         <input
           type={showPassword ? "text" : "password"}
-          placeholder="New Password"
+          placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          onFocus={() => setShowPasswordMessage(true)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
+          className={`${inputBase} ${inputBg} pr-10 text-sm`}
         />
         {password && (
           <button
-            type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
@@ -123,38 +100,44 @@ export default function ResetPasswordForm() {
         )}
       </div>
 
-      {/* Live password validation */}
-      {showPasswordMessage && passwordMessage && (
-        <p className="text-red-500 text-sm mb-4">{passwordMessage}</p>
-      )}
-
-      {/* Confirm Password */}
-      <div className="relative mb-6">
-        <input
-          type={showConfirmPassword ? "text" : "password"}
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
-        />
-        {confirmPassword && (
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
-          >
-            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        )}
+      <div className="mb-4 text-right">
+        <button onClick={onSwitchToForgot} className={`hover:underline text-sm ${textMain}`}>
+          {t("auth.forgotPassword")}
+        </button>
       </div>
 
       <button
-        onClick={handleSubmit}
+        onClick={handleSignIn}
         disabled={loading}
-        className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 disabled:opacity-50 text-sm sm:text-base"
+        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 mb-4 text-sm`}
       >
-        {loading ? "Resetting..." : "Reset Password"}
+        {loading ? t("auth.signingIn") : t("auth.login")}
       </button>
+
+      <div className="flex items-center my-6">
+        <hr className="flex-1 border-gray-300" />
+        <span className={`px-3 text-sm ${textSecondary}`}>OR</span>
+        <hr className="flex-1 border-gray-300" />
+      </div>
+
+      <button
+        onClick={() => apiClient.signInWithGoogle()}
+        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-3 font-medium ${btnGoogle} text-sm`}
+      >
+        <Image src="/images/google.png" width={20} height={20} alt="Google" />
+        {t("auth.continueWithGoogle")}
+      </button>
+
+      <div className="mt-6 text-center">
+        <p className={`text-sm ${textSecondary}`}>
+          {t("auth.dontHaveAccount")}{" "}
+          <button onClick={onSwitchToSignUp} className={`hover:underline ${textMain}`}>
+            {t("auth.signup")}
+          </button>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default SignInCard;

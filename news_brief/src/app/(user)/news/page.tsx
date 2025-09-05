@@ -6,11 +6,17 @@ import TopBar from "@/components/reusable_components/search_topbar";
 
 import ChatBot from "@/components/reusable_components/chatbot";
 import { ThemeContext } from "../../contexts/ThemeContext";
+import CategoryComponent from "@/components/news_component/CategoryComponent";
+import { ActiveCategoryContext } from "@/app/contexts/ActiveCategoryContext";
 
 
 
 const News = () => {
   const context = useContext(ThemeContext);
+  const categoryContext = useContext(ActiveCategoryContext);
+  if (!categoryContext)
+    throw new Error("ToggleButton must be used inside ActiveCategoryProvider");
+  const { activeCategory, setActiveCategory } = categoryContext;
 
   if (!context)
     throw new Error("ToggleButton must be used inside ThemeProvider");
@@ -28,8 +34,12 @@ const News = () => {
           <div className="flex justify-between w-full mb-4">
             <TopBar />
           </div>
-          <NewsComponent />
-        </div>
+          {activeCategory === "all" ? (
+                  <NewsComponent />
+          ) : (
+            <CategoryComponent activeCategory={activeCategory} />
+          )}
+                  </div>
       </div>
     </>
   );

@@ -11,20 +11,24 @@ import DarkMode from "../dark_mode/DarkMode";
 import ProfileDropdown from "./DropDownBar";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { ActiveCategoryContext } from "@/app/contexts/ActiveCategoryContext";
 
 const token = getAccessToken();
 
 export default function TopBar() {
   const context = useContext(ThemeContext);
+  const categoryContext = useContext(ActiveCategoryContext);
+  if (!categoryContext) throw new Error("TopBar must be used inside ActiveCategoryProvider");
   if (!context) throw new Error("TopBar must be used inside ThemeProvider");
   const { theme } = context;
+  const { activeCategory, setActiveCategory } = categoryContext;
 
   const { t, i18n } = useTranslation();
 
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"signin" | "signup" | "forgot">("signin");
-  const [activeCategory, setActiveCategory] = useState("all");
 
+  
   const categories = [
     "all",
     "world",

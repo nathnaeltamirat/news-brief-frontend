@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import ThemeProvider from "./contexts/ThemeContext";
 import { I18nProvider } from "@/components/I18nProvider";
+import ActiveCategoryProvider from "./contexts/ActiveCategoryContext";
 // adjust path if needed
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body>
         <I18nProvider>
           <ThemeProvider>
-            {children}
+            <ActiveCategoryProvider>
+             {children}
+            </ActiveCategoryProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>
