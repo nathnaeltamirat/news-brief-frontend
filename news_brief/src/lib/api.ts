@@ -10,12 +10,12 @@ export interface News {
   topics: string[];
   source: string;
   posted_at: string;
-  image_url:string
+  image_url: string;
 }
 
 export interface User {
   id: string;
-  name: string;
+  fullname: string;
   email: string;
   role?: "admin" | "user";
   subscribed: string[]; // news sources / publishers user follows
@@ -65,22 +65,25 @@ class ApiClient {
   }
   // authenticated profile
   async getProfile(): Promise<User> {
-    return this.request<User>("/auth/me", { method: "GET" });
+    return this.request<User>("/me", { method: "GET" });
   }
   async updateProfile(data: {
-    full_name?: string;
-    email?: string;
+    fullname?: string;
   }): Promise<User> {
-    return this.request<User>("/auth/me", {
+    return this.request<User>("/me", {
+      headers:{
+        Authorization: `Bearer ${getAccessToken()}`,  
+      },
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
+
   //  get user
   async getUser(): Promise<User> {
     return {
       id: "u123",
-      name: "John Doe",
+      fullname: "John Doe",
       email: "john@example.com",
       role: "user", // add this
       subscribed: ["TechCrunch"],
@@ -90,7 +93,6 @@ class ApiClient {
   }
 
   async signUp(fullname: string, email: string, password: string) {
-
     const options = {
       method: "POST",
       body: JSON.stringify({ fullname, email, password }),
@@ -480,4 +482,3 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
-
