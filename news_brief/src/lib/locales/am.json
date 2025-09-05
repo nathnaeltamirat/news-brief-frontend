@@ -1,31 +1,33 @@
 {
   "auth": {
-    "login": "መግቢያ",
-    "signup": "መመዝገቢያ",
-    "forgotPassword": "የይለፍ ቃል ረሱ?",
-    "welcomeBack": "እንኳን በደህና መጡ",
-    "signingIn": "በመግባት ላይ...",
-    "signingUp": "በመመዝገብ ላይ...",
+    "login": "ግባ",
+    "signup": "መዝግብ",
+    "forgotPassword": "የይለፍ ቃል ረሳህ?",
+    "welcomeBack": "እንኳን በደህና መጣህ",
+    "signingIn": "መግባት እየተከናወነ...",
+    "signingUp": "መመዝገብ እየተከናወነ...",
     "invalidCredentials": "የተሳሳተ መረጃ",
-    "somethingWentWrong": "አንዳንድ ችግር ተፈጥሯል ❌",
-    "continueWithGoogle": "በ Google ይቀጥሉ",
+    "somethingWentWrong": "አንዴ ተገጽሞ ❌",
+    "continueWithGoogle": "በGoogle ይቀጥሉ",
     "dontHaveAccount": "መለያ የለዎትም?",
-    "alreadyHaveAccount": "መለያ አለዎት?",
+"selectYourInterests": "እንደ ምን ትወዳላችሁ ይምረጡ",
+"continue": "ቀጥል",
+    "alreadyHaveAccount": "አስቀድሞ መለያ አሎት?",
     "fullName": "ሙሉ ስም",
     "email": "ኢሜይል",
     "password": "የይለፍ ቃል",
-    "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
-    "passwordRequirements": "የይለፍ ቃል ቢያንስ 8 ቁምፊ፣ አንድ የትልቅ ፊደል፣ አንድ የትንሽ ፊደል፣ አንድ ቁጥር፣ እና የልዩ ምልክት መያዝ አለበት።"
+    "confirmPassword": "የይለፍ ቃል አረጋግጥ",
+    "passwordRequirements": "የይለፍ ቃል ቢያንስ 8 ቁምፊዎችን፣ ከፍተኛ ፊደል፣ ዝቅተኛ ፊደል፣ ቁጥር እና ልዩ ቁምፊ አሳት።"
   },
   "languages": {
     "english": "እንግሊዝኛ",
     "amharic": "አማርኛ"
   },
   "search": {
-    "placeholder": "ዜና፣ ጉዳዮች፣ ወይም ሰዎችን ፈልግ..."
+    "placeholder": "ዜና፣ ርዕሶች ወይም ሰዎች ይፈልጉ..."
   },
   "categories": {
-    "all": "ሁሉም",
+    "all": "ሁሉ",
     "world": "ዓለም",
     "national": "ብሔራዊ",
     "politics": "ፖለቲካ",
@@ -37,62 +39,62 @@
     "health": "ጤና",
     "environment": "አካባቢ",
     "education": "ትምህርት",
-    "law": "ህግ",
+    "law": "ሕግ",
     "crime": "ወንጀል",
-    "weather": "የአየር ጠባይ",
+    "weather": "አየር ንብረት",
     "opinion": "አስተያየት",
     "sport": "ስፖርት"
   },
- 
   "settings": {
     "title": "ቅንብሮች",
     "saveChanges": "ለውጦችን አስቀምጥ",
     "tabs": {
-      "customization": "ማበጀት",
+      "customization": "ማስተካከያ",
       "account": "መለያ",
-      "categories": "ምድቦች",
-      "subscriptions": "ተመዝጋቢዎች"
+      "categories": "ርዕሶች",
+      "subscriptions": "እቅዶች"
     },
     "customization": {
-      "title": "ማበጀት",
-      "theme": "ገጽታ",
+      "title": "ማስተካከያ",
+      "theme": "ቅንብር",
       "showAvatars": "አቫታሮችን አሳይ"
     },
     "themes": {
-      "system": "የስርዓት ነባር",
+      "system": "የስርዓት ነገር",
       "light": "ብርሃን",
       "dark": "ጨለማ"
     },
     "account": {
       "title": "የመለያ ዝርዝሮች",
-      "username": "ተጠቃሚ ስም",
+      "username": "የተጠቃሚ ስም",
       "placeholders": {
-        "fullName": "ሙሉ ስም ያስገቡ",
-        "email": "ኢሜይል ያስገቡ",
-        "username": "ተጠቃሚ ስም ያስገቡ",
-        "password": "የይለፍ ቃል ያስገቡ"
+        "fullName": "ሙሉ ስም አስገባ",
+        "email": "ኢሜይል አስገባ",
+        "username": "የተጠቃሚ ስም አስገባ",
+        "password": "የይለፍ ቃል አስገባ"
       },
       "created": "መለያ ተፈጥሯል",
       "dangerZone": {
-        "title": "አደጋ ቦታ",
-        "delete": "መለያ አጥፋ",
-        "warning": "ይህ እርምጃ የማይቀለበስ ነው"
+        "title": "አደጋ ክልል",
+        "delete": "መለያ አስወግድ",
+        "warning": "ይህ እርምጃ አልተመለሰም"
       }
     },
     "categories": {
-      "title": "የተወደዱ መለዮዎች",
-      "add": "አዲስ መለዮዎች ያክሉ",
-      "placeholder": "መለዮዎችን ፈልግ",
-      "addButton": "አክል"
+      "title": "ተወዳጆች መለያዎች",
+      "add": "አዲስ መለያዎች ጨምር",
+      "placeholder": "መለያዎችን ፈልግ",
+      "addButton": "ጨምር"
     },
     "subscriptions": {
-      "title": "የእርስዎ ተመዝጋቢዎች",
+      "title": "የእርስዎ እቅዶች",
       "remove": "አስወግድ",
-      "search": "አዲስ የዜና ሚዲያ ፈልግ",
-      "placeholder": "የህትመት፣ ፖድካስት፣ RSS ፈልግ",
-      "addButton": "አክል"
+      "search": "አዲስ ዜና ሚዲያ ፈልግ",
+      "placeholder": "ህትመቶች፣ ፖድካስቶች፣ RSS ፈልግ",
+      "addButton": "ጨምር"
     }
   },
+
     "profile": {
     "menuTitle": "መገለጫ",
     "forYou": "ለእርስዎ",
