@@ -1,6 +1,6 @@
 "use client";
 // API service layer for backend integration
-const API_BASE_URL = "https://news-brief-core-api-excr.onrender.com/api/v1";
+const API_BASE_URL = "https://news-brief-core-api.onrender.com/api/v1";
 
 // Types matching backend interfaces
 export interface News {
@@ -89,10 +89,11 @@ class ApiClient {
     };
   }
 
-  async signUp(full_name: string, email: string, password: string) {
+  async signUp(fullname: string, email: string, password: string) {
+
     const options = {
       method: "POST",
-      body: JSON.stringify({ full_name, email, password }),
+      body: JSON.stringify({ fullname, email, password }),
     };
     const res = await fetch(`${this.baseURL}/auth/register`, options);
     const status_code = res.status;
