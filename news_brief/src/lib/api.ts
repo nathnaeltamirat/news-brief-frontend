@@ -65,8 +65,7 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    const token =
-      typeof window !== "undefined" ? getAccessToken : null;
+    const token = typeof window !== "undefined" ? getAccessToken : null;
 
     const config: RequestInit = {
       ...options,
@@ -97,7 +96,7 @@ class ApiClient {
     const res = await this.request<{ sources: Source[] }>("/sources", {
       method: "GET",
     });
-    console.log("getting source",res)
+    console.log("getting source", res);
     return res.sources;
   }
   async getSubscriptions(): Promise<Source[]> {
@@ -105,7 +104,7 @@ class ApiClient {
       "/me/subscriptions",
       { method: "GET" }
     );
-    console.log("getting subscription",res)
+    console.log("getting subscription", res);
     return res.subscriptions;
   }
 
@@ -122,12 +121,10 @@ class ApiClient {
     });
   }
 
-  async updateProfile(data: {
-    fullname?: string;
-  }): Promise<User> {
+  async updateProfile(data: { fullname?: string }): Promise<User> {
     return this.request<User>("/me", {
-      headers:{
-        Authorization: `Bearer ${getAccessToken()}`,  
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
       },
       method: "PUT",
       body: JSON.stringify(data),
@@ -320,6 +317,44 @@ class ApiClient {
           },
         ]);
       }, 100);
+    });
+  }
+  async createTopic(
+    slug: string,
+    en: string,
+    am: string
+  ): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/admin/create-topics", {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "POST",
+      body: JSON.stringify({
+        slug,
+        label: {
+          en,
+          am,
+        },
+      }),
+    });
+  }
+
+  async createSource(data: {
+    slug: string;
+    name: string;
+    description: string;
+    url: string;
+    logo_url: string;
+    languages: string;
+    topics: string[];
+    reliability_score: number;
+  }): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/admin/create-sources", {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "POST",
+      body: JSON.stringify(data),
     });
   }
 
