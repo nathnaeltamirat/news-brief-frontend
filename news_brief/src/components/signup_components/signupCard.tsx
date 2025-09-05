@@ -167,7 +167,6 @@ const unselectedClasses =
     ? "bg-gray-800 text-gray-300 border-gray-700 hover:bg-gray-700"
     : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200";
 
-
   return (
     <div
       className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
