@@ -73,23 +73,27 @@ const SignInCard: React.FC<SignInCardProps> = ({
 
   return (
     <div
-      className={`relative w-full max-w-sm mx-auto rounded-xl shadow-md p-6 ${bgCard} transition-all duration-300`}
+      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
     >
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-lg font-bold"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold"
         >
           ✕
         </button>
       )}
 
-      <h1 className={`text-xl font-semibold text-center mb-4 ${textMain}`}>
+      <h1
+        className={`text-2xl sm:text-3xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
+      >
         {t("auth.welcomeBack")}
       </h1>
 
       {error && (
-        <p className="text-red-500 text-center mb-3 text-sm">{error}</p>
+        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
+          {error}
+        </p>
       )}
 
       <input
@@ -97,16 +101,16 @@ const SignInCard: React.FC<SignInCardProps> = ({
         placeholder={t("auth.email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className={`w-full mb-3 px-3 py-2 rounded-lg border ${inputBg} text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none`}
+        className={`w-full mb-3 px-4 py-3 rounded-xl border ${inputBg} text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none`}
       />
 
-      <div className="relative mb-3">
+      <div className="relative mb-4">
         <input
           type={showPassword ? "text" : "password"}
           placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={`w-full px-3 py-2 rounded-lg border ${inputBg} pr-9 text-sm focus:ring-1 focus:ring-blue-500 focus:outline-none`}
+          className={`w-full px-4 py-3 rounded-xl border ${inputBg} pr-10 text-sm sm:text-base focus:ring-2 focus:ring-blue-500 focus:outline-none`}
         />
         {password && (
           <button
@@ -114,15 +118,15 @@ const SignInCard: React.FC<SignInCardProps> = ({
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
 
-      <div className="mb-3 text-right">
+      <div className="mb-4 text-right">
         <button
           onClick={onSwitchToForgot}
-          className={`hover:underline text-xs font-medium ${textMain}`}
+          className={`hover:underline font-medium text-xs sm:text-sm ${textMain}`}
         >
           {t("auth.forgotPassword")}
         </button>
@@ -131,27 +135,29 @@ const SignInCard: React.FC<SignInCardProps> = ({
       <button
         onClick={handleSignIn}
         disabled={loading}
-        className={`w-full py-2 rounded-lg font-medium ${btnPrimary} disabled:opacity-50 mb-3 text-sm`}
+        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 mb-4 text-sm sm:text-base`}
       >
         {loading ? t("auth.signingIn") : t("auth.login")}
       </button>
 
-      <div className="flex items-center my-3">
+      <div className="flex items-center my-4 sm:my-6">
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-        <span className={`px-2 text-xs ${textSecondary}`}>OR</span>
+        <span className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}>
+          OR
+        </span>
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
       </div>
 
       <button
         onClick={() => apiClient.signInWithGoogle()}
-        className={`w-full border py-2 rounded-lg flex items-center justify-center gap-2 font-medium ${btnGoogle} text-sm`}
+        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
       >
-        <Image src="/images/google.png" width={18} height={18} alt="Google Logo" />
+        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
         {t("auth.continueWithGoogle")}
       </button>
 
-      <div className="mt-3 text-center">
-        <p className={`text-xs ${textSecondary}`}>
+      <div className="mt-4 sm:mt-6 text-center">
+        <p className={`text-sm sm:text-base ${textSecondary}`}>
           {t("auth.dontHaveAccount")}{" "}
           <button
             onClick={onSwitchToSignUp}

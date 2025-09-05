@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { apiClient } from "../../lib/api";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { useTranslation } from "react-i18next"; // Added translation import
+import { useTranslation } from "react-i18next";
 
 interface SignUpCardProps {
   onClose?: () => void;
@@ -16,7 +16,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   onClose,
   onSwitchToSignIn,
 }) => {
-  const { t } = useTranslation(); // Added translation hook
+  const { t } = useTranslation();
 
   const context = useContext(ThemeContext);
   if (!context) throw new Error("SignUpCard must be used inside ThemeProvider");
@@ -50,11 +50,11 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      setError(t("auth.passwordsDoNotMatch")); // Added translation
+      setError(t("auth.passwordsDoNotMatch"));
       return;
     }
     if (getPasswordMessage(password) !== "") {
-      setError(t("auth.passwordDoesNotMeetRequirements")); // Added translation
+      setError(t("auth.passwordDoesNotMeetRequirements"));
       return;
     }
 
@@ -65,7 +65,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
     try {
       const res = await apiClient.signUp(fullName, email, password);
       if (res.status_code === 201) {
-        setSuccess(res.message || t("auth.userCreatedSuccess")); // Added translation
+        setSuccess(res.message || t("auth.userCreatedSuccess"));
       }
       setFullName("");
       setEmail("");
@@ -76,9 +76,9 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
     } catch (err: unknown) {
       if (err instanceof Error) {
         const statusError = err as Error & { statusCode?: number };
-        if (statusError.statusCode === 409) setError(t("auth.accountAlreadyRegistered")); // Added translation
+        if (statusError.statusCode === 409) setError(t("auth.accountAlreadyRegistered"));
         else setError(statusError.message);
-      } else setError(t("auth.somethingWentWrong")); // Added translation
+      } else setError(t("auth.somethingWentWrong"));
     } finally {
       setLoading(false);
     }
@@ -105,82 +105,88 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
       : "text-white border border-gray-600 hover:bg-gray-700";
 
   return (
-    <div className={`relative w-full max-w-xs mx-auto rounded-lg shadow-md p-4 ${bgCard} transition-all duration-300`}>
+    <div
+      className={`relative w-full max-w-md sm:max-w-lg mx-3 sm:mx-auto rounded-2xl shadow-xl p-4 sm:p-8 ${bgCard} transition-all duration-300`}
+    >
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-sm font-bold"
+          className={`absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-bold`}
         >
           ✕
         </button>
       )}
 
-      <h1 className={`text-lg font-bold text-center mb-2 ${textMain}`}>
-        {t("auth.signup")} {/* Added translation */}
+      <h1
+        className={`text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6 ${textMain}`}
+      >
+        {t("auth.signup")}
       </h1>
 
       {success && (
-        <p className="text-green-600 text-center mb-1 text-xs">{success}</p>
+        <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
+          {success}
+        </p>
       )}
       {error && (
-        <p className="text-red-500 text-center mb-1 text-xs">{error}</p>
+        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
+          {error}
+        </p>
       )}
 
       <input
         type="text"
-        placeholder={t("auth.fullName")} 
+        placeholder={t("auth.fullName")}
         value={fullName}
         onChange={(e) => setFullName(e.target.value)}
-        className={`${inputBase} ${inputBg} text-xs mb-2`}
+        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
       />
       <input
         type="email"
         placeholder={t("auth.email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className={`${inputBase} ${inputBg} text-xs mb-2`}
+        className={`${inputBase} ${inputBg} text-sm sm:text-base`}
       />
 
-      {/* Password */}
-      <div className="relative mb-2">
+      <div className="relative">
         <input
           type={showPassword ? "text" : "password"}
-          placeholder={t("auth.password")} 
+          placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onFocus={() => setShowPasswordMessage(true)}
-          className={`${inputBase} ${inputBg} pr-9 text-xs`}
+          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
         />
         {password && (
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
       {showPasswordMessage && passwordMessage && (
-        <p className="text-red-500 text-xs mb-1">{passwordMessage}</p>
+        <p className="text-red-500 text-xs sm:text-sm mb-4">{passwordMessage}</p>
       )}
 
-      {/* Confirm Password */}
-      <div className="relative mb-2">
+      <div className="relative mb-4 sm:mb-6">
         <input
           type={showConfirmPassword ? "text" : "password"}
-          placeholder={t("auth.confirmPassword")} 
+          placeholder={t("auth.confirmPassword")}
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className={`${inputBase} ${inputBg} pr-9 text-xs`}
+          className={`${inputBase} ${inputBg} pr-10 text-sm sm:text-base`}
         />
         {confirmPassword && (
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
@@ -188,33 +194,33 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
       <button
         onClick={handleSignUp}
         disabled={loading}
-        className={`w-full py-2 rounded-full font-medium ${btnPrimary} disabled:opacity-50 text-xs mb-2`}
+        className={`w-full py-3 rounded-[30px] font-semibold ${btnPrimary} disabled:opacity-50 text-sm sm:text-base mb-4`}
       >
-        {loading ? t("auth.signingUp") : t("auth.signup")} {/* Added translation */}
+        {loading ? t("auth.signingUp") : t("auth.signup")}
       </button>
 
-      <div className="flex items-center my-2">
+      <div className="flex items-center my-3 sm:my-6">
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-        <span className={`px-2 text-xs ${textSecondary}`}>OR</span>
+        <span className={`px-2 sm:px-3 text-xs sm:text-sm ${textSecondary}`}>OR</span>
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
       </div>
 
       <button
         onClick={() => apiClient.signInWithGoogle()}
-        className={`w-full border py-2 rounded-full flex items-center justify-center gap-1 font-medium ${btnGoogle} text-xs`}
+        className={`w-full border py-3 rounded-[30px] flex items-center justify-center gap-2 sm:gap-3 font-medium ${btnGoogle} text-sm sm:text-base`}
       >
-        <Image src="/images/google.png" width={14} height={14} alt="Google Logo" />
-        {t("auth.continueWithGoogle")} {/* Added translation */}
+        <Image src="/images/google.png" width={24} height={24} alt="Google Logo" />
+        {t("auth.continueWithGoogle")}
       </button>
 
-      <div className="mt-2 text-center">
-        <p className={`text-xs ${textSecondary}`}>
-          {t("auth.alreadyHaveAccount")}{" "} {/* Added translation */}
+      <div className="mt-4 sm:mt-6 text-center">
+        <p className={`text-sm sm:text-base ${textSecondary}`}>
+          {t("auth.alreadyHaveAccount")}{" "}
           <button
             onClick={() => setTimeout(() => onSwitchToSignIn?.(), 100)}
-            className="font-medium hover:underline text-blue-600"
+            className={`font-medium hover:underline ${textMain}`}
           >
-            {t("auth.login")} {/* Added translation */}
+            {t("auth.login")}
           </button>
         </p>
       </div>
@@ -223,4 +229,3 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
 };
 
 export default SignUpCard;
-
