@@ -67,6 +67,42 @@ class ApiClient {
   async getProfile(): Promise<User> {
     return this.request<User>("/me", { method: "GET" });
   }
+  // Inside ApiClient class
+async createTopic(slug: string, en: string, am: string): Promise<{ message: string }> {
+  return this.request<{ message: string }>("/admin/create-topics", {
+     headers:{
+        Authorization: `Bearer ${getAccessToken()}`,  
+      },
+    method: "POST",
+    body: JSON.stringify({
+      slug,
+      label: {
+        en,
+        am,
+      },
+    }),
+  });
+}
+
+async createSource(data: {
+  slug: string;
+  name: string;
+  description: string;
+  url: string;
+  logo_url: string;
+  languages: string;
+  topics: string[];
+  reliability_score: number;
+}): Promise<{ message: string }> {
+  return this.request<{ message: string }>("/admin/create-sources", {
+     headers:{
+        Authorization: `Bearer ${getAccessToken()}`,  
+      },
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
   async updateProfile(data: {
     fullname?: string;
   }): Promise<User> {

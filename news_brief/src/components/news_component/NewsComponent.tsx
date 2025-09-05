@@ -307,7 +307,7 @@ function FeaturedToday({
   if (!news) return null;
   return (
     <div
-      className={`group cursor-pointer transition-shadow rounded-lg overflow-hidden hover:shadow-lg`}
+      className={`group cursor-pointer transition-shadow  rounded-lg overflow-hidden hover:shadow-lg`}
       onClick={() => onClick(news.id)}
     >
       <div className="overflow-hidden">
@@ -317,7 +317,7 @@ function FeaturedToday({
           className="w-full h-80 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <div className="mt-4">
+      <div className="mt-4 pl-2 pb-2">
         <p
           className={`text-xs mb-1 uppercase tracking-wide ${
             theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -326,7 +326,7 @@ function FeaturedToday({
           {news.topics} · {news.posted_at}
         </p>
         <h2
-          className={`text-2xl font-bold mb-3 ${
+          className={`text-2xl  font-bold mb-3 ${
             theme === "dark"
               ? "text-gray-100 hover:text-blue-400"
               : "hover:text-blue-600"
@@ -375,7 +375,7 @@ function FeaturedStory({
           className="w-full h-52 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <div className="mt-3">
+      <div className="mt-3 pl-2 pb-1">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           {Array.isArray(news.topics) ? (
             news.topics.map((t, i) => (
@@ -434,7 +434,7 @@ function TrendingCard({
           className="w-full h-28 object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
         />
       </div>
-      <div className="mt-2">
+      <div className="mt-2 pl-2 pb-1">
         <div className="flex items-center gap-2 mb-1 flex-wrap">
           {Array.isArray(story.topics) ? (
             story.topics.map((t, i) => (
