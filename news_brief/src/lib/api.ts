@@ -567,4 +567,17 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
-
+export function getUserRole(): "admin" | "user" | null {
+  if (typeof window !== "undefined") {
+    const data = localStorage.getItem("person");
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        return parsed?.user?.role ?? null;
+      } catch {
+        return null;
+      }
+    }
+  }
+  return null;
+}
