@@ -4,7 +4,7 @@ import { Edit2, Eye, EyeOff } from "lucide-react";
 import TopBar from "@/components/reusable_components/topBar";
 import { useTranslation } from "react-i18next";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { apiClient, User, Source } from "../../../lib/api";
+import { apiClient, User, Source, Topic } from "../../../lib/api";
 
 type TabId = "customization" | "account" | "categories" | "subscriptions";
 
@@ -29,13 +29,24 @@ const SettingsPage = () => {
   const [sources, setSources] = useState<Source[]>([]);
   const [subscriptions, setSubscriptions] = useState<Source[]>([]);
   const [selectedSource, setSelectedSource] = useState("");
-
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<boolean | null | string>(null);
+  const [loading, setLoading] = useState<boolean | null | string>(null);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
+
+  // Topics state
+  const [allTopics, setAllTopics] = useState<Topic[]>([]);
+  const [subscribedTopics, setSubscribedTopics] = useState<
+    {
+      slug: string;
+      topic_name: string;
+      label: { en: string; am: string };
+      story_count: number;
+    }[]
+  >([]);
+  const [selectedTopic, setSelectedTopic] = useState("");
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "customization", label: t("settings.tabs.customization") },
@@ -43,28 +54,36 @@ const SettingsPage = () => {
     { id: "categories", label: t("settings.tabs.categories") },
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
-   const [hasChanges, setHasChanges] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-   // Watch for profile edits and any changes in subscriptions to enable save button
-   useEffect(() => {
-     if (editingFullName || editingEmail || editingPassword || selectedSource) {
-       setHasChanges(true);
-     } else {
-       setHasChanges(false);
-     }
-   }, [editingFullName, editingEmail, editingPassword, selectedSource]);
+  // Watch for profile edits and any changes in subscriptions to enable save button
+  useEffect(() => {
+    if (editingFullName || editingEmail || editingPassword || selectedSource) {
+      setHasChanges(true);
+    } else {
+      setHasChanges(false);
+    }
+  }, [editingFullName, editingEmail, editingPassword, selectedSource]);
 
-  // Load sources + subscriptions + tags from localStorage
+  // Load sources + subscriptions + topics from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const allSources = await apiClient.getSources();
-        const mySubs = await apiClient.getSubscriptions();
+        const [allSources, mySubs, topics, subscribedTopicsData] =
+          await Promise.all([
+            apiClient.getSources(),
+            apiClient.getSubscriptions(),
+            apiClient.getTopics(),
+            apiClient.getSubscribedTopics(),
+          ]);
+
         console.log("from source", allSources);
         setSources(allSources);
         setSubscriptions(mySubs);
+        setAllTopics(topics);
+        setSubscribedTopics(subscribedTopicsData);
 
-        // Load tags from localStorage
+        // Load tags from localStorage (keep for backward compatibility)
         const savedTags = localStorage.getItem("userTags");
         if (savedTags) {
           try {
@@ -72,15 +91,13 @@ const SettingsPage = () => {
             setTags(parsedTags);
           } catch (e) {
             console.error("Error parsing saved tags:", e);
-            // Fallback to default tags
-            setTags(["Technology", "Climate", "AI"]);
+            setTags([]);
           }
         } else {
-          // Set default tags if none saved
-          setTags(["Technology", "Climate", "AI"]);
+          setTags([]);
         }
       } catch (err) {
-        console.error("Error fetching sources/subs:", err);
+        console.error("Error fetching data:", err);
       }
     };
     fetchData();
@@ -126,6 +143,32 @@ const SettingsPage = () => {
       setSubscriptions(subscriptions.filter((s) => s.slug !== slug));
     } catch (err) {
       console.error("Failed to remove subscription:", err);
+    }
+  };
+
+  // Add topic subscription
+  const handleAddTopicSubscription = async () => {
+    if (!selectedTopic) return;
+    try {
+      await apiClient.subscribeToTopic(selectedTopic);
+      // Refresh subscribed topics
+      const updatedSubscribedTopics = await apiClient.getSubscribedTopics();
+      setSubscribedTopics(updatedSubscribedTopics);
+      setSelectedTopic("");
+    } catch (err) {
+      console.error("Error adding topic subscription:", err);
+    }
+  };
+
+  // Remove topic subscription
+  const handleRemoveTopicSubscription = async (topicId: string) => {
+    try {
+      await apiClient.unsubscribeFromTopic(topicId);
+      // Refresh subscribed topics
+      const updatedSubscribedTopics = await apiClient.getSubscribedTopics();
+      setSubscribedTopics(updatedSubscribedTopics);
+    } catch (err) {
+      console.error("Error removing topic subscription:", err);
     }
   };
 
@@ -204,26 +247,6 @@ const SettingsPage = () => {
     }
   };
 
-  // Tag functions
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag)) {
-      const newTags = [...tags, newTag.trim()];
-      setTags(newTags);
-      setNewTag("");
-
-      // Save to localStorage
-      localStorage.setItem("userTags", JSON.stringify(newTags));
-    }
-  };
-
-  const removeTag = (tag: string) => {
-    const newTags = tags.filter((t) => t !== tag);
-    setTags(newTags);
-
-    // Save to localStorage
-    localStorage.setItem("userTags", JSON.stringify(newTags));
-  };
-
   // Dynamic classes for theme
   const inputClass = `w-full border rounded-lg px-3 py-2 ${
     theme === "dark"
@@ -236,8 +259,6 @@ const SettingsPage = () => {
       ? "border-gray-700 bg-gray-900"
       : "border-gray-200 bg-gray-50"
   }`;
-
-  
 
   return (
     <>
@@ -448,50 +469,69 @@ const SettingsPage = () => {
                     Manage your topic interests to personalize your news feed.
                   </p>
 
-                  {tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
-                        >
-                          {tag}
-                          <button
-                            onClick={() => removeTag(tag)}
-                            className="text-blue-500 hover:text-blue-800 ml-1"
+                  {/* Current subscribed topics */}
+                  <div className="mb-6">
+                    <h3 className="text-md font-medium mb-3">
+                      Subscribed Topics
+                    </h3>
+                    {subscribedTopics.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {subscribedTopics.map((topic) => (
+                          <span
+                            key={topic.slug}
+                            className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
                           >
-                            ✕
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-sm">
-                      No topics selected yet. Add some topics to personalize
-                      your news feed.
-                    </p>
-                  )}
+                            {topic.label?.en || topic.topic_name}
+                            <button
+                              onClick={() =>
+                                handleRemoveTopicSubscription(topic.slug)
+                              }
+                              className="text-blue-500 hover:text-blue-800 ml-1"
+                            >
+                              ✕
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm">
+                        No topics subscribed yet. Subscribe to topics to
+                        personalize your news feed.
+                      </p>
+                    )}
+                  </div>
                 </section>
 
                 <section className={sectionClass}>
                   <h3 className="text-md font-medium mb-3">
-                    {t("settings.addTags")}
+                    Subscribe to Topics
                   </h3>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <input
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Enter a topic name..."
+                    <select
+                      value={selectedTopic}
+                      onChange={(e) => setSelectedTopic(e.target.value)}
                       className={`${inputClass} flex-1`}
-                      onKeyPress={(e) => e.key === "Enter" && addTag()}
-                    />
+                    >
+                      <option value="">Select a topic...</option>
+                      {allTopics
+                        .filter(
+                          (topic) =>
+                            !subscribedTopics.some(
+                              (sub) => sub.slug === topic.id
+                            )
+                        )
+                        .map((topic) => (
+                          <option key={topic.id} value={topic.id}>
+                            {topic.label?.en || topic.id}
+                          </option>
+                        ))}
+                    </select>
                     <button
-                      onClick={addTag}
-                      disabled={!newTag.trim()}
+                      onClick={handleAddTopicSubscription}
+                      disabled={!selectedTopic}
                       className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      + Add Topic
+                      + Subscribe
                     </button>
                   </div>
                 </section>

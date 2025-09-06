@@ -454,6 +454,80 @@ class ApiClient {
     }
   }
 
+  // Get personalized feed (For You)
+  async getForYouFeed(page: number = 1, limit: number = 10): Promise<TrendingNewsResponse> {
+    try {
+      const res = await this.request<TrendingNewsResponse>(`/me/for-you?page=${page}&limit=${limit}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log("Getting for you feed:", res);
+      return res;
+    } catch (error) {
+      console.error("Error fetching for you feed:", error);
+      return {
+        news: [],
+        total: 0,
+        total_pages: 0,
+        page: 1,
+        limit: 10
+      };
+    }
+  }
+
+  // Get subscribed topics
+  async getSubscribedTopics(): Promise<{ slug: string; topic_name: string; label: { en: string; am: string }; story_count: number }[]> {
+    try {
+      const res = await this.request<{ slug: string; topic_name: string; label: { en: string; am: string }; story_count: number }[]>("/me/subscribed-topics", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log("Getting subscribed topics:", res);
+      return res;
+    } catch (error) {
+      console.error("Error fetching subscribed topics:", error);
+      return [];
+    }
+  }
+
+  // Subscribe to a topic
+  async subscribeToTopic(topicId: string): Promise<{ message: string }> {
+    try {
+      const res = await this.request<{ message: string }>(`/me/topics/${topicId}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log("Subscribed to topic:", res);
+      return res;
+    } catch (error) {
+      console.error(`Error subscribing to topic ${topicId}:`, error);
+      throw error;
+    }
+  }
+
+  // Unsubscribe from a topic
+  async unsubscribeFromTopic(topicId: string): Promise<{ message: string }> {
+    try {
+      const res = await this.request<{ message: string }>(`/me/topics/${topicId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log("Unsubscribed from topic:", res);
+      return res;
+    } catch (error) {
+      console.error(`Error unsubscribing from topic ${topicId}:`, error);
+      throw error;
+    }
+  }
+
   async signIn(email: string, password: string) {
     const methods = {
       method: "POST",

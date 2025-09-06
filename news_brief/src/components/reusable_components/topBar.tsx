@@ -55,12 +55,7 @@ export default function TopBar() {
             </div>
 
             {/* Notifications */}
-            <button
-              className={`p-2 rounded-full ${bgBtn}`}
-              aria-label="Notifications"
-            >
-              <Bell size={18} />
-            </button>
+
 
             {/* Language Dropdown */}
             <div className="relative">

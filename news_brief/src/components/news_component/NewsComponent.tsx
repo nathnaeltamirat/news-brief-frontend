@@ -226,9 +226,9 @@ export default function NewsComponent() {
             console.log("Updated bookmarked news after addition:", Array.from(newSet));
             return newSet;
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Handle 409 error (already bookmarked) gracefully
-          if (error.message?.includes('409') || error.message?.includes('already bookmarked')) {
+          if (error instanceof Error && (error.message?.includes('409') || error.message?.includes('already bookmarked'))) {
             // Item is already bookmarked, just update local state
             console.log("Item was already bookmarked, updating local state for:", newsId);
             setBookmarkedNews(prev => {
@@ -588,18 +588,9 @@ function SmallStoryShimmer({ theme }: { theme: string }) {
   );
 }
 
-function TrendingCardShimmer({ theme }: { theme: string }) {
-  return (
-    <div className="w-64 flex-shrink-0 space-y-2">
-      <Shimmer className="w-full h-28 rounded-lg" theme={theme} />
-      <Shimmer className="w-3/4 h-4" theme={theme} />
-      <Shimmer className="w-full h-3" theme={theme} />
-    </div>
-  );
-}
 
 /* --- Helper Components --- */
-function SectionHeader({ title, theme }: { title: string; theme: string }) {
+export function SectionHeader({ title, theme }: { title: string; theme: string }) {
   return (
     <div className="flex items-center mb-6">
       <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
@@ -811,7 +802,7 @@ function FeaturedToday({
 }
 
 
-function FeaturedTodayNew({
+export function FeaturedTodayNew({
   news,
   onClick,
   onBookmark,
@@ -1106,7 +1097,7 @@ function TrendingCard({
   );
 }
 
-function TrendingCardNew({
+export function TrendingCardNew({
   story,
   onClick,
   onBookmark,

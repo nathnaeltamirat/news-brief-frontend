@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useState, useEffect } from "react";
-import { Bell, Globe, Search, Mic } from "lucide-react";
+import { Globe, Search, Mic } from "lucide-react";
 import Button from "./Button";
 import SignInCard from "../signin_components/siginCard";
 import SignUpCard from "../signup_components/signupCard";
@@ -27,7 +27,6 @@ export default function TopBar() {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"signin" | "signup" | "forgot">("signin");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [topics, setTopics] = useState<Topic[]>([]);
   const [userTopics, setUserTopics] = useState<Topic[]>([]);
 
   // Load topics from API and filter user's subscribed topics
@@ -35,7 +34,6 @@ export default function TopBar() {
     const loadTopics = async () => {
       try {
         const topicsData = await apiClient.getTopics();
-        setTopics(topicsData);
         
         // Get user's subscribed topic IDs from localStorage
         const personData = localStorage.getItem("person");
@@ -152,9 +150,7 @@ export default function TopBar() {
             <div className="flex items-center gap-3 flex-shrink-0">
               <div className="hidden sm:block">    <DarkMode /></div>
           
-              <button className={`p-2 rounded-full ${bgBtn}`} aria-label="Notifications">
-                <Bell size={18} />
-              </button>
+    
 
               {/* Language Dropdown */}
               <div className="relative  ">

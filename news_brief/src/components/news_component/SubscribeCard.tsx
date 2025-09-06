@@ -55,14 +55,10 @@ export default function SubscribedNews() {
     const fetchSubscribedNews = async () => {
       try {
         setLoading(true);
-<<<<<<< HEAD
         const [subscribedNews, topicsData] = await Promise.all([
           apiClient.getSubscribedNews(),
           apiClient.getTopics()
         ]);
-=======
-        const subscribedNews = await apiClient.getSubscribedFeed();
->>>>>>> main
         setNews(subscribedNews);
         setTopics(topicsData);
       } catch (err: unknown) {

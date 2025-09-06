@@ -92,7 +92,8 @@
       "remove": "Remove",
       "search": "Search New News Media",
       "placeholder": "Search publications, podcasts, RSS",
-      "addButton": "Add"
+      "addButton": "Add",
+          "addTags": "Add Topics"
     }
   },
   "profile": {
@@ -102,5 +103,6 @@
     "subscriptions": "Subscriptions",
     "settings": "Settings",
     "logout": "Logout"
+
   }
 }

@@ -2,16 +2,19 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiClient, News } from "@/lib/api";
+import { apiClient, TrendingNews, Topic } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 import { BookmarkMinus } from "lucide-react";
 import { TopicTag } from "@/components/news_component/NewsComponent";
 
 export default function SavedNewsComp() {
-  const [savedNews, setSavedNews] = useState<News[]>([]);
+  const [savedNews, setSavedNews] = useState<TrendingNews[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const context = useContext(ThemeContext);
+  const { i18n } = useTranslation();
 
   if (!context) throw new Error("SavedNews must be used inside ThemeProvider");
   const { theme } = context;
@@ -19,8 +22,12 @@ export default function SavedNewsComp() {
   useEffect(() => {
     async function fetchSaved() {
       try {
-        const data = await apiClient.getSavedNews();
-        setSavedNews(data);
+        const [bookmarksData, topicsData] = await Promise.all([
+          apiClient.getBookmarks(),
+          apiClient.getTopics()
+        ]);
+        setSavedNews(bookmarksData.news);
+        setTopics(topicsData);
       } finally {
         setLoading(false);
       }
@@ -29,12 +36,28 @@ export default function SavedNewsComp() {
   }, []);
 
   const handleUnsave = async (id: string) => {
-    await apiClient.removeSavedNewsItem(id);
-    setSavedNews((prev) => prev.filter((n) => n.id !== id));
+    try {
+      await apiClient.removeBookmark(id);
+      setSavedNews((prev) => prev.filter((n) => n.id !== id));
+    } catch (error) {
+      console.error("Error removing bookmark:", error);
+    }
   };
 
   const handleClick = (id: string) => {
     router.push(`/news/${id}`);
+  };
+
+  // Helper function to convert topic IDs to topic names
+  const getTopicNames = (topicIds: string[] | undefined): string[] => {
+    if (!topicIds || !Array.isArray(topicIds) || topicIds.length === 0) {
+      return ["General"];
+    }
+    
+    return topicIds.map(id => {
+      const topic = topics.find(t => t.id === id);
+      return topic ? (i18n.language === 'am' ? topic.label.am : topic.label.en) : id;
+    });
   };
 
   return (
@@ -44,13 +67,15 @@ export default function SavedNewsComp() {
           theme === "dark" ? "text-white" : "text-gray-900"
         }`}
       >
-        Saved News
+        {i18n.language === 'am' ? 'የተቀመጡ ዜናዎች' : 'Saved News'}
       </h1>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
       ) : savedNews.length === 0 ? (
-        <p className="text-center text-gray-400 text-lg">No Saved News</p>
+        <p className="text-center text-gray-400 text-lg">
+          {i18n.language === 'am' ? 'ምንም የተቀመጡ ዜናዎች የሉም' : 'No Saved News'}
+        </p>
       ) : (
         <div className="grid gap-6">
           {savedNews.map((news) => (
@@ -60,6 +85,8 @@ export default function SavedNewsComp() {
               onClick={handleClick}
               onUnsave={handleUnsave}
               theme={theme}
+              getTopicNames={getTopicNames}
+              currentLanguage={i18n.language}
             />
           ))}
         </div>
@@ -75,11 +102,15 @@ export function SavedNewsCard({
   onClick,
   onUnsave,
   theme,
+  getTopicNames,
+  currentLanguage,
 }: {
-  news: News;
+  news: TrendingNews;
   onClick: (id: string) => void;
   onUnsave: (id: string) => void;
   theme: string;
+  getTopicNames: (topicIds: string[] | undefined) => string[];
+  currentLanguage: string;
 }) {
   return (
     <div
@@ -90,8 +121,8 @@ export function SavedNewsCard({
       {/* Image */}
       <div className="relative overflow-hidden rounded-lg w-full sm:w-1/3">
         <img
-          src={news.image_url}
-          alt={news.title}
+          src={`/images/other/${Math.floor(Math.random() * 10) + 1}.jpg`}
+          alt={currentLanguage === 'am' ? news.title_am || news.title : news.title_en || news.title}
           className="w-full h-full object-cover aspect-[4/3] sm:aspect-auto transition-transform duration-300 group-hover:scale-105"
         />
       </div>
@@ -100,17 +131,15 @@ export function SavedNewsCard({
       <div className="relative flex flex-col p-3.5 w-full sm:w-2/3">
         {/* Tags + timestamp */}
         <div className="flex items-center gap-2 mb-2 flex-wrap">
-          {Array.isArray(news.topics) ? (
-            news.topics.map((t, i) => <TopicTag key={i} text={t} theme={theme} />)
-          ) : (
-            <TopicTag text={String(news.topics)} theme={theme} />
-          )}
+          {getTopicNames(news.topics).map((topicName, i) => (
+            <TopicTag key={i} text={topicName} theme={theme} />
+          ))}
           <span
             className={`text-[11px] ${
               theme === "dark" ? "text-gray-400" : "text-gray-500"
             }`}
           >
-            {news.posted_at}
+            {news.published_at}
           </span>
         </div>
 
@@ -122,7 +151,7 @@ export function SavedNewsCard({
               : "text-gray-900 hover:text-blue-600"
           }`}
         >
-          {news.title}
+          {currentLanguage === 'am' ? news.title_am || news.title : news.title_en || news.title}
         </h2>
 
         {/* Description */}
@@ -131,7 +160,10 @@ export function SavedNewsCard({
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}
         >
-          {news.description}
+          {currentLanguage === 'am' 
+            ? news.summary_am || news.body_am || news.body 
+            : news.summary_en || news.body_en || news.body
+          }
         </p>
 
         {/* Unsave button */}
