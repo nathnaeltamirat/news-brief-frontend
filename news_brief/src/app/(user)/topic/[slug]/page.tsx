@@ -192,7 +192,7 @@ export default function TopicNewsPage() {
     };
 
     const imageFolder = topicImageMap[primaryTopic] || 'other';
-    const randomImage = Math.floor(Math.random() * 10) + 1;
+    const randomImage = Math.floor(Math.random() * 6) + 1;
     const imagePath = `/images/${imageFolder}/${randomImage}.jpg`;
     
     console.log("getTopicImage: Using image from", imageFolder, "folder:", imagePath);

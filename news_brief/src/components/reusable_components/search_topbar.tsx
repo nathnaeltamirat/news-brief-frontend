@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useState, useEffect } from "react";
-import { Globe, Search, Mic, Lock } from "lucide-react";
+import { Globe, Search, Lock } from "lucide-react";
 import Button from "./Button";
 import SignInCard from "../signin_components/siginCard";
 import SignUpCard from "../signup_components/signupCard";
@@ -12,6 +12,7 @@ import ProfileDropdown from "./DropDownBar";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslation } from "react-i18next";
+
 
 const token = getAccessToken();
 
@@ -29,6 +30,12 @@ export default function TopBar() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [userTopics, setUserTopics] = useState<Topic[]>([]);
   const [showDefaultTopics, setShowDefaultTopics] = useState(false);
+  
+  // Search functionality
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Load topics from API and filter user's subscribed topics
   useEffect(() => {
@@ -90,6 +97,37 @@ export default function TopBar() {
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // Search functionality with debouncing
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        // Search in news using the API
+        const response = await apiClient.request(`/news?page=1&limit=10&search=${encodeURIComponent(searchQuery)}`, {
+          method: "GET",
+        });
+        
+        if (response && response.news) {
+          setSearchResults(response.news);
+          setShowSearchResults(true);
+        }
+      } catch (error) {
+        console.error("Search error:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300); // 300ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
   const handleLogout = () => {
     router.replace("/logout");
   };
@@ -150,7 +188,7 @@ export default function TopBar() {
   return (
     <>
       <header
-        className={`w-full sticky top-0 z-20 transition-colors ${
+        className={`w-full sticky top-0 z-20 transition-colors relative ${
           theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
         }`}
       >
@@ -265,23 +303,12 @@ export default function TopBar() {
           </div>
 
           {/* Third Row: Search */}
-          <div
-            className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
-          >
-            <Search size={18} className="mr-2 text-gray-500 flex-shrink-0" />
-            <input
-              type="text"
-              placeholder={t("search.placeholder")}
-              className="bg-transparent outline-none flex-1 text-sm"
-            />
-            <Mic
-              size={18}
-              className="text-gray-500 cursor-pointer flex-shrink-0"
-            />
-          </div>
+   
         </div>
       </header>
 
+      {/* Search Results Dropdown */}
+   
       {/* Auth Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
