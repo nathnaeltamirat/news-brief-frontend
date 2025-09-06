@@ -4,9 +4,8 @@ import React, { useContext } from "react";
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
 
-import ChatBot from "@/components/reusable_components/chatbot";
+import ChatBot from "@/components/reusable_components/Generalchatbot";
 import { ThemeContext } from "../../contexts/ThemeContext";
-
 
 
 const News = () => {
