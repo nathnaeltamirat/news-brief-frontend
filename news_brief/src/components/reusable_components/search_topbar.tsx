@@ -31,11 +31,6 @@ export default function TopBar() {
   const [userTopics, setUserTopics] = useState<Topic[]>([]);
   const [showDefaultTopics, setShowDefaultTopics] = useState(false);
   
-  // Search functionality
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
 
   // Load topics from API and filter user's subscribed topics
   useEffect(() => {
@@ -97,36 +92,6 @@ export default function TopBar() {
     return () => clearTimeout(timeoutId);
   }, []);
 
-  // Search functionality with debouncing
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setShowSearchResults(false);
-      return;
-    }
-
-    const timeoutId = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        // Search in news using the API
-        const response = await apiClient.request(`/news?page=1&limit=10&search=${encodeURIComponent(searchQuery)}`, {
-          method: "GET",
-        });
-        
-        if (response && response.news) {
-          setSearchResults(response.news);
-          setShowSearchResults(true);
-        }
-      } catch (error) {
-        console.error("Search error:", error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300); // 300ms debounce
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
 
   const handleLogout = () => {
     router.replace("/logout");
@@ -303,7 +268,16 @@ export default function TopBar() {
           </div>
 
           {/* Third Row: Search */}
-   
+          <div
+            className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
+          >
+            <Search size={18} className="mr-2 text-gray-500 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder={t("search.placeholder")}
+              className="bg-transparent outline-none flex-1 text-sm"
+            />
+          </div>
         </div>
       </header>
 

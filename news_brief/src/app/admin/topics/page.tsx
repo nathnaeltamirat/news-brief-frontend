@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AxiosError } from "axios";
 import { apiClient } from "@/lib/api";
 
 export default function AddTopicsPage() {
@@ -87,14 +86,15 @@ export default function AddTopicsPage() {
 
   if (err instanceof Error && err.message.includes("topic with slug already exists")) {
     friendlyMessage = "❌ Topic already exists.";
-  } else if (err instanceof AxiosError) {
-    const errorData = err.response?.data as { error?: string };
-    if (errorData?.error?.includes("exists")) {
+  } else if (err instanceof Error) {
+    if (err.message.includes("exists")) {
       friendlyMessage = "❌ Slug or topic already exists.";
       fieldErrors = {
         slug: "Slug already exists.",
         topicName: "Topic name already exists.",
       };
+    } else {
+      friendlyMessage = `❌ ${err.message}`;
     }
   } else {
     friendlyMessage = "❌ Failed to create topic. Please try again.";

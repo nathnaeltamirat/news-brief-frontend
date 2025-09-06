@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios, { AxiosError } from "axios";
 import { apiClient } from "@/lib/api";
 import Button from "@/components/reusable_components/Button";
 
@@ -95,18 +94,17 @@ const confirmSubmit = async () => {
     friendlyMessage = "❌ Slug, name, or URL already exists.";
     
   } 
-  // ✅ Type-safe check for Axios errors
-  else if (axios.isAxiosError(err)) {
-    const error = err as AxiosError<{ error?: string }>;
-    if (error.response?.data?.error === "Failed to create source") {
+  // ✅ Generic error handling
+  else if (err instanceof Error) {
+    if (err.message.includes("Failed to create source")) {
       friendlyMessage = "❌ Slug, name, or URL already exists.";
       fieldErrors = {
         slug: "Slug already exists.",
         name: "Name already exists.",
         url: "URL already exists.",
       };
-    } else if (error.response?.data?.error) {
-      friendlyMessage = `❌ ${error.response.data.error}`;
+    } else {
+      friendlyMessage = `❌ ${err.message}`;
     }
   }
 
