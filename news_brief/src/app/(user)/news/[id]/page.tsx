@@ -1,63 +1,87 @@
 "use client";
-import Image from "next/image";
+
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "next/navigation";
-import { apiClient, News } from "../../../../lib/api";
-import ChatBot from "../../../../components/reusable_components/chatbot";
+import ChatBot from "../../../../components/reusable_components/Specficchatbot";
 import { ThemeContext } from "../../../contexts/ThemeContext";
+import TopBar from "@/components/reusable_components/search_topbar";
+import { TopicTag } from "@/components/news_component/NewsComponent";
 
-function Card({ children }: { children: React.ReactNode }) {
-  const context = useContext(ThemeContext);
-  if (!context) throw new Error("Card must be used inside ThemeProvider");
-  const { theme } = context;
+type News = {
+  id: string;
+  title: string;
+  body?: string;
+  image_url: string;
+  source?: string;
+  posted_at?: string;
+  topics: string[];
+  summary_en?: string;
+  summary_am?: string;
+};
 
-  return (
-    <div
-      className={`rounded-xl border shadow-sm p-4 mb-4 ${
-        theme === "dark"
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
+type SimpleVoice = { voice_id: string; name: string };
 
 export default function NewsDetailPage() {
   const params = useParams();
   const { theme } = useContext(ThemeContext)!;
+
   const [news, setNews] = useState<News | null>(null);
-  const [similarNews, setSimilarNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // --- TTS / Podcast state ---
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [rate, setRate] = useState(1);
-  const [progress, setProgress] = useState(0);
-  const [currentChunkIndex, setCurrentChunkIndex] = useState(0);
-  const chunksRef = useRef<string[]>([]);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // --- Language toggle ---
+  const [showAmharic, setShowAmharic] = useState(false);
 
+  // --- Eleven Labs TTS ---
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [voices, setVoices] = useState<SimpleVoice[]>([]);
+  const [selectedVoice, setSelectedVoice] = useState("ZF6FPAbjXT4488VcRRnw");
+  const [selectedLanguage, setSelectedLanguage] = useState("en"); // en or am
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastRequestRef = useRef<{
+    voiceId: string;
+    text: string;
+    lang: string;
+  } | null>(null);
+
+  // Fetch voices
+  useEffect(() => {
+    async function fetchVoices() {
+      try {
+        const res = await fetch("/api/voices", { cache: "no-store" });
+        const data = await res.json();
+        if (Array.isArray(data.voices) && data.voices.length > 0) {
+          setVoices(data.voices);
+          setSelectedVoice(data.voices[0].voice_id);
+          return;
+        }
+      } catch {
+        setVoices([
+          { voice_id: "ZF6FPAbjXT4488VcRRnw", name: "Default Voice" },
+          { voice_id: "pNInz6obpgDQGcFmaJgB", name: "Rachel" },
+          { voice_id: "EXAVITQu4vr4xnSDxMaL", name: "Domi" },
+        ]);
+      }
+    }
+    fetchVoices();
+  }, []);
+
+  // Fetch translated news directly from backend
   useEffect(() => {
     async function fetchData() {
       try {
-        const topNews = await apiClient.getTopNews();
-        const selected = topNews.find((n) => n.id === params.id) || topNews[0];
-        setNews(selected);
+        if (!params.id) return;
 
-        const allNews = await apiClient.getDummyNews();
-        if (selected) {
-          const similar = allNews.filter(
-            (item) =>
-              item.id !== selected.id &&
-              item.topics.some((topic) => selected.topics.includes(topic))
-          );
-          setSimilarNews(similar);
+        const res = await fetch(
+          `https://news-brief-core-api.onrender.com/api/v1/news/${params.id}/translate`,
+          { method: "POST" }
+        );
 
-          // Split text into chunks for progressive reading
-          chunksRef.current = selected.description.match(/.{1,150}/g) || [];
-        }
+        if (!res.ok) throw new Error(`Failed to fetch news: ${res.status}`);
+        const translated = await res.json();
+        console.log("Translated response:", translated);
+
+        setNews(translated);
       } catch (error) {
         console.error("Failed to fetch news:", error);
       } finally {
@@ -67,53 +91,79 @@ export default function NewsDetailPage() {
     fetchData();
   }, [params.id]);
 
-  // --- Speak a chunk ---
-  const speakChunk = (index: number) => {
-    if (!chunksRef.current[index]) {
-      setIsPlaying(false);
-      setProgress(100);
-      setCurrentChunkIndex(0);
-      return;
+  // Reset audio helper
+  const resetAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
     }
-
-    const utterance = new SpeechSynthesisUtterance(chunksRef.current[index]);
-    utterance.rate = rate;
-    utterance.onend = () => {
-      const nextIndex = index + 1;
-      setCurrentChunkIndex(nextIndex);
-      setProgress((nextIndex / chunksRef.current.length) * 100);
-      if (isPlaying) speakChunk(nextIndex);
-    };
-
-    utteranceRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+    setIsPlaying(false);
+    lastRequestRef.current = null;
   };
 
-  // --- Play / Pause ---
-  const handlePlay = () => {
-    if (!window.speechSynthesis)
-      return alert("Speech Synthesis not supported!");
+  const handlePlayElevenLabs = async () => {
+    if (!news) return;
 
-    if (isPlaying) {
-      window.speechSynthesis.pause();
-      setIsPlaying(false);
+    // Use Amharic or English text
+    const text = showAmharic
+      ? news.summary_am || ""
+      : news.summary_en || news.body || "";
+
+    // Always use "en" (ElevenLabs doesn't support "am")
+    const lang = "en";
+
+    const sameAsLast =
+      lastRequestRef.current &&
+      lastRequestRef.current.voiceId === selectedVoice &&
+      lastRequestRef.current.text === text &&
+      lastRequestRef.current.lang === lang;
+
+    if (audioRef.current && sameAsLast) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+        setIsPlaying(true);
+      } else {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
       return;
     }
 
-    if (utteranceRef.current && window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
+    resetAudio();
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          voice_id: selectedVoice,
+          language_code: lang, // always "en"
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("TTS request failed");
+        return;
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setAudioUrl(url);
+
+      audioRef.current = new Audio(url);
+      audioRef.current.play();
       setIsPlaying(true);
-      return;
+      lastRequestRef.current = { voiceId: selectedVoice, text, lang };
+
+      audioRef.current.onended = () => setIsPlaying(false);
+    } catch (err) {
+      console.error("Unexpected error in TTS:", err);
     }
-
-    setIsPlaying(true);
-    speakChunk(currentChunkIndex);
-  };
-
-  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newRate = parseFloat(e.target.value);
-    setRate(newRate);
-    if (utteranceRef.current) utteranceRef.current.rate = newRate;
   };
 
   if (loading) return <p className="p-6">Loading...</p>;
@@ -123,128 +173,120 @@ export default function NewsDetailPage() {
     <>
       <ChatBot defaultOpen={true} />
       <div
-        className={`min-h-screen flex ${
+        className={`mx-auto flex flex-col ${
           theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
         }`}
       >
-        <div className="flex-1 flex flex-col lg:ml-0 mt-20 lg:mt-0">
-          <header className="flex items-center p-4">
-            <div className="relative w-full max-w-xl mx-auto">
-              <input
-                type="text"
-                placeholder="Search topics, people, ideas..."
-                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black"
-              />
-            </div>
-          </header>
+        <TopBar />
 
-          <div className="flex flex-1 space-x-4 lg:space-x-17">
-            <div className="flex-1 p-4 lg:p-6 space-y-6">
-              <button
-                onClick={() => history.back()}
-                className="text-md text-gray-500 hover:underline"
-              >
-                Back
-              </button>
+        <main className="max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 flex-1">
+          {/* Title */}
+          <h1 className="text-2xl lg:text-3xl font-bold mb-4">{news.title}</h1>
 
-              <h1 className="text-xl lg:text-2xl font-bold leading-snug">
-                {news.title}
-              </h1>
-              <p
-                className={`${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                {news.description}
-              </p>
-
-              <h2 className="text-xl lg:text-2xl font-bold mb-2">
-                Listening Mode
-              </h2>
-              <div
-                className={`flex flex-col lg:flex-row items-stretch gap-4 rounded-xl shadow-lg p-4 ${
-                  theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-                }`}
-              >
-                <div className="relative w-full lg:w-1/2 h-32 lg:h-40 rounded-lg overflow-hidden">
-                  <Image
-                    src="/photo.png"
-                    alt="News"
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
-
-                <div className="flex flex-col justify-between flex-1 mt-2 lg:mt-0 lg:ml-4">
-                  <h3 className="text-lg font-bold">{news.title}</h3>
-                  <p
-                    className={`${
-                      theme === "dark" ? "text-gray-300" : "text-gray-500"
-                    } text-sm mb-2`}
-                  >
-                    Listen to this article like a podcast. The text will be read
-                    continuously.
-                  </p>
-
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={handlePlay}
-                      className={`px-4 py-2 rounded-full font-bold ${
-                        theme === "dark"
-                          ? "bg-gray-700 text-white hover:bg-gray-600"
-                          : "bg-white text-black hover:bg-gray-200"
-                      }`}
-                    >
-                      {isPlaying ? "Pause" : "Play"}
-                    </button>
-
-                    <label className="text-sm">
-                      Speed: {rate.toFixed(1)}x
-                      <input
-                        type="range"
-                        min="0.5"
-                        max="2"
-                        step="0.1"
-                        value={rate}
-                        onChange={handleRateChange}
-                        className="ml-2"
-                      />
-                    </label>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="w-full bg-gray-400 h-2 rounded mt-2">
-                    <div
-                      className="h-2 rounded"
-                      style={{
-                        width: `${progress}%`,
-                        backgroundColor: theme === "dark" ? "#fff" : "#000",
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="font-semibold mb-2">Similar News</h2>
-                {similarNews.map((item) => (
-                  <Card key={item.id}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-sm text-gray-500">
-                        img
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{item.title}</p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden lg:block w-0 md:w-80"></div>
+          {/* Meta info */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            {news.topics?.map((t, i) => (
+              <TopicTag key={i} text={t} theme={theme} />
+            ))}
+            <span
+              className={`text-xs ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {news.source} • {news.posted_at}
+            </span>
           </div>
-        </div>
+
+          {/* Cover Image */}
+          <div className="relative w-full h-72 lg:h-[28rem] mb-6 rounded-lg overflow-hidden shadow">
+            <img
+              src={news.image_url}
+              alt={news.title}
+              className="absolute inset-0 object-cover w-full h-full"
+            />
+          </div>
+
+          {/* Language toggle */}
+          <div className="flex gap-3 mb-4">
+            <button
+              onClick={() => {
+                setShowAmharic(false);
+                setSelectedLanguage("en");
+                resetAudio();
+              }}
+              className={`px-3 py-1 rounded ${
+                !showAmharic ? "bg-indigo-600 text-white" : "bg-gray-200 "
+              }`}
+            >
+              English
+            </button>
+            <button
+              onClick={() => {
+                setShowAmharic(true);
+                setSelectedLanguage("am");
+                resetAudio();
+              }}
+              className={`px-3 py-1 rounded ${
+                showAmharic ? "bg-indigo-600 text-white" : "bg-gray-200 "
+              }`}
+            >
+              አማርኛ
+            </button>
+          </div>
+
+          {/* Description */}
+          <p
+            className={`text-base leading-relaxed mb-10 ${
+              theme === "dark" ? "text-gray-300" : "text-gray-700"
+            }`}
+          >
+            {showAmharic
+              ? news.summary_am || "No Amharic version available."
+              : news.summary_en || news.body || "No English version available."}
+          </p>
+
+          {/* Listening Mode */}
+          <section className="max-w-2xl">
+            <h2 className="text-lg font-semibold mb-3">🎧 Listening Mode</h2>
+            <div
+              className={`flex items-center gap-5 rounded-xl shadow-md p-4 transition-all duration-700 
+              ${
+                theme === "dark"
+                  ? "bg-gradient-to-r from-gray-700 via-gray-600 to-gray-500 text-white"
+                  : "bg-gradient-to-r from-gray-100 via-gray-50 to-white text-black"
+              }`}
+            >
+              {/* Thumbnail */}
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+                <img
+                  src={news.image_url}
+                  alt="Thumbnail"
+                  className="absolute inset-0 object-cover w-full h-full"
+                />
+              </div>
+
+              {/* Player Section */}
+              <div className="flex flex-col flex-1 min-w-0">
+                <h3 className="text-sm font-semibold truncate">{news.title}</h3>
+                <p
+                  className={`${
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  } text-xs mb-2 truncate`}
+                >
+                  AI will read this article for you.
+                </p>
+              </div>
+
+              {/* Play button */}
+              <button
+                onClick={handlePlayElevenLabs}
+                className="w-11 h-11 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-500 text-white"
+              >
+                {isPlaying ? "⏸" : "▶️"}
+              </button>
+            </div>
+          </section>
+        </main>
       </div>
     </>
   );
