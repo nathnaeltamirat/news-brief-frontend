@@ -4,8 +4,7 @@ import Button from "@/components/reusable_components/Button";
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
 
-
-import ChatBot from "@/components/reusable_components/chatbot";
+import ChatBot from "@/components/reusable_components/Generalchatbot";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 import ProfileDropdown from "@/components/reusable_components/DropDownBar";
@@ -20,7 +19,6 @@ const News = () => {
 
   return (
     <>
- 
       <ChatBot />
       <div
         className={`flex flex-col lg:flex-row gap-5 min-h-screen w-full transition-colors ${
@@ -32,8 +30,6 @@ const News = () => {
             <TopBar />
           </div>
           <NewsComponent />
-     
-          
         </div>
       </div>
     </>
