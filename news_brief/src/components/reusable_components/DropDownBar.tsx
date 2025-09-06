@@ -75,7 +75,7 @@ function ProfileDropdown({ onLogoutClick }: ProfileDropdownProps) {
             </li>
             <li>
               <Link
-                href="/subscriptions"
+                href="/subscribed"
                 className={`flex items-center gap-2 px-4 py-2 transition-colors ${hoverItem}`}
               >
                 <Bell size={14} /> {t("profile.subscriptions")}
