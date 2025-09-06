@@ -31,6 +31,7 @@ export default function TopicNewsPage() {
       if (!topicSlug) return;
       
       try {
+        setLoading(true);
         setTopicLoading(true);
         setErrorMessage(null);
         
@@ -83,7 +84,7 @@ export default function TopicNewsPage() {
         setBookmarkedNews(new Set());
       }
     };
-
+    
     initializeBookmarks();
   }, [topicSlug]);
 
@@ -102,6 +103,7 @@ export default function TopicNewsPage() {
     try {
       if (bookmarkedNews.has(newsId)) {
         // Remove bookmark
+        console.log("Removing bookmark for:", newsId);
         await apiClient.removeBookmark(newsId);
         setBookmarkedNews(prev => {
           const newSet = new Set(prev);
@@ -111,6 +113,7 @@ export default function TopicNewsPage() {
         });
       } else {
         // Add bookmark
+        console.log("Adding bookmark for:", newsId);
         try {
           await apiClient.saveBookmark(newsId);
           setBookmarkedNews(prev => {
@@ -258,7 +261,7 @@ export default function TopicNewsPage() {
               ))}
             </div>
           </div>
-        ) : topicNews && topicNews.length > 0 ? (
+        ) : topicNews && topicNews.length > 0 && topic ? (
           <NewsGridNew
             title={i18n.language === 'am' ? topic.label.am : topic.label.en}
             data={topicNews}

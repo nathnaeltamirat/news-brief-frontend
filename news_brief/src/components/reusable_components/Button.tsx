@@ -21,8 +21,8 @@ const Button: React.FC<ButtonProps> = ({ variant = "primary", children, classNam
     case "primary":
       variantClasses =
         theme === "dark"
-          ? "bg-gray-100 text-black border border-gray-100 hover:bg-gray-200 hover:text-black"
-          : "bg-black text-white border border-black hover:bg-gray-600 hover:text-white";
+          ? "bg-[#27233A] text-black border border-gray-100 hover:bg-gray-600 hover:text-black"
+          : "bg-[#27233A] text-white border border-black hover:bg-gray-600 hover:text-white";
       break;
     case "secondary":
       variantClasses =
