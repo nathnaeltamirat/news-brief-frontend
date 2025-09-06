@@ -13,6 +13,7 @@ export interface News {
   image_url: string;
 }
 export interface Source {
+  id:string;
   slug: string;
   name: string;
   description: string;
@@ -150,6 +151,7 @@ class ApiClient {
     return res.subscriptions.map((sub) => {
       const sourceDetails = allSources.find((s) => s.slug === sub.source_slug);
       return {
+        id: sourceDetails?.id || "",
         slug: sub.source_slug,
         name: sub.source_name,
         description: sourceDetails?.description || "",
@@ -484,8 +486,8 @@ class ApiClient {
   }
   async createNews(data: {
   title: string;
-  language: string;  // "en" | "am"
-  source_id: string;    // UUID of the source
+  language: string;  
+  source_id: string;    
   body: string;
   topics: string[];  
 }): Promise<{ message: string }> {
@@ -499,12 +501,42 @@ class ApiClient {
       language: data.language.toLowerCase(), // must be "en" or "am"
       source_id: data.source_id,               // backend expects `source_id`
       body: data.body,
-      topics: data.topics,
+      topics_id: data.topics,
        
     }),
   });
 }
+async getAnalytics(): Promise<{
+  total_users: number;
+  total_news: number;
+  total_sources: number;
+  total_topics: number;
+}> {
+  return this.request<{
+    total_users: number;
+    total_news: number;
+    total_sources: number;
+    total_topics: number;
+  }>("/admin/analytics", {
+    headers: {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    method: "GET",
+  });
+}
 
+async fetchLatestData(): Promise<{ ingested: number; ids: string[]; skipped: number }> {
+  return this.request<{ ingested: number; ids: string[]; skipped: number }>(
+    "/admin/ingest/scraper",
+    {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "POST",
+      body: JSON.stringify({ query: "", top_k: 5 }),
+    }
+  );
+}
 
   async getDummyNews(): Promise<News[]> {
     return new Promise((resolve) => {

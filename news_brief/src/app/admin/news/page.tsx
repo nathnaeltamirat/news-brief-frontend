@@ -24,30 +24,37 @@ export default function AddNewsPage() {
     { id: "am", name: "Amharic" },
   ];
 
-  useEffect(() => {
-    const fetchSources = async () => {
-      try {
-        const data: Source[] = await apiClient.getSources();
-        setSources(data.map(src => ({ id: src.slug, name: src.name })));
-      } catch (err) {
-        console.error("Error fetching sources:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  const fetchSources = async () => {
+    try {
+      const data: Source[] = await apiClient.getSources();
+      // Use the source id for the select value
+      setSources(data.map(src => ({ id: src.id, name: src.name })));
+    } catch (err) {
+      console.error("Error fetching sources:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Example static topics – replace with API if needed
-    const fetchTopics = () => {
-      setTopics([
-        { id: "3924a80e-81de-43ee-8145-17e4334e004d", name: "World" },
-        { id: "b8a9b38d-60e3-48ba-ae4f-e2feee3441f2", name: "Business" },
-        { id: "17e4334e004d-1234", name: "Politics" },
-      ]);
-    };
+  const fetchTopics = async () => {
+    try {
+      const data = await apiClient.getTopics(); // returns Topic[]
+      setTopics(
+        data.map(t => ({
+          id: t.id,
+          name: form.language === "am" ? t.label.am : t.label.en // use selected language
+        }))
+      );
+    } catch (err) {
+      console.error("Error fetching topics:", err);
+      setTopics([]);
+    }
+  };
 
-    fetchSources();
-    fetchTopics();
-  }, []);
+  fetchSources();
+  fetchTopics();
+}, [form.language]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -71,6 +78,12 @@ export default function AddNewsPage() {
   };
 
   const confirmSubmit = async () => {
+    if (form.topics.length === 0) {
+    alert("Please select at least one topic.");
+    return;
+  }
+  console.log("Submitting TopicsID:", form.topics);
+
     try {
       setShowConfirm(false);
       setSubmitted(false);
@@ -80,7 +93,7 @@ export default function AddNewsPage() {
         language: form.language,
         source_id: form.source_id,
         body: form.body,
-        topics: form.topics,
+        topics : form.topics,
          
       });
 
@@ -175,7 +188,10 @@ export default function AddNewsPage() {
                   onClick={() => setOpenTopics(!openTopics)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2 bg-white text-left flex justify-between items-center"
                 >
-                  {form.topics.length ? form.topics.map(id => topics.find(t => t.id === id)?.name).join(", ") : "Select topics"}
+                  {form.topics.length
+  ? form.topics.map(id => topics.find(t => t.id === id)?.name).join(", ")
+  : "Select topics"}
+
                   <span>{openTopics ? "▲" : "▼"}</span>
                 </button>
 
@@ -199,7 +215,8 @@ export default function AddNewsPage() {
 
             {/* Submit */}
             <div className="md:col-span-2 flex justify-end mt-4">
-              <button type="submit" className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg">
+              <button type="submit"
+               className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
                 Submit
               </button>
             </div>

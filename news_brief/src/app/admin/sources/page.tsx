@@ -203,9 +203,9 @@ export default function AddSourcePage() {
             {/* Submit */}
             <div className="md:col-span-2 flex justify-end mt-4">
               <Button
-                variant = "primary"
+                
                 type="submit"
-                // className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md"
+                className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition"
                 disabled={apiLoading}
               >
                 {apiLoading ? "Submitting..." : "Submit"}
@@ -229,7 +229,7 @@ export default function AddSourcePage() {
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition"
                 onClick={confirmSubmit}
               >
                 Submit
