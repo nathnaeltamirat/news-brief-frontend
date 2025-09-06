@@ -136,6 +136,7 @@ class ApiClient {
     console.log("getting source", res);
     return res.sources;
   }
+  
   async getSubscriptions(): Promise<Source[]> {
     const res = await this.request<SubscriptionsApiResponse>(
       "/me/subscriptions",
@@ -237,7 +238,7 @@ class ApiClient {
       fullname: "John Doe",
       email: "john@example.com",
       role: "user", // add this
-      subscribed: ["TechCrunch"],
+      subscribed: ["TechCrunch", "BBC", "Reuters"], // sources user follows
       topic_interest: ["AI", "Tech", "Science"], // topics user cares about
       saved_news: ["1", "3", "2", "5"],
     };
