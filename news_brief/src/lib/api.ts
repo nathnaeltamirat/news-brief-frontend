@@ -137,7 +137,7 @@ class ApiClient {
     console.log("getting source", res);
     return res.sources;
   }
-  
+
   async getSubscriptions(): Promise<Source[]> {
     const res = await this.request<SubscriptionsApiResponse>(
       "/me/subscriptions",
@@ -208,6 +208,27 @@ class ApiClient {
     await this.request(`/me/subscriptions/${sourceSlug}`, {
       method: "DELETE",
     });
+  }
+  async getUserTopics(): Promise<Topic[]> {
+    try {
+      type UserTopicsResponse = {
+        topics: Topic[];
+        total_topics: number;
+      };
+
+      const res = await this.request<UserTopicsResponse>("/me/topics", {
+        method: "GET",
+      });
+
+      if (res && Array.isArray(res.topics)) {
+        return res.topics;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching user topics:", error);
+      return [];
+    }
   }
 
   async addTopic(topicSlug: string): Promise<void> {
@@ -485,58 +506,61 @@ class ApiClient {
     });
   }
   async createNews(data: {
-  title: string;
-  language: string;  
-  source_id: string;    
-  body: string;
-  topics: string[];  
-}): Promise<{ message: string }> {
-  return this.request<{ message: string }>("/admin/news", {
-    headers: {
-      Authorization: `Bearer ${getAccessToken()}`,
-    },
-    method: "POST",
-    body: JSON.stringify({
-      title: data.title,
-      language: data.language.toLowerCase(), // must be "en" or "am"
-      source_id: data.source_id,               // backend expects `source_id`
-      body: data.body,
-      topics_id: data.topics,
-       
-    }),
-  });
-}
-async getAnalytics(): Promise<{
-  total_users: number;
-  total_news: number;
-  total_sources: number;
-  total_topics: number;
-}> {
-  return this.request<{
-    total_users: number;
-    total_news: number;
-    total_sources: number;
-    total_topics: number;
-  }>("/admin/analytics", {
-    headers: {
-      Authorization: `Bearer ${getAccessToken()}`,
-    },
-    method: "GET",
-  });
-}
-
-async fetchLatestData(): Promise<{ ingested: number; ids: string[]; skipped: number }> {
-  return this.request<{ ingested: number; ids: string[]; skipped: number }>(
-    "/admin/ingest/scraper",
-    {
+    title: string;
+    language: string;
+    source_id: string;
+    body: string;
+    topics: string[];
+  }): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/admin/news", {
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,
       },
       method: "POST",
-      body: JSON.stringify({ query: "", top_k: 5 }),
-    }
-  );
-}
+      body: JSON.stringify({
+        title: data.title,
+        language: data.language.toLowerCase(), // must be "en" or "am"
+        source_id: data.source_id, // backend expects `source_id`
+        body: data.body,
+        topics_id: data.topics,
+      }),
+    });
+  }
+  async getAnalytics(): Promise<{
+    total_users: number;
+    total_news: number;
+    total_sources: number;
+    total_topics: number;
+  }> {
+    return this.request<{
+      total_users: number;
+      total_news: number;
+      total_sources: number;
+      total_topics: number;
+    }>("/admin/analytics", {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "GET",
+    });
+  }
+
+  async fetchLatestData(): Promise<{
+    ingested: number;
+    ids: string[];
+    skipped: number;
+  }> {
+    return this.request<{ ingested: number; ids: string[]; skipped: number }>(
+      "/admin/ingest/scraper",
+      {
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        method: "POST",
+        body: JSON.stringify({ query: "", top_k: 5 }),
+      }
+    );
+  }
 
   async getDummyNews(): Promise<News[]> {
     return new Promise((resolve) => {

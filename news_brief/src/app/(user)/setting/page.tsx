@@ -4,7 +4,7 @@ import { Edit2, Eye, EyeOff } from "lucide-react";
 import TopBar from "@/components/reusable_components/topBar";
 import { useTranslation } from "react-i18next";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { apiClient, User, Source } from "../../../lib/api";
+import { apiClient, User, Source, Topic } from "../../../lib/api";
 
 type TabId = "customization" | "account" | "categories" | "subscriptions";
 
@@ -16,7 +16,6 @@ const SettingsPage = () => {
 
   const { theme, setTheme } = context;
 
-  const [activeTab, setActiveTab] = useState<TabId>("account");
   const [profile, setProfile] = useState<User | null>(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -33,11 +32,11 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
+  const [userTopics, setUserTopics] = useState<Topic[]>([]);
+  const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [topicsLoading, setTopicsLoading] = useState(false);
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "customization", label: t("settings.tabs.customization") },
@@ -46,6 +45,18 @@ const SettingsPage = () => {
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
   const [hasChanges, setHasChanges] = useState(false);
+  // Load from localStorage (default to "account")
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("activeTab") as TabId) || "account";
+    }
+    return "account";
+  });
+
+  // Save tab changes to localStorage
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
 
   // Watch for profile edits and any changes in subscriptions to enable save button
   useEffect(() => {
@@ -56,44 +67,39 @@ const SettingsPage = () => {
     }
   }, [editingFullName, editingEmail, editingPassword, selectedSource]);
 
-  // Load sources + subscriptions + tags from localStorage
+  // Load sources + subscriptions + topics from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const allSources = await apiClient.getSources();
         const mySubs = await apiClient.getSubscriptions();
+
+        // Get all available topics (for the dropdown)
+        const allTopics = await apiClient.getTopics();
         console.log("from source", allSources);
+        console.log("from all topics", allTopics);
         setSources(allSources);
         setSubscriptions(mySubs);
+        setAvailableTopics(allTopics);
 
-        // Load tags from localStorage
-        const savedTags = localStorage.getItem("userTags");
-        if (savedTags) {
-          try {
-            const parsedTags = JSON.parse(savedTags);
-            setTags(parsedTags);
-          } catch (e) {
-            console.error("Error parsing saved tags:", e);
-            // Fallback to default tags
-            setTags(["Technology", "Climate", "AI"]);
-          }
-        } else {
-          // Set default tags if none saved
-          setTags(["Technology", "Climate", "AI"]);
-        }
+        // Get user's current topic interests
+        const userTopics = await apiClient.getUserTopics();
+        console.log("from user topics", userTopics);
+        console.log("userTopics length:", userTopics.length);
+        console.log("Setting userTopics state with:", userTopics);
+        setUserTopics(userTopics);
       } catch (err) {
-        console.error("Error fetching sources/subs:", err);
+        console.error("Error fetching sources/subs/topics:", err);
       }
     };
     fetchData();
   }, []);
 
-  // Save tags to localStorage whenever tags change
+  // Debug: Monitor userTopics state changes
   useEffect(() => {
-    if (tags.length > 0) {
-      localStorage.setItem("userTags", JSON.stringify(tags));
-    }
-  }, [tags]);
+    console.log("userTopics state changed:", userTopics);
+    console.log("userTopics state length:", userTopics.length);
+  }, [userTopics]);
 
   // Add subscription
   const handleAddSubscription = async () => {
@@ -206,24 +212,49 @@ const SettingsPage = () => {
     }
   };
 
-  // Tag functions
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag)) {
-      const newTags = [...tags, newTag.trim()];
-      setTags(newTags);
-      setNewTag("");
-
-      // Save to localStorage
-      localStorage.setItem("userTags", JSON.stringify(newTags));
+  // Topic functions
+  const addTopic = async () => {
+    if (!selectedTopic) return;
+    setTopicsLoading(true);
+    try {
+      await apiClient.addTopic(selectedTopic);
+      const updatedUserTopics = await apiClient.getUserTopics();
+      setUserTopics(updatedUserTopics);
+      setSelectedTopic("");
+    } catch (err) {
+      console.error("Failed to add topic:", err);
+      alert(
+        `Failed to add topic: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setTopicsLoading(false);
     }
   };
 
-  const removeTag = (tag: string) => {
-    const newTags = tags.filter((t) => t !== tag);
-    setTags(newTags);
-
-    // Save to localStorage
-    localStorage.setItem("userTags", JSON.stringify(newTags));
+  const removeTopic = async (topicSlug: string) => {
+    setTopicsLoading(true);
+    try {
+      // Find the topic by slug to get the ID for the API call
+      const topic = userTopics.find((t) => t.slug === topicSlug);
+      if (!topic) {
+        throw new Error("Topic not found");
+      }
+      await apiClient.removeTopic(topic.id);
+      // Refresh user topics directly
+      const updatedUserTopics = await apiClient.getUserTopics();
+      setUserTopics(updatedUserTopics);
+    } catch (err) {
+      console.error("Failed to remove topic:", err);
+      alert(
+        `Failed to remove topic: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setTopicsLoading(false);
+    }
   };
 
   // Dynamic classes for theme
@@ -312,15 +343,6 @@ const SettingsPage = () => {
                     <option value="dark">Dark</option>
                   </select>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">
-                    {t("settings.showAvatars")}
-                  </span>
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-5 w-5 text-black rounded"
-                  />
-                </div>
               </section>
             )}
 
@@ -376,9 +398,8 @@ const SettingsPage = () => {
                       />
                     </div>
                   </div>
-                  
-                 
-
+                  {/* Password */}
+                  {/*  */}
                 </div>
               </section>
             )}
@@ -394,17 +415,18 @@ const SettingsPage = () => {
                     Manage your topic interests to personalize your news feed.
                   </p>
 
-                  {tags.length > 0 ? (
+                  {userTopics.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {tags.map((tag) => (
+                      {userTopics.map((topic) => (
                         <span
-                          key={tag}
+                          key={topic.slug}
                           className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
                         >
-                          {tag}
+                          {topic.label.en}
                           <button
-                            onClick={() => removeTag(tag)}
-                            className="text-blue-500 hover:text-blue-800 ml-1"
+                            onClick={() => removeTopic(topic.slug)}
+                            disabled={topicsLoading}
+                            className="text-blue-500 hover:text-blue-800 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             ✕
                           </button>
@@ -412,32 +434,45 @@ const SettingsPage = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-sm">
-                      No topics selected yet. Add some topics to personalize
-                      your news feed.
-                    </p>
+                    <div>
+                      <p className="text-gray-500 text-sm">
+                        No topics selected yet. Add some topics to personalize
+                        your news feed.
+                      </p>
+                    </div>
                   )}
                 </section>
 
                 <section className={sectionClass}>
                   <h3 className="text-md font-medium mb-3">
-                    {t("settings.addTags")}
+                    Add Topic Interest
                   </h3>
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <input
-                      type="text"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Enter a topic name..."
+                    <select
+                      value={selectedTopic}
+                      onChange={(e) => setSelectedTopic(e.target.value)}
                       className={`${inputClass} flex-1`}
-                      onKeyPress={(e) => e.key === "Enter" && addTag()}
-                    />
-                    <button
-                      onClick={addTag}
-                      disabled={!newTag.trim()}
-                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      + Add Topic
+                      <option value="">Select a topic...</option>
+                      {availableTopics
+                        .filter(
+                          (topic) =>
+                            !userTopics.some(
+                              (userTopic) => userTopic.slug === topic.slug
+                            )
+                        )
+                        .map((topic) => (
+                          <option key={topic.slug} value={topic.id}>
+                            {topic.label.en}
+                          </option>
+                        ))}
+                    </select>
+                    <button
+                      onClick={addTopic}
+                      disabled={!selectedTopic || topicsLoading}
+                      className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {topicsLoading ? "Adding..." : "+ Add Topic"}
                     </button>
                   </div>
                 </section>
@@ -458,21 +493,21 @@ const SettingsPage = () => {
                       key={sub.slug}
                       className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border border-gray-200 rounded-xl px-4 py-3 gap-2 sm:gap-0"
                     >
-                      <div className="flex  ">
-                        {/* {sub.logo_url && (
+                      <div className="flex items-center gap-3">
+                        {sub.logo_url && (
                           <img
                             src={sub.logo_url}
                             alt={sub.name}
                             className="w-6 h-6 rounded"
                           />
-                        )} */}
+                        )}
                         <span className="text-gray-800 font-medium">
                           {sub.name}
                         </span>
                       </div>
                       <button
                         onClick={() => handleRemoveSubscription(sub.slug)}
-                        className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-[#EAF2FF] hover:border-[#0B66FF] hover:text-[#0B66FF] transition"
+                        className="text-sm border border-gray-900 rounded-lg px-3 py-1.5 hover:bg-gray-900 hover:text-white transition"
                       >
                         Remove
                       </button>
@@ -506,7 +541,7 @@ const SettingsPage = () => {
                   </select>
                   <button
                     onClick={handleAddSubscription}
-                    className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                    className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition w-full sm:w-auto"
                   >
                     + Add
                   </button>
@@ -519,6 +554,5 @@ const SettingsPage = () => {
     </>
   );
 };
-
 
 export default SettingsPage;
