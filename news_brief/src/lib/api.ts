@@ -239,7 +239,7 @@ class ApiClient {
       role: "user", // add this
       subscribed: ["TechCrunch"],
       topic_interest: ["AI", "Tech", "Science"], // topics user cares about
-      saved_news: ["1", "3"],
+      saved_news: ["1", "3", "2", "5"],
     };
   }
 
