@@ -105,67 +105,66 @@ export default function NewsDetailPage() {
     lastRequestRef.current = null;
   };
 
-const handlePlayElevenLabs = async () => {
-  if (!news) return;
+  const handlePlayElevenLabs = async () => {
+    if (!news) return;
 
-  // Use Amharic or English text
-  const text = showAmharic
-    ? news.summary_am || ""
-    : news.summary_en || news.body || "";
+    // Use Amharic or English text
+    const text = showAmharic
+      ? news.summary_am || ""
+      : news.summary_en || news.body || "";
 
-  // Always use "en" (ElevenLabs doesn't support "am")
-  const lang = "en";
+    // Always use "en" (ElevenLabs doesn't support "am")
+    const lang = "en";
 
-  const sameAsLast =
-    lastRequestRef.current &&
-    lastRequestRef.current.voiceId === selectedVoice &&
-    lastRequestRef.current.text === text &&
-    lastRequestRef.current.lang === lang;
+    const sameAsLast =
+      lastRequestRef.current &&
+      lastRequestRef.current.voiceId === selectedVoice &&
+      lastRequestRef.current.text === text &&
+      lastRequestRef.current.lang === lang;
 
-  if (audioRef.current && sameAsLast) {
-    if (audioRef.current.paused) {
-      audioRef.current.play();
-      setIsPlaying(true);
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-    return;
-  }
-
-  resetAudio();
-  try {
-    const res = await fetch("/api/tts", {
-      method: "POST",
-      cache: "no-store",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        voice_id: selectedVoice,
-        language_code: lang, // always "en"
-      }),
-    });
-
-    if (!res.ok) {
-      console.error("TTS request failed");
+    if (audioRef.current && sameAsLast) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+        setIsPlaying(true);
+      } else {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
       return;
     }
 
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    setAudioUrl(url);
+    resetAudio();
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          voice_id: selectedVoice,
+          language_code: lang, // always "en"
+        }),
+      });
 
-    audioRef.current = new Audio(url);
-    audioRef.current.play();
-    setIsPlaying(true);
-    lastRequestRef.current = { voiceId: selectedVoice, text, lang };
+      if (!res.ok) {
+        console.error("TTS request failed");
+        return;
+      }
 
-    audioRef.current.onended = () => setIsPlaying(false);
-  } catch (err) {
-    console.error("Unexpected error in TTS:", err);
-  }
-};
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setAudioUrl(url);
 
+      audioRef.current = new Audio(url);
+      audioRef.current.play();
+      setIsPlaying(true);
+      lastRequestRef.current = { voiceId: selectedVoice, text, lang };
+
+      audioRef.current.onended = () => setIsPlaying(false);
+    } catch (err) {
+      console.error("Unexpected error in TTS:", err);
+    }
+  };
 
   if (loading) return <p className="p-6">Loading...</p>;
   if (!news) return <p className="p-6">News not found.</p>;
@@ -216,9 +215,7 @@ const handlePlayElevenLabs = async () => {
                 resetAudio();
               }}
               className={`px-3 py-1 rounded ${
-                !showAmharic
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700"
+                !showAmharic ? "bg-indigo-600 text-white" : "bg-gray-200 "
               }`}
             >
               English
@@ -230,9 +227,7 @@ const handlePlayElevenLabs = async () => {
                 resetAudio();
               }}
               className={`px-3 py-1 rounded ${
-                showAmharic
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700"
+                showAmharic ? "bg-indigo-600 text-white" : "bg-gray-200 "
               }`}
             >
               አማርኛ
