@@ -114,9 +114,24 @@ export default function AddNewsPage() {
           Add New News
         </h2>
 
-        {loading ? (
-          <div>Loading...</div>
-        ) : (
+       {loading ? (
+  // 🔲 Skeleton Loader
+  <div className="animate-pulse space-y-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="h-10 bg-gray-200 rounded"></div> {/* Title */}
+      <div className="h-10 bg-gray-200 rounded"></div> {/* Language */}
+    </div>
+
+    <div className="h-10 bg-gray-200 rounded"></div> {/* Source */}
+    <div className="h-24 bg-gray-200 rounded"></div> {/* Body */}
+
+    <div className="h-10 bg-gray-200 rounded"></div> {/* Topics */}
+    
+    <div className="flex justify-end mt-4">
+      <div className="h-10 w-28 bg-gray-200 rounded"></div> {/* Submit Button */}
+    </div>
+  </div>
+) : (
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Title */}
             <div className="md:col-span-2">

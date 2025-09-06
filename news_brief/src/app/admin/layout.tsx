@@ -1,4 +1,6 @@
 "use client";
+
+import Footer from "@/components/Footer/Footer";
 import AdminTopBar from "../../components/Admin_components/AdminTopBar";
 
 export default function AdminLayout({
@@ -11,6 +13,7 @@ export default function AdminLayout({
       <AdminTopBar />
   
       <main className="flex-1 p-4 bg-gray-50 pt-16">{children}</main>
+      <Footer/>
     </div>
   );
 }
