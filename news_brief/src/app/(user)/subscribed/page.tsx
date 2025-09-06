@@ -1,61 +1,38 @@
 "use client";
-import Button from "@/components/reusable_components/Button";
-import TopBar from "@/components/reusable_components/search_topbar";
-import { apiClient } from "@/lib/api";
-import { useContext, useEffect, useState } from "react";
-import SubscribedComponent from "@/components/news_component/subscribedComponent";
-import { ThemeContext } from "../../contexts/ThemeContext";
+import React, { useContext } from "react";
 
-const ForYou = () => {
-  const [topics, setTopics] = useState<string[]>([]);
+import NewsComponent from "@/components/news_component/NewsComponent";
+import TopBar from "@/components/reusable_components/search_topbar";
+
+import ChatBot from "@/components/reusable_components/Generalchatbot";
+import { ThemeContext } from "../../contexts/ThemeContext";
+import SubscribedNews from "@/components/news_component/SubscribeCard";
+
+
+const News = () => {
   const context = useContext(ThemeContext);
+
   if (!context)
     throw new Error("ToggleButton must be used inside ThemeProvider");
   const { theme } = context;
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await apiClient.getUser();
-      setTopics(user.topic_interest);
-    };
-    fetchUser();
-  }, []);
-
-  const MainTopics = () => {
-    return (
+  return (
+    <>
+      <ChatBot />
       <div
-        className={`flex gap-3 sm:gap-5 my-5 overflow-x-auto pb-2 scrollbar-hide px-2 ${
+        className={`flex flex-col lg:flex-row gap-5 min-h-screen w-full transition-colors ${
           theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
         }`}
       >
-        {topics.map((item, index) => (
-          <Button
-            variant="tertiary"
-            key={index}
-            className="rounded-full px-3 py-1 text-sm flex-shrink-0"
-          >
-            {item}
-          </Button>
-        ))}
-      </div>
-    );
-  };
-
-  return (
-    <div
-      className={`flex flex-col lg:flex-row gap-5 min-h-screen w-full transition-colors ${
-        theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
-      }`}
-    >
-      <div className="flex-1 lg:ml-0 lg:mt-10 mt-20 px-4 lg:px-6 lg:mr-10 w-full max-w-full overflow-x-hidden">
-        <div className="flex justify-between">
-   
+        <div className="flex-1 lg:ml-0 lg:mt-1  px-4 lg:px-6 lg:mr-10 w-full overflow-hidden">
+          <div className="flex justify-between w-full mb-4">
+            <TopBar />
+          </div>
+          <SubscribedNews/>
         </div>
-        <MainTopics />
-        <SubscribedComponent />
       </div>
-    </div>
+    </>
   );
 };
 
-export default ForYou;
+export default News;

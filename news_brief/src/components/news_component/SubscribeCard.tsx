@@ -52,7 +52,7 @@ export default function SubscribedNews() {
     const fetchSubscribedNews = async () => {
       try {
         setLoading(true);
-        const subscribedNews = await apiClient.getSubscribedNews();
+        const subscribedNews = await apiClient.getSubscribedFeed();
         setNews(subscribedNews);
       } catch (err: unknown) {
         setErrorMessage(
