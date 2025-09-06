@@ -231,7 +231,7 @@ function SectionHeader({ title, theme }: { title: string; theme: string }) {
   );
 }
 
-function TopicTag({ text, theme }: { text: string; theme: string }) {
+export function TopicTag({ text, theme }: { text: string; theme: string }) {
   return (
     <span
       className={`inline-block px-2 py-0.5 rounded-full uppercase tracking-wide text-[10px] font-medium ${

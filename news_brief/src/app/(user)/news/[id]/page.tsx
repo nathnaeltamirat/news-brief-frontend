@@ -7,6 +7,7 @@ import { apiClient, News } from "../../../../lib/api";
 import ChatBot from "../../../../components/reusable_components/Specficchatbot";
 import { ThemeContext } from "../../../contexts/ThemeContext";
 import TopBar from "@/components/reusable_components/search_topbar";
+import { TopicTag } from "@/components/news_component/NewsComponent";
 
 function Card({ children }: { children: React.ReactNode }) {
   const context = useContext(ThemeContext);
@@ -274,52 +275,72 @@ export default function NewsDetailPage() {
   if (loading) return <p className="p-6">Loading...</p>;
   if (!news) return <p className="p-6">News not found.</p>;
 
-  return (
+ return (
+
     <>
       <ChatBot defaultOpen={true} />
       <div
-        className={`min-h-screen flex flex-col ${
+        className={` mx-auto  flex flex-col ${
           theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
         }`}
       >
         <TopBar />
 
-        <main className="flex flex-col lg:flex-row flex-1 mt-4 lg:mt-0 px-4 lg:px-12 gap-6">
-          <div className="flex-1 space-y-6">
-            {/* <button
-              onClick={() => history.back()}
-              className="text-md text-gray-500 hover:underline"
-            >
-              Back
-            </button> */}
+        <main className="  max-w-7xl w-full mx-auto px-4 lg:px-8 py-8 flex-1">
+          {/* Title */}
+          <h1 className="text-2xl lg:text-3xl font-bold mb-4">{news.title}</h1>
 
-            <h1 className="text-xl lg:text-2xl font-bold leading-snug mx-auto my-8">
-              {news.title}
-            </h1>
-            <p
-              className={`${
-                theme === "dark" ? "text-gray-300" : "text-gray-600"
+          {/* Meta info */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            {news.topics.map((t, i) => (
+              <TopicTag key={i} text={t} theme={theme} />
+            ))}
+            <span
+              className={`text-xs ${
+                theme === "dark" ? "text-gray-400" : "text-gray-500"
               }`}
             >
-              {news.description}
-            </p>
+              {news.source} • {news.posted_at}
+            </span>
+          </div>
 
-            <h2 className="text-lg font-semibold mb-2">Listening Mode</h2>
+          {/* Cover Image */}
+          <div className="relative w-full h-72 lg:h-[28rem] mb-6 rounded-lg overflow-hidden shadow">
+          <img
+              src={news.image_url}
+              alt={news.title}
+              className="absolute inset-0 object-cover w-full h-full"
+              loading="eager" // Equivalent to priority
+              decoding="async"
+            />
+          </div>
+
+          {/* Description */}
+          <p
+            className={`text-base leading-relaxed mb-10 ${
+              theme === "dark" ? "text-gray-300" : "text-gray-700"
+            }`}
+          >
+            {news.description}
+          </p>
+
+          {/* Listening Mode */}
+          <section className="max-w-2xl">
+            <h2 className="text-lg font-semibold mb-3">🎧 Listening Mode</h2>
             <div
-              className={`flex items-center gap-5 rounded-xl shadow-md p-4 transition-all duration-700 max-w-md  ${
-                theme === "dark"
-                  ? "bg-gradient-to-r from-gray-700 via-gray-500 to-white text-white"
-                  : "bg-gradient-to-r from-gray-700 via-gray-300 to-white text-black"
-              }`}
+              className={`flex items-center gap-5 rounded-xl shadow-md p-4 transition-all duration-700 
+              ${theme === "dark"
+                ? "bg-gradient-to-r from-gray-700 via-gray-600 to-gray-500 text-white"
+                : "bg-gradient-to-r from-gray-100 via-gray-50 to-white text-black"}`}
             >
               {/* Thumbnail */}
               <div className="relative w-16 h-16 rounded-lg overflow-hidden">
-                <Image
-                  src="/photo.png"
-                  alt="News"
-                  fill
-                  style={{ objectFit: "cover" }}
-                  className="rounded-lg"
+                <img
+                src={news.image_url}
+                alt="Thumbnail"
+                className="absolute inset-0 object-cover w-full h-full"
+               
+                decoding="async"
                 />
               </div>
 
@@ -328,70 +349,24 @@ export default function NewsDetailPage() {
                 <h3 className="text-sm font-semibold truncate">{news.title}</h3>
                 <p
                   className={`${
-                    theme === "dark" ? "text-gray-200" : "text-gray-700"
+                    theme === "dark" ? "text-gray-300" : "text-gray-600"
                   } text-xs mb-2 truncate`}
                 >
                   AI will read this article for you.
                 </p>
 
-                {/* Voice Selector */}
-                <select
-                  value={selectedVoice}
-                  onChange={(e) => handleVoiceChange(e.target.value)}
-                  className="mb-2 p-1.5 rounded-md border border-gray-700 text-xs bg-transparent focus:outline-none"
-                >
-                  {voices.map((voice) => (
-                    <option key={voice.voice_id} value={voice.voice_id}>
-                      {voice.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Progress bar with time */}
-                <div className="flex items-center gap-2 select-none">
-                  <span className="text-[11px] text-gray-700 w-8 text-right">
-                    {formatTime(
-                      isDragging && previewTime !== null
-                        ? previewTime
-                        : currentTime
-                    )}
-                  </span>
-
-                  <div
-                    className="flex-1 h-1.5 bg-gray-400/40 rounded-full cursor-pointer relative group"
-                    onClick={handleSeek}
-                    onMouseMove={(e) => isDragging && handleDragging(e)}
-                    onMouseUp={handleDragEnd}
-                  >
-                    <div
-                      className="h-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-200"
-                      style={{ width: `${progress}%` }}
-                    />
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white border border-gray-400 shadow-sm opacity-0 group-hover:opacity-100 transition cursor-grab active:cursor-grabbing"
-                      style={{
-                        left: `${progress}%`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                      onMouseDown={handleDragStart}
-                    />
-                  </div>
-
-                  <span className="text-[11px] text-gray-500 w-8">
-                    {formatTime(duration)}
-                  </span>
-                </div>
+                {/* Voice selector + progress bar would go here */}
+                {/* Placeholder for your player logic */}
               </div>
 
               {/* Play button */}
               <button
-                onClick={handlePlayElevenLabs}
-                className={`w-11 h-11 flex items-center justify-center rounded-full `}
+                className="w-11 h-11 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-500 text-white"
               >
-                {isPlaying ? "⏸" : "▶️"}
+                ▶️
               </button>
             </div>
-          </div>
+          </section>
         </main>
       </div>
     </>
