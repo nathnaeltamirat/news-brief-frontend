@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState, useContext } from "react";
-import { apiClient, News } from "@/lib/api";
+import { apiClient, News, Topic } from "@/lib/api";
 import { NewsGrid } from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
 import ChatBot from "@/components/reusable_components/Generalchatbot";
 import router from "next/router";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 interface ForYouProps {
   handleNewsClick: (id: string) => void;
@@ -58,9 +59,11 @@ const ForYouComponent: React.FC<ForYouProps> = ({ handleNewsClick }) => {
   const context = useContext(ThemeContext);
   if (!context) throw new Error("ForYouComponent must be used inside ThemeProvider");
   const { theme } = context;
+  const { i18n } = useTranslation();
 
   const [artsNews, setArtsNews] = useState<News[] | null>(null);
   const [businessNews, setBusinessNews] = useState<News[] | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -68,12 +71,14 @@ const ForYouComponent: React.FC<ForYouProps> = ({ handleNewsClick }) => {
     (async () => {
       try {
         setLoading(true);
-        const [artsData, businessData] = await Promise.all([
+        const [artsData, businessData, topicsData] = await Promise.all([
           apiClient.getArtsNews(),
           apiClient.getBusinessNews(),
+          apiClient.getTopics(),
         ]);
         setArtsNews(artsData);
         setBusinessNews(businessData);
+        setTopics(topicsData);
       } catch (err: unknown) {
         setErrorMessage(err instanceof Error ? err.message : "Failed to fetch news");
       } finally {
@@ -81,6 +86,24 @@ const ForYouComponent: React.FC<ForYouProps> = ({ handleNewsClick }) => {
       }
     })();
   }, []);
+
+  // Helper function to convert topic IDs to names
+  const getTopicNames = (topicIds: string[]): string[] => {
+    if (!topicIds || !Array.isArray(topicIds) || !topics || topics.length === 0) {
+      return topicIds.length > 0 ? ["General"] : ["News"];
+    }
+    
+    const result = topicIds.map(id => {
+      const topic = topics.find(t => t.id === id);
+      if (topic) {
+        return i18n.language === 'am' ? topic.label.am : topic.label.en;
+      }
+      return "General";
+    });
+    
+    const uniqueResult = [...new Set(result)].filter(name => name && name.trim() !== '');
+    return uniqueResult.length > 0 ? uniqueResult : ["News"];
+  };
 
   return (
     <>
@@ -107,13 +130,13 @@ const ForYouComponent: React.FC<ForYouProps> = ({ handleNewsClick }) => {
           ) : (
             <>
               <div className="mb-6 ml-5">
-                <NewsGrid title="Arts" data={artsNews} onClick={handleNewsClick} theme={theme} />
+                <NewsGrid title="Arts" data={artsNews} onClick={handleNewsClick} theme={theme} getTopicNames={getTopicNames} />
               </div>
               <div className="mb-6 ml-5">
-                <NewsGrid title="Business" data={businessNews} onClick={handleNewsClick} theme={theme} />
+                <NewsGrid title="Business" data={businessNews} onClick={handleNewsClick} theme={theme} getTopicNames={getTopicNames} />
               </div>
               <div className="mb-6 ml-5">
-                <NewsGrid title="Politics" data={businessNews} onClick={handleNewsClick} theme={theme} />
+                <NewsGrid title="Politics" data={businessNews} onClick={handleNewsClick} theme={theme} getTopicNames={getTopicNames} />
               </div>
             </>
           )}

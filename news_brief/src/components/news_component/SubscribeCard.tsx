@@ -4,8 +4,9 @@ import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { apiClient } from "../../lib/api";
+import { apiClient, Topic } from "../../lib/api";
 import {News} from "../../lib/api";
+import { useTranslation } from "react-i18next";
 
 function TopicTag({ text, theme }: { text: string; theme: string }) {
   return (
@@ -41,19 +42,25 @@ function SectionHeader({ title, theme }: { title: string; theme: string }) {
 
 export default function SubscribedNews() {
   const [news, setNews] = useState<News[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
   const context = useContext(ThemeContext);
   const theme = context?.theme || "light";
+  const { i18n } = useTranslation();
 
   // Fetch subscribed news
   useEffect(() => {
     const fetchSubscribedNews = async () => {
       try {
         setLoading(true);
-        const subscribedNews = await apiClient.getSubscribedNews();
+        const [subscribedNews, topicsData] = await Promise.all([
+          apiClient.getSubscribedNews(),
+          apiClient.getTopics()
+        ]);
         setNews(subscribedNews);
+        setTopics(topicsData);
       } catch (err: unknown) {
         setErrorMessage(
           err instanceof Error ? err.message : "Failed to fetch subscribed news"
@@ -65,6 +72,14 @@ export default function SubscribedNews() {
 
     fetchSubscribedNews();
   }, []);
+
+  // Helper function to convert topic IDs to topic names
+  const getTopicNames = (topicIds: string[]): string[] => {
+    return topicIds.map(id => {
+      const topic = topics.find(t => t.id === id);
+      return topic ? (i18n.language === 'am' ? topic.label.am : topic.label.en) : id;
+    });
+  };
 
   // Handle news click
   const handleNewsClick = (newsId: string) => {
@@ -166,13 +181,9 @@ export default function SubscribedNews() {
           {/* Content */}
           <div className="md:w-2/3 mt-2 md:mt-0 pl-2 pb-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
-              {Array.isArray(story.topics) ? (
-                story.topics.map((t, i) => (
-                  <TopicTag key={i} text={t} theme={theme} />
-                ))
-              ) : (
-                <TopicTag text={story.topics} theme={theme} />
-              )}
+              {getTopicNames(story.topics).map((topicName, i) => (
+                <TopicTag key={i} text={topicName} theme={theme} />
+              ))}
               <p
                 className={`text-[11px] ${
                   theme === "dark" ? "text-gray-400" : "text-gray-500"

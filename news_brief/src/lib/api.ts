@@ -12,6 +12,54 @@ export interface News {
   posted_at: string;
   image_url: string;
 }
+
+export interface TodayNews {
+  id: string;
+  title: string;
+  body: string;
+  title_en: string;
+  title_am: string;
+  body_en: string;
+  body_am: string;
+  summary_en: string;
+  summary_am: string;
+  language: string;
+  source_id: string;
+  topics: string[];
+  published_at: string;
+  published_date_localized: string;
+  created_at: string;
+  updated_at: string;
+  is_bookmarked?: boolean; // Made optional since it's not always in the response
+}
+
+export interface TrendingNews {
+  id: string;
+  title: string;
+  body: string;
+  title_en: string;
+  title_am: string;
+  body_en: string;
+  body_am: string;
+  summary_en: string;
+  summary_am: string;
+  language: string;
+  source_id: string;
+  topics: string[];
+  published_at: string;
+  published_date_localized: string;
+  created_at: string;
+  updated_at: string;
+  is_bookmarked: boolean;
+}
+
+export interface TrendingNewsResponse {
+  news: TrendingNews[];
+  total: number;
+  total_pages: number;
+  page: number;
+  limit: number;
+}
 export interface Source {
   slug: string;
   name: string;
@@ -44,7 +92,6 @@ export interface SourcesApiResponse {
 export interface Topic {
   id: string;
   slug: string;
-  topic_name: string;
   label: {
     en: string;
     am: string;
@@ -164,21 +211,6 @@ class ApiClient {
 
   async getTopics(): Promise<Topic[]> {
     try {
-      try {
-        const res = await this.request<{ topics: Topic[] }>("/me/topics", {
-          method: "GET",
-        });
-        console.log("getting user topics", res);
-
-        if (res && res.topics && res.topics.length > 0) {
-          return res.topics;
-        }
-      } catch (userTopicsError) {
-        console.log(
-          "User topics endpoint not available, falling back to general topics"
-        );
-      }
-
       const res = await this.request<TopicsResponse>("/topics", {
         method: "GET",
       });
@@ -276,6 +308,149 @@ class ApiClient {
     };
   }
 
+  // Save user topics to backend
+  async saveUserTopics(topicIds: string[]): Promise<void> {
+    console.log("Saving topics to backend:", topicIds);
+    console.log("Request body will be:", JSON.stringify({ topics: topicIds }));
+    console.log("Access token:", getAccessToken() ? "Present" : "Missing");
+    
+    try {
+      // Try PUT method first as it's more appropriate for updating user preferences
+      await this.request(`/me/topics`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({ topics: topicIds }),
+      });
+      console.log("Topics saved successfully");
+    } catch (error) {
+      console.error("Error saving topics with PUT, trying POST:", error);
+      try {
+        // Fallback to POST method
+        await this.request(`/me/topics`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getAccessToken()}`,
+          },
+          body: JSON.stringify({ topics: topicIds }),
+        });
+        console.log("Topics saved successfully with POST");
+      } catch (postError) {
+        console.error("Error saving topics with POST:", postError);
+        throw postError;
+      }
+    }
+  }
+
+  // Get today's news
+  async getTodaysNews(): Promise<TodayNews[]> {
+    try {
+      const res = await this.request<{ news: TodayNews[] }>("/news/today", {
+        method: "GET",
+      });
+      console.log("Getting today's news:", res);
+      return res.news || [];
+    } catch (error) {
+      console.error("Error fetching today's news:", error);
+      return [];
+    }
+  }
+
+  // Get trending news with pagination
+  async getTrendingNews(page: number = 1, limit: number = 10): Promise<TrendingNewsResponse> {
+    try {
+      const res = await this.request<TrendingNewsResponse>(`/news/trending?page=${page}&limit=${limit}`, {
+        method: "GET",
+      });
+      console.log("Getting trending news:", res);
+      return res;
+    } catch (error) {
+      console.error("Error fetching trending news:", error);
+      return {
+        news: [],
+        total: 0,
+        total_pages: 0,
+        page: 1,
+        limit: 10
+      };
+    }
+  }
+
+  // Get news for a specific topic
+  async getTopicNews(topicId: string, page: number = 1, limit: number = 10): Promise<TrendingNewsResponse> {
+    try {
+      const res = await this.request<TrendingNewsResponse>(`/topics/${topicId}/news?page=${page}&limit=${limit}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log(`Getting news for topic ${topicId}:`, res);
+      return res;
+    } catch (error) {
+      console.error(`Error fetching news for topic ${topicId}:`, error);
+      return {
+        news: [],
+        total: 0,
+        total_pages: 0,
+        page: 1,
+        limit: 10
+      };
+    }
+  }
+
+  // Bookmark API methods
+  async saveBookmark(newsId: string): Promise<{ message: string }> {
+    try {
+      const res = await this.request<{ message: string }>("/me/bookmarks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+        body: JSON.stringify({ news_id: newsId }),
+      });
+      console.log(`Bookmark saved for news ${newsId}:`, res);
+      return res;
+    } catch (error) {
+      console.error(`Error saving bookmark for news ${newsId}:`, error);
+      throw error;
+    }
+  }
+
+  async removeBookmark(newsId: string): Promise<{ message: string }> {
+    try {
+      const res = await this.request<{ message: string }>(`/me/bookmarks/${newsId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log(`Bookmark removed for news ${newsId}:`, res);
+      return res;
+    } catch (error) {
+      console.error(`Error removing bookmark for news ${newsId}:`, error);
+      throw error;
+    }
+  }
+
+  async getBookmarks(): Promise<{ news: TrendingNews[], total: number, total_pages: number, page: number, limit: number }> {
+    try {
+      const res = await this.request<{ news: TrendingNews[], total: number, total_pages: number, page: number, limit: number }>("/me/bookmarks", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${getAccessToken()}`,
+        },
+      });
+      console.log("Fetched user bookmarks:", res);
+      return res;
+    } catch (error) {
+      console.error("Error fetching bookmarks:", error);
+      return { news: [], total: 0, total_pages: 0, page: 0, limit: 0 };
+    }
+  }
+
   async signIn(email: string, password: string) {
     const methods = {
       method: "POST",
@@ -370,10 +545,16 @@ class ApiClient {
     }
   }
 
+  // Get topic name by slug from local cache
+  getTopicNameBySlug(slug: string): string | undefined {
+    const topic = this.topicsCache.find((t) => t.slug === slug);
+    return topic ? topic.label.en : undefined;
+  }
+
   // Get topic name by id from local cache
   getTopicNameById(id: string): string | undefined {
     const topic = this.topicsCache.find((t) => t.id === id);
-    return topic ? topic.topic_name : undefined;
+    return topic ? topic.label.en : undefined;
   }
   async getArtsNews(): Promise<News[]> {
     const news = await this.getDummyNews();

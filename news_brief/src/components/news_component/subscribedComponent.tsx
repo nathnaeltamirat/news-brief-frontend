@@ -1,25 +1,32 @@
 "use client";
-import { apiClient, News } from "@/lib/api";
+import { apiClient, News, Topic } from "@/lib/api";
 import { useEffect, useState, useContext } from "react";
 import Button from "../reusable_components/Button";
 import { Bookmark, ThumbsDown } from "lucide-react";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 export default function SubscribedComponent() {
   const [news, setNews] = useState<News[] | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const context = useContext(ThemeContext);
   if (!context) throw new Error("SubscribedComponent must be used inside ThemeProvider");
   const { theme } = context;
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const getInformation = async () => {
       try {
         setLoading(true);
-        const topicNews = await apiClient.getSubscribedFeed();
+        const [topicNews, topicsData] = await Promise.all([
+          apiClient.getSubscribedFeed(),
+          apiClient.getTopics()
+        ]);
         setNews(topicNews);
+        setTopics(topicsData);
       } catch (err: unknown) {
         if (err instanceof Error) setErrorMessage(err.message);
         else setErrorMessage("Failed to fetch news");
@@ -29,6 +36,14 @@ export default function SubscribedComponent() {
     };
     getInformation();
   }, []);
+
+  // Helper function to convert topic IDs to topic names
+  const getTopicNames = (topicIds: string[]): string[] => {
+    return topicIds.map(id => {
+      const topic = topics.find(t => t.id === id);
+      return topic ? (i18n.language === 'am' ? topic.label.am : topic.label.en) : id;
+    });
+  };
 
   if (loading) return <p>Loading news ...</p>;
   if (errorMessage) return <p>Error: {errorMessage}</p>;
@@ -56,9 +71,9 @@ export default function SubscribedComponent() {
               {/* Topics & Date */}
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                 <div className="flex gap-2 flex-wrap">
-                  {item.topics.map((value, idx) => (
+                  {getTopicNames(item.topics).map((topicName, idx) => (
                     <Button key={idx} variant="tertiary" className="rounded-lg px-3 py-1 text-xs sm:text-sm">
-                      {value}
+                      {topicName}
                     </Button>
                   ))}
                 </div>

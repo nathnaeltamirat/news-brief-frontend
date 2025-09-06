@@ -1,13 +1,15 @@
 'use client';
-import { apiClient, News } from "@/lib/api";
+import { apiClient, News, Topic } from "@/lib/api";
 import { useContext, useEffect, useState } from "react";
 import Button from "../reusable_components/Button";
 import { Bookmark, ThumbsDown } from "lucide-react";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
+import { useTranslation } from "react-i18next";
 
 
 export default function ForyouComponent() {
   const [news, setNews] = useState<News[] | null>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -15,13 +17,18 @@ export default function ForyouComponent() {
   if (!context)
     throw new Error("ToggleButton must be used inside ThemeProvider");
   const { theme } = context;
+  const { i18n } = useTranslation();
 
   useEffect(() => {
     const getInformation = async () => {
       try {
         setLoading(true);
-        const topicNews = await apiClient.getTopicFeed();
+        const [topicNews, topicsData] = await Promise.all([
+          apiClient.getTopicFeed(),
+          apiClient.getTopics()
+        ]);
         setNews(topicNews);
+        setTopics(topicsData);
       } catch (err: unknown) {
         if (err instanceof Error) setErrorMessage(err.message);
         else setErrorMessage("Failed to fetch news");
@@ -31,6 +38,14 @@ export default function ForyouComponent() {
     };
     getInformation();
   }, []);
+
+  // Helper function to convert topic IDs to topic names
+  const getTopicNames = (topicIds: string[]): string[] => {
+    return topicIds.map(id => {
+      const topic = topics.find(t => t.id === id);
+      return topic ? (i18n.language === 'am' ? topic.label.am : topic.label.en) : id;
+    });
+  };
 
   if (loading) return <p>Loading news ...</p>;
   if (errorMessage) return <p>Error: {errorMessage}</p>;
@@ -53,13 +68,13 @@ export default function ForyouComponent() {
             <div className="p-4 flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:justify-between gap-2 sm:gap-0">
                 <div className="flex flex-wrap gap-2">
-                  {item.topics.map((value, idx) => (
+                  {getTopicNames(item.topics).map((topicName, idx) => (
                     <Button
                       key={idx}
                       variant="tertiary"
                       className="rounded-full px-4 py-1 text-sm flex-shrink-0"
                     >
-                      {value}
+                      {topicName}
                     </Button>
                   ))}
                 </div>
