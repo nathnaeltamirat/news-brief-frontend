@@ -3,9 +3,9 @@
 import Image from "next/image";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "next/navigation";
-import { apiClient, News } from "../../../lib/api";
-import ChatBot from "../../../components/reusable_components/Specficchatbot";
-import { ThemeContext } from "../../contexts/ThemeContext";
+import { apiClient, News } from "../../../../lib/api";
+import ChatBot from "../../../../components/reusable_components/Specficchatbot";
+import { ThemeContext } from "../../../contexts/ThemeContext";
 import TopBar from "@/components/reusable_components/search_topbar";
 
 function Card({ children }: { children: React.ReactNode }) {

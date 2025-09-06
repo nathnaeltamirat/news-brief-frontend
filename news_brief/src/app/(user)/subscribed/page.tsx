@@ -1,10 +1,10 @@
-'use client'
+"use client";
 import Button from "@/components/reusable_components/Button";
 import TopBar from "@/components/reusable_components/search_topbar";
 import { apiClient } from "@/lib/api";
 import { useContext, useEffect, useState } from "react";
 import SubscribedComponent from "@/components/news_component/subscribedComponent";
-import { ThemeContext } from "../contexts/ThemeContext";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
 const ForYou = () => {
   const [topics, setTopics] = useState<string[]>([]);
@@ -15,7 +15,7 @@ const ForYou = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const user = await apiClient.getUser(); 
+      const user = await apiClient.getUser();
       setTopics(user.topic_interest);
     };
     fetchUser();
@@ -47,10 +47,9 @@ const ForYou = () => {
         theme === "light" ? "bg-white text-black" : "bg-gray-900 text-white"
       }`}
     >
-
       <div className="flex-1 lg:ml-0 lg:mt-10 mt-20 px-4 lg:px-6 lg:mr-10 w-full max-w-full overflow-x-hidden">
         <div className="flex justify-between">
-          <TopBar />
+   
         </div>
         <MainTopics />
         <SubscribedComponent />

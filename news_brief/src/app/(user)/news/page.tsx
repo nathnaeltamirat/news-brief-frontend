@@ -1,14 +1,12 @@
 "use client";
 import React, { useContext } from "react";
-import Button from "@/components/reusable_components/Button";
+
 import NewsComponent from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
 
 import ChatBot from "@/components/reusable_components/Generalchatbot";
-import { ThemeContext } from "../contexts/ThemeContext";
+import { ThemeContext } from "../../contexts/ThemeContext";
 
-import ProfileDropdown from "@/components/reusable_components/DropDownBar";
-import DarkMode from "@/components/dark_mode/DarkMode";
 
 const News = () => {
   const context = useContext(ThemeContext);
