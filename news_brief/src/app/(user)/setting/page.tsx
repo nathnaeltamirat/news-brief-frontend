@@ -122,6 +122,7 @@ const SettingsPage = () => {
   const handleRemoveSubscription = async (slug: string) => {
     try {
       await apiClient.removeSubscription(slug);
+      setHasChanges(true);
       setSubscriptions(subscriptions.filter((s) => s.slug !== slug));
     } catch (err) {
       console.error("Failed to remove subscription:", err);
