@@ -380,6 +380,28 @@ class ApiClient {
     }
   }
 
+  // Get news by ID
+  async getNewsById(newsId: string): Promise<TrendingNews> {
+    try {
+      // Since there's no direct /news/{id} endpoint, we need to get all news and find by ID
+      const res = await this.request<{ news: TrendingNews[], total: number, total_pages: number, page: number, limit: number }>("/news?page=1&limit=1000", {
+        method: "GET",
+      });
+      console.log("Getting news by ID:", res);
+      
+      // Find the specific news item by ID
+      const newsItem = res.news?.find(item => item.id === newsId);
+      if (!newsItem) {
+        throw new Error(`News with ID ${newsId} not found`);
+      }
+      
+      return newsItem;
+    } catch (error) {
+      console.error("Error fetching news by ID:", error);
+      throw error;
+    }
+  }
+
   // Get news for a specific topic
   async getTopicNews(topicId: string, page: number = 1, limit: number = 10): Promise<TrendingNewsResponse> {
     try {
