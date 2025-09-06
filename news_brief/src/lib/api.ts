@@ -191,7 +191,6 @@ class ApiClient {
       return [];
     } catch (error) {
       console.error("Error fetching topics:", error);
-      // Return empty array if API call fails
       return [];
     }
   }

@@ -107,7 +107,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
         placeholder={t("auth.email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className={`w-full mb-2 px-3 py-2 rounded-lg border ${inputBg} text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+        className={`w-full mb-2 px-3 py-2 rounded-lg border ${inputBg} text-xs sm:text-sm focus:ring-2 focus:ring-black focus:outline-none`}
       />
 
       <div className="relative mb-3">
@@ -116,7 +116,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
           placeholder={t("auth.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={`w-full px-3 py-2 rounded-lg border ${inputBg} pr-10 text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none`}
+          className={`w-full px-3 py-2 rounded-lg border ${inputBg} pr-10 text-xs sm:text-sm focus:ring-2 focus:ring-black focus:outline-none`}
         />
         {password && (
           <button
@@ -148,9 +148,7 @@ const SignInCard: React.FC<SignInCardProps> = ({
 
       <div className="flex items-center my-3 sm:my-4">
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
-        <span className={`px-2 text-xs ${textSecondary}`}>
-          OR
-        </span>
+        <span className={`px-2 text-xs ${textSecondary}`}>OR</span>
         <hr className="flex-1 border-gray-300 dark:border-gray-700" />
       </div>
 
@@ -183,4 +181,3 @@ const SignInCard: React.FC<SignInCardProps> = ({
 };
 
 export default SignInCard;
-

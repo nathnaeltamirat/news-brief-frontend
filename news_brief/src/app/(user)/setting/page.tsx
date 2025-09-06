@@ -33,6 +33,8 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
@@ -43,16 +45,16 @@ const SettingsPage = () => {
     { id: "categories", label: t("settings.tabs.categories") },
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
-   const [hasChanges, setHasChanges] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-   // Watch for profile edits and any changes in subscriptions to enable save button
-   useEffect(() => {
-     if (editingFullName || editingEmail || editingPassword || selectedSource) {
-       setHasChanges(true);
-     } else {
-       setHasChanges(false);
-     }
-   }, [editingFullName, editingEmail, editingPassword, selectedSource]);
+  // Watch for profile edits and any changes in subscriptions to enable save button
+  useEffect(() => {
+    if (editingFullName || editingEmail || editingPassword || selectedSource) {
+      setHasChanges(true);
+    } else {
+      setHasChanges(false);
+    }
+  }, [editingFullName, editingEmail, editingPassword, selectedSource]);
 
   // Load sources + subscriptions + tags from localStorage
   useEffect(() => {
@@ -237,8 +239,6 @@ const SettingsPage = () => {
       : "border-gray-200 bg-gray-50"
   }`;
 
-  
-
   return (
     <>
       <TopBar />
@@ -374,65 +374,11 @@ const SettingsPage = () => {
                         disabled={!editingEmail}
                         placeholder={t("settings.account.placeholders.email")}
                       />
-                      {/* <button
-                        type="button"
-                        onClick={() => setEditingEmail(true)}
-                        className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
-                      >
-                        <Edit2 size={16} />
-                      </button> */}
                     </div>
                   </div>
-                  {/* Password */}
-                  <div className="relative sm:col-span-2">
-                    <label className="block text-sm font-medium mb-1">
-                      {t("auth.password")}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={
-                          editingPassword
-                            ? passwordVisible
-                              ? "text"
-                              : "password"
-                            : "text"
-                        }
-                        value={editingPassword ? password : "●●●●●●●"}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder={t(
-                          "settings.account.placeholders.password"
-                        )}
-                        className={`${inputClass} pr-10 ${
-                          editingPassword ? "text-gray-900" : "text-gray-400"
-                        }`}
-                        disabled={!editingPassword}
-                      />
-                      {!editingPassword ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingPassword(true);
-                            setPassword("");
-                          }}
-                          className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setPasswordVisible(!passwordVisible)}
-                          className="absolute right-2 top-2.5 text-gray-500 hover:text-gray-700"
-                        >
-                          {passwordVisible ? (
-                            <EyeOff size={16} />
-                          ) : (
-                            <Eye size={16} />
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  
+                 
+
                 </div>
               </section>
             )}
@@ -512,14 +458,14 @@ const SettingsPage = () => {
                       key={sub.slug}
                       className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border border-gray-200 rounded-xl px-4 py-3 gap-2 sm:gap-0"
                     >
-                      <div className="flex items-center gap-3">
-                        {sub.logo_url && (
+                      <div className="flex  ">
+                        {/* {sub.logo_url && (
                           <img
                             src={sub.logo_url}
                             alt={sub.name}
                             className="w-6 h-6 rounded"
                           />
-                        )}
+                        )} */}
                         <span className="text-gray-800 font-medium">
                           {sub.name}
                         </span>
@@ -573,5 +519,6 @@ const SettingsPage = () => {
     </>
   );
 };
+
 
 export default SettingsPage;
