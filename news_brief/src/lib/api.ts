@@ -217,20 +217,56 @@ class ApiClient {
       const res = await this.request<TopicsResponse>("/topics", {
         method: "GET",
       });
-      console.log("getting general topics", res);
-
+    
       if (res && res.topics) {
         return res.topics;
       }
-
+    
       return [];
-    } catch (error) {
-      console.error("Error fetching topics:", error);
-      // Return empty array if API call fails
+    } catch {
       return [];
     }
-  }
-  async addSubscription(sourceSlug: string): Promise<void> {
+    }
+    
+    async getUserTopics(): Promise<Topic[]> {
+    try {
+      const res = await this.request<string[] | Topic[] | { topics: string[] } | { topics: Topic[] }>("/me/topics", {
+        method: "GET",
+      });
+    
+      if (Array.isArray(res)) {
+        if (res.length > 0 && typeof res[0] === 'string') {
+          const allTopics = await this.getTopics();
+          const topicIds = res as string[];
+          const filteredTopics = allTopics.filter(topic => topicIds.includes(topic.id));
+          return filteredTopics;
+        } else {
+          return res as Topic[];
+        }
+      }
+    
+      // Check if response has topics property
+      if (res && typeof res === 'object' && 'topics' in res) {
+        const topicsData = (res as { topics: unknown }).topics;
+        if (topicsData && Array.isArray(topicsData)) {
+          if (topicsData.length > 0 && typeof topicsData[0] === 'string') {
+            const allTopics = await this.getTopics();
+            const topicIds = topicsData as string[];
+            const filteredTopics = allTopics.filter(topic => topicIds.includes(topic.id));
+            return filteredTopics;
+          } else {
+            return topicsData as Topic[];
+          }
+        }
+      }
+    
+      return [];
+    } catch {
+      return [];
+    }
+    }
+
+    async addSubscription(sourceSlug: string): Promise<void> {
     await this.request(`/me/subscriptions`, {
       method: "POST",
       body: JSON.stringify({ source_key: sourceSlug }),
@@ -243,13 +279,13 @@ class ApiClient {
     });
   }
 
-  async addTopic(topicSlug: string): Promise<void> {
+  async addTopic(topicId: string): Promise<void> {
     await this.request(`/me/topics`, {
       method: "POST",
-      body: JSON.stringify({ topic_key: topicSlug }),
+      body: JSON.stringify({ topics: [topicId] }),
     });
-  }
-
+    }
+    
   async removeTopic(topicSlug: string): Promise<void> {
     await this.request(`/me/topics/${topicSlug}`, {
       method: "DELETE",
