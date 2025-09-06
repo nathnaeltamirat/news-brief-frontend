@@ -383,6 +383,29 @@ class ApiClient {
       body: JSON.stringify(data),
     });
   }
+  async createNews(data: {
+  title: string;
+  language: string;  // "en" | "am"
+  source_id: string;    // UUID of the source
+  body: string;
+  topics: string[];  
+}): Promise<{ message: string }> {
+  return this.request<{ message: string }>("/admin/news", {
+    headers: {
+      Authorization: `Bearer ${getAccessToken()}`,
+    },
+    method: "POST",
+    body: JSON.stringify({
+      title: data.title,
+      language: data.language.toLowerCase(), // must be "en" or "am"
+      source_id: data.source_id,               // backend expects `source_id`
+      body: data.body,
+      topics: data.topics,
+       
+    }),
+  });
+}
+
 
   async getDummyNews(): Promise<News[]> {
     return new Promise((resolve) => {

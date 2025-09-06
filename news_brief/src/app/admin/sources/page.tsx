@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { apiClient } from "@/lib/api"; // 👈 make sure you import your API client
+import { apiClient } from "@/lib/api"; 
+ // 👈 make sure you import your API client
+import Button from "@/components/reusable_components/Button";
 
 export default function AddSourcePage() {
   const [form, setForm] = useState({
@@ -200,13 +202,14 @@ export default function AddSourcePage() {
 
             {/* Submit */}
             <div className="md:col-span-2 flex justify-end mt-4">
-              <button
+              <Button
+                variant = "primary"
                 type="submit"
-                className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md"
+                // className="bg-black hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md"
                 disabled={apiLoading}
               >
                 {apiLoading ? "Submitting..." : "Submit"}
-              </button>
+              </Button>
             </div>
           </form>
         )}
@@ -241,7 +244,7 @@ export default function AddSourcePage() {
         <div className="absolute top-8 right-8 bg-black text-white px-5 py-3 rounded-lg shadow-lg">
           {message}
         </div>
-      )}
+      )}..
     </div>
   );
 }
