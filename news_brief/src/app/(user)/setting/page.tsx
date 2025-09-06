@@ -43,6 +43,16 @@ const SettingsPage = () => {
     { id: "categories", label: t("settings.tabs.categories") },
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
+   const [hasChanges, setHasChanges] = useState(false);
+
+   // Watch for profile edits and any changes in subscriptions to enable save button
+   useEffect(() => {
+     if (editingFullName || editingEmail || editingPassword || selectedSource) {
+       setHasChanges(true);
+     } else {
+       setHasChanges(false);
+     }
+   }, [editingFullName, editingEmail, editingPassword, selectedSource]);
 
   // Load sources + subscriptions + tags from localStorage
   useEffect(() => {
@@ -100,6 +110,13 @@ const SettingsPage = () => {
       );
     }
   };
+  const saveBtnClass = `px-4 py-2 rounded-lg transition-colors ${
+    hasChanges
+      ? "bg-black text-white hover:bg-gray-800"
+      : theme === "dark"
+      ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
+      : "bg-gray-300 text-gray-900 hover:bg-gray-400"
+  }`;
 
   // Remove subscription
   const handleRemoveSubscription = async (slug: string) => {
@@ -219,13 +236,7 @@ const SettingsPage = () => {
       : "border-gray-200 bg-gray-50"
   }`;
 
-  const saveBtnClass = `px-4 py-2 rounded-lg transition-colors ${
-    editingFullName || editingEmail || editingPassword
-      ? "bg-black text-white hover:bg-gray-800"
-      : theme === "dark"
-      ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
-      : "bg-gray-300 text-gray-900 hover:bg-gray-400"
-  }`;
+  
 
   return (
     <>
