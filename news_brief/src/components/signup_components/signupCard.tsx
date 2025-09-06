@@ -93,7 +93,7 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
   const bgCard = theme === "light" ? "bg-gray-50" : "bg-gray-900";
   const textMain = theme === "light" ? "text-gray-900" : "text-gray-100";
   const textSecondary = theme === "light" ? "text-gray-500" : "text-gray-400";
-  const inputBase = `w-full mb-3 px-4 py-3 rounded-xl border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
+  const inputBase = `w-full mb-2 px-3 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors`;
   const inputBg =
     theme === "light"
       ? "bg-gray-50 border-gray-200 text-black placeholder-gray-500"
@@ -106,7 +106,6 @@ const SignUpCard: React.FC<SignUpCardProps> = ({
     theme === "light"
       ? "text-black border border-gray-300 hover:bg-gray-100"
       : "text-white border border-gray-600 hover:bg-gray-700";
-
 
 
 

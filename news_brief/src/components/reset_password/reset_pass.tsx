@@ -86,18 +86,18 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <div className="relative w-full max-w-md sm:max-w-lg mx-auto rounded-2xl shadow-xl p-6 sm:p-8 bg-gray-50 transition-all duration-300">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-6">
+    <div className="relative w-full max-w-xs sm:max-w-sm mx-auto rounded-xl shadow-lg p-4 sm:p-5 bg-gray-50 transition-all duration-300">
+      <h1 className="text-lg sm:text-xl font-bold text-center text-gray-900 mb-4">
         Reset Your Password
       </h1>
 
       {success && (
-        <p className="text-green-600 text-center mb-3 text-sm sm:text-base">
+        <p className="text-green-600 text-center mb-2 text-xs sm:text-sm">
           {success}
         </p>
       )}
       {error && (
-        <p className="text-red-500 text-center mb-3 text-sm sm:text-base">
+        <p className="text-red-500 text-center mb-2 text-xs sm:text-sm">
           {error}
         </p>
       )}
@@ -110,7 +110,7 @@ export default function ResetPasswordForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onFocus={() => setShowPasswordMessage(true)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 pr-10 text-xs sm:text-sm"
         />
         {password && (
           <button
@@ -118,24 +118,24 @@ export default function ResetPasswordForm() {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
 
       {/* Live password validation */}
       {showPasswordMessage && passwordMessage && (
-        <p className="text-red-500 text-sm mb-4">{passwordMessage}</p>
+        <p className="text-red-500 text-xs mb-3">{passwordMessage}</p>
       )}
 
       {/* Confirm Password */}
-      <div className="relative mb-6">
+      <div className="relative mb-4">
         <input
           type={showConfirmPassword ? "text" : "password"}
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 pr-10 text-sm sm:text-base"
+          className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 pr-10 text-xs sm:text-sm"
         />
         {confirmPassword && (
           <button
@@ -143,7 +143,7 @@ export default function ResetPasswordForm() {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
           >
-            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         )}
       </div>
@@ -151,7 +151,7 @@ export default function ResetPasswordForm() {
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="w-full bg-black text-white py-3 rounded-[30px] font-semibold hover:bg-gray-900 disabled:opacity-50 text-sm sm:text-base"
+        className="w-full bg-black text-white py-2 rounded-[20px] font-semibold hover:bg-gray-900 disabled:opacity-50 text-xs sm:text-sm"
       >
         {loading ? "Resetting..." : "Reset Password"}
       </button>

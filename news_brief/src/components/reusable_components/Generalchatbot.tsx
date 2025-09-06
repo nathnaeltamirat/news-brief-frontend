@@ -13,7 +13,9 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
 
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const [isMobile, setIsMobile] = useState(false);
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<
+    { id: number; text: string; sender: "user" | "bot" }[]
+  >([
     {
       id: 1,
       text: "Hi there! I'm Tim, your News Brief Assistant. How can I help you today?",
@@ -39,26 +41,59 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, [isMobile, defaultOpen]);
 
-  const handleSendMessage = () => {
+  // UPDATED: Send message -> call our Next.js proxy route (/api/chat)
+  const handleSendMessage = async () => {
     if (inputValue.trim() === "") return;
 
-    setMessages([
-      ...messages,
-      { id: messages.length + 1, text: inputValue, sender: "user" },
+    // 1) Render the user's message immediately
+    const userInput = inputValue;
+    setMessages((prev) => [
+      ...prev,
+      { id: prev.length + 1, text: userInput, sender: "user" },
     ]);
+    setInputValue("");
 
-    setTimeout(() => {
+    try {
+      // 2) Call your proxy API route (avoids CORS)
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userInput }),
+      });
+
+      // 3) Handle non-OK response
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(
+          errorText || `Request failed with status ${res.status}`
+        );
+      }
+
+      // 4) Parse and display the bot's reply
+      const data = await res.json();
+      const reply =
+        (data && (data.reply as string)) || "Sorry, I didn’t understand that.";
+
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now(), text: reply, sender: "bot" },
+      ]);
+    } catch (err: unknown) {
+      // 5) Show a friendly error in chat
+      let errorMessage = "Something went wrong";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
       setMessages((prev) => [
         ...prev,
         {
-          id: prev.length + 1,
-          text: "Thanks for your message! I'll help you stay updated with the latest news.",
+          id: Date.now(),
+          text: `⚠️ Error: ${errorMessage}`,
           sender: "bot",
         },
       ]);
-    }, 1000);
-
-    setInputValue("");
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -66,6 +101,7 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
       handleSendMessage();
     }
   };
+
   const handleClearMessages = () => {
     setMessages([
       {
@@ -75,6 +111,7 @@ const ChatBot = ({ defaultOpen = false }: ChatBotProps) => {
       },
     ]);
   };
+
   return (
     <div className="fixed bottom-4 right-4 lg:bottom-6 lg:right-6  z-50 pointer-events-auto">
       {!isOpen && (

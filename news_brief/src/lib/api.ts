@@ -12,7 +12,36 @@ export interface News {
   posted_at: string;
   image_url: string;
 }
-interface Topic {
+export interface Source {
+  slug: string;
+  name: string;
+  description: string;
+  url: string;
+  logo_url: string;
+  languages: string;
+  topics: string[];
+  reliability_score: number;
+}
+
+// API response structure for subscriptions
+export interface SubscriptionResponse {
+  source_slug: string;
+  source_name: string;
+  subscribed_at: string;
+  topics: string[];
+}
+
+export interface SubscriptionsApiResponse {
+  subscriptions: SubscriptionResponse[];
+  total_subscriptions: number;
+  subscription_limit: number;
+}
+
+export interface SourcesApiResponse {
+  sources: Source[];
+  total_sources: number;
+}
+export interface Topic {
   id: string;
   slug: string;
   topic_name: string;
@@ -55,8 +84,9 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? getAccessToken() : null;
+    console.log("Making request to:", url);
+    console.log("Token available:", !!token);
 
     const config: RequestInit = {
       ...options,
@@ -70,30 +100,148 @@ class ApiClient {
     const response = await fetch(url, config);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData = {};
+      try {
+        errorData = await response.json();
+        console.error("API Error Response:", errorData);
+      } catch (e) {
+        console.error("Error parsing error response:", e);
+      }
       throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`
+        `HTTP error! status: ${response.status} - ${JSON.stringify(errorData)}`
       );
     }
 
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      try {
+        return await response.json();
+      } catch (e) {
+        console.error("Error parsing successful JSON response:", e);
+        throw new Error("Failed to parse JSON response.");
+      }
+    } else {
+      return {} as T;
+    }
   }
   // authenticated profile
   async getProfile(): Promise<User> {
     return this.request<User>("/me", { method: "GET" });
   }
-  async updateProfile(data: {
-    fullname?: string;
-  }): Promise<User> {
+
+  async getSources(): Promise<Source[]> {
+    const res = await this.request<SourcesApiResponse>("/sources", {
+      method: "GET",
+    });
+    console.log("getting source", res);
+    return res.sources;
+  }
+  async getSubscriptions(): Promise<Source[]> {
+    const res = await this.request<SubscriptionsApiResponse>(
+      "/me/subscriptions",
+      { method: "GET" }
+    );
+    console.log("getting subscription", res);
+
+    // Transform API response to match Source interface
+    // We need to get full source details from the sources endpoint
+    const allSources = await this.getSources();
+
+    return res.subscriptions.map((sub) => {
+      const sourceDetails = allSources.find((s) => s.slug === sub.source_slug);
+      return {
+        slug: sub.source_slug,
+        name: sub.source_name,
+        description: sourceDetails?.description || "",
+        url: sourceDetails?.url || "",
+        logo_url: sourceDetails?.logo_url || "",
+        languages: sourceDetails?.languages || "",
+        topics: sub.topics,
+        reliability_score: sourceDetails?.reliability_score || 0,
+      };
+    });
+  }
+
+  async getTopics(): Promise<Topic[]> {
+    try {
+      try {
+        const res = await this.request<{ topics: Topic[] }>("/me/topics", {
+          method: "GET",
+        });
+        console.log("getting user topics", res);
+
+        if (res && res.topics && res.topics.length > 0) {
+          return res.topics;
+        }
+      } catch (userTopicsError) {
+        console.log(
+          "User topics endpoint not available, falling back to general topics"
+        );
+      }
+
+      const res = await this.request<TopicsResponse>("/topics", {
+        method: "GET",
+      });
+      console.log("getting general topics", res);
+
+      if (res && res.topics) {
+        return res.topics;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      // Return empty array if API call fails
+      return [];
+    }
+  }
+  async addSubscription(sourceSlug: string): Promise<void> {
+    await this.request(`/me/subscriptions`, {
+      method: "POST",
+      body: JSON.stringify({ source_key: sourceSlug }),
+    });
+  }
+
+  async removeSubscription(sourceSlug: string): Promise<void> {
+    await this.request(`/me/subscriptions/${sourceSlug}`, {
+      method: "DELETE",
+    });
+  }
+
+  async addTopic(topicSlug: string): Promise<void> {
+    await this.request(`/me/topics`, {
+      method: "POST",
+      body: JSON.stringify({ topic_key: topicSlug }),
+    });
+  }
+
+  async removeTopic(topicSlug: string): Promise<void> {
+    await this.request(`/me/topics/${topicSlug}`, {
+      method: "DELETE",
+    });
+  }
+
+  async updateProfile(data: { fullname?: string }): Promise<User> {
     return this.request<User>("/me", {
-      headers:{
-        Authorization: `Bearer ${getAccessToken()}`,  
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
       },
       method: "PUT",
       body: JSON.stringify(data),
     });
   }
-
+  //  get user
+  async getUser(): Promise<User> {
+    return {
+      id: "u123",
+      fullname: "John Doe",
+      email: "john@example.com",
+      role: "user", // add this
+      subscribed: ["TechCrunch"],
+      topic_interest: ["AI", "Tech", "Science"], // topics user cares about
+      saved_news: ["1", "3"],
+    };
+  }
 
   async signUp(fullname: string, email: string, password: string) {
     const options = {
@@ -149,6 +297,31 @@ class ApiClient {
     // localStorage.setItem("topics", JSON.stringify(this.topicsCache))
     console.log(logged_val);
   }
+  async getSubscribedNews(): Promise<News[]> {
+    try {
+      // First get the user's subscriptions
+      const subscriptions = await this.getSubscriptions();
+
+      // If no subscriptions, return empty array
+      if (!subscriptions || subscriptions.length === 0) {
+        return [];
+      }
+
+      // Get all news
+      const allNews = await this.getDummyNews();
+
+      // Filter news to only include items from subscribed sources
+      const subscribedSources = subscriptions.map((sub) => sub.slug);
+      const subscribedNews = allNews.filter((news) =>
+        subscribedSources.includes(news.source.toLowerCase())
+      );
+
+      return subscribedNews;
+    } catch (error) {
+      console.error("Error fetching subscribed news:", error);
+      throw new Error("Failed to fetch news from your subscriptions");
+    }
+  }
 
   async forgotPassword(email: string) {
     return this.request<{ message: string }>("/auth/forgot-password", {
@@ -168,7 +341,7 @@ class ApiClient {
     // Redirect user to backend Google login route
     window.location.href = `${this.baseURL}/auth/google/login`;
   }
-async loadTopics() {
+  async loadTopics() {
     try {
       const res = await fetch(`${this.baseURL}/topics`, {
         method: "GET",
@@ -186,7 +359,7 @@ async loadTopics() {
       const data: TopicsResponse = await res.json();
 
       this.topicsCache = data.topics;
-    localStorage.setItem("all_topics", JSON.stringify(this.topicsCache));
+      localStorage.setItem("all_topics", JSON.stringify(this.topicsCache));
       return {
         message: "Topics loaded successfully",
         status_code,
@@ -269,6 +442,44 @@ async loadTopics() {
           },
         ]);
       }, 100);
+    });
+  }
+  async createTopic(
+    slug: string,
+    en: string,
+    am: string
+  ): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/admin/create-topics", {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "POST",
+      body: JSON.stringify({
+        slug,
+        label: {
+          en,
+          am,
+        },
+      }),
+    });
+  }
+
+  async createSource(data: {
+    slug: string;
+    name: string;
+    description: string;
+    url: string;
+    logo_url: string;
+    languages: string;
+    topics: string[];
+    reliability_score: number;
+  }): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/admin/create-sources", {
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
+      method: "POST",
+      body: JSON.stringify(data),
     });
   }
 
@@ -520,9 +731,6 @@ export function getAccessToken(): string | null {
   }
   return null;
 }
-
-
-
 export function getUserRole(): "admin" | "user" | null {
   if (typeof window !== "undefined") {
     const data = localStorage.getItem("person");
@@ -537,4 +745,3 @@ export function getUserRole(): "admin" | "user" | null {
   }
   return null;
 }
-

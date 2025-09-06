@@ -166,7 +166,7 @@ export default function AddNewsPage() {
             {/* Body (Amharic) */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-600 mb-2">
-                Body (Amharic)
+                Body 
               </label>
               <textarea
                 name="bodyAm"
@@ -177,20 +177,7 @@ export default function AddNewsPage() {
               />
             </div>
 
-            {/* Body (English) */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-600 mb-2">
-                Body (English)
-              </label>
-              <textarea
-                name="bodyEn"
-                value={form.bodyEn}
-                onChange={handleChange}
-                placeholder="Body content in English"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-28 resize-none focus:border-black focus:ring-0 transition"
-              />
-            </div>
-
+           
             {/* Topics Multi-select Dropdown */}
             <div className="md:col-span-2 relative">
               <label className="block text-sm font-medium text-gray-600 mb-2">
@@ -251,7 +238,7 @@ export default function AddNewsPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96 shadow-lg text-center">
             <h3 className="text-lg font-semibold mb-4">Confirm Submission</h3>
-            <p className="mb-6">Are you sure you want to submit this news?</p>
+            <p className="mb-6"> you want to submit this news?</p>
             <div className="flex justify-center gap-4">
               <button
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
@@ -263,7 +250,7 @@ export default function AddNewsPage() {
                 className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
                 onClick={confirmSubmit}
               >
-                Yes, Submit
+                Submit
               </button>
             </div>
           </div>

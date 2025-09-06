@@ -1,10 +1,10 @@
 "use client";
 import React, { useContext, useState, useEffect } from "react";
-import { Newspaper, Podcast, Rss, Edit2, Eye, EyeOff } from "lucide-react";
+import { Edit2, Eye, EyeOff } from "lucide-react";
 import TopBar from "@/components/reusable_components/topBar";
 import { useTranslation } from "react-i18next";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
-import { apiClient, User } from "../../../lib/api";
+import { apiClient, User, Source } from "../../../lib/api";
 
 type TabId = "customization" | "account" | "categories" | "subscriptions";
 
@@ -26,23 +26,16 @@ const SettingsPage = () => {
   const [editingPassword, setEditingPassword] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  const [sources, setSources] = useState<Source[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Source[]>([]);
+  const [selectedSource, setSelectedSource] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [tags, setTags] = useState(["Technology", "Climate", "AI"]);
+  const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
-
-  const [subscriptions, setSubscriptions] = useState([
-    {
-      id: 1,
-      name: "The Daily Journal",
-      icon: <Newspaper className="w-5 h-5" />,
-    },
-    { id: 2, name: "Tech Brief Weekly", icon: <Podcast className="w-5 h-5" /> },
-    { id: 3, name: "Global News RSS", icon: <Rss className="w-5 h-5" /> },
-  ]);
-  const [newSubscription, setNewSubscription] = useState("");
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "customization", label: t("settings.tabs.customization") },
@@ -50,6 +43,91 @@ const SettingsPage = () => {
     { id: "categories", label: t("settings.tabs.categories") },
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
+   const [hasChanges, setHasChanges] = useState(false);
+
+   // Watch for profile edits and any changes in subscriptions to enable save button
+   useEffect(() => {
+     if (editingFullName || editingEmail || editingPassword || selectedSource) {
+       setHasChanges(true);
+     } else {
+       setHasChanges(false);
+     }
+   }, [editingFullName, editingEmail, editingPassword, selectedSource]);
+
+  // Load sources + subscriptions + tags from localStorage
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const allSources = await apiClient.getSources();
+        const mySubs = await apiClient.getSubscriptions();
+        console.log("from source", allSources);
+        setSources(allSources);
+        setSubscriptions(mySubs);
+
+        // Load tags from localStorage
+        const savedTags = localStorage.getItem("userTags");
+        if (savedTags) {
+          try {
+            const parsedTags = JSON.parse(savedTags);
+            setTags(parsedTags);
+          } catch (e) {
+            console.error("Error parsing saved tags:", e);
+            // Fallback to default tags
+            setTags(["Technology", "Climate", "AI"]);
+          }
+        } else {
+          // Set default tags if none saved
+          setTags(["Technology", "Climate", "AI"]);
+        }
+      } catch (err) {
+        console.error("Error fetching sources/subs:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Save tags to localStorage whenever tags change
+  useEffect(() => {
+    if (tags.length > 0) {
+      localStorage.setItem("userTags", JSON.stringify(tags));
+    }
+  }, [tags]);
+
+  // Add subscription
+  const handleAddSubscription = async () => {
+    if (!selectedSource) return;
+    try {
+      await apiClient.addSubscription(selectedSource);
+      const updated = await apiClient.getSubscriptions();
+      setSubscriptions(updated);
+      setSelectedSource("");
+    } catch (err) {
+      console.error("Failed to add subscription:", err);
+      alert(
+        `Failed to add subscription: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+    }
+  };
+  const saveBtnClass = `px-4 py-2 rounded-lg transition-colors ${
+    hasChanges
+      ? "bg-black text-white hover:bg-gray-800"
+      : theme === "dark"
+      ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
+      : "bg-gray-300 text-gray-900 hover:bg-gray-400"
+  }`;
+
+  // Remove subscription
+  const handleRemoveSubscription = async (slug: string) => {
+    try {
+      await apiClient.removeSubscription(slug);
+      setHasChanges(true);
+      setSubscriptions(subscriptions.filter((s) => s.slug !== slug));
+    } catch (err) {
+      console.error("Failed to remove subscription:", err);
+    }
+  };
 
   // Fetch profile from API or localStorage
   useEffect(() => {
@@ -82,11 +160,7 @@ const SettingsPage = () => {
           setError("No profile data found.");
         }
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Failed to load profile");
-        }
+        setError(err instanceof Error ? err.message : "Failed to load profile");
       } finally {
         setLoading(false);
       }
@@ -122,13 +196,9 @@ const SettingsPage = () => {
         localStorage.setItem("person", JSON.stringify(parsed));
       }
 
-      alert("Profile updated successfully!");
+      // Profile updated successfully - could add toast notification here
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to load profile");
-      }
+      setError(err instanceof Error ? err.message : "Failed to update profile");
     } finally {
       setSaving(false);
     }
@@ -137,28 +207,22 @@ const SettingsPage = () => {
   // Tag functions
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag)) {
-      setTags([...tags, newTag]);
+      const newTags = [...tags, newTag.trim()];
+      setTags(newTags);
       setNewTag("");
-    }
-  };
-  const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
 
-  // Subscription functions
-  const addSubscription = () => {
-    if (newSubscription.trim()) {
-      setSubscriptions([
-        ...subscriptions,
-        {
-          id: Date.now(),
-          name: newSubscription,
-          icon: <Newspaper className="w-5 h-5" />,
-        },
-      ]);
-      setNewSubscription("");
+      // Save to localStorage
+      localStorage.setItem("userTags", JSON.stringify(newTags));
     }
   };
-  const removeSubscription = (id: number) =>
-    setSubscriptions(subscriptions.filter((s) => s.id !== id));
+
+  const removeTag = (tag: string) => {
+    const newTags = tags.filter((t) => t !== tag);
+    setTags(newTags);
+
+    // Save to localStorage
+    localStorage.setItem("userTags", JSON.stringify(newTags));
+  };
 
   // Dynamic classes for theme
   const inputClass = `w-full border rounded-lg px-3 py-2 ${
@@ -173,13 +237,7 @@ const SettingsPage = () => {
       : "border-gray-200 bg-gray-50"
   }`;
 
-  const saveBtnClass = `px-4 py-2 rounded-lg transition-colors ${
-    editingFullName || editingEmail || editingPassword
-      ? "bg-black text-white hover:bg-gray-800"
-      : theme === "dark"
-      ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
-      : "bg-gray-300 text-gray-900 hover:bg-gray-400"
-  }`;
+  
 
   return (
     <>
@@ -386,22 +444,33 @@ const SettingsPage = () => {
                   <h2 className="text-lg font-medium mb-4">
                     {t("settings.tabs.categories")}
                   </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center gap-2 bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full text-sm font-medium"
-                      >
-                        {tag}
-                        <button
-                          onClick={() => removeTag(tag)}
-                          className="text-gray-500 hover:text-gray-800"
+                  <p className="text-sm text-gray-600 mb-4">
+                    Manage your topic interests to personalize your news feed.
+                  </p>
+
+                  {tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
                         >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
+                          {tag}
+                          <button
+                            onClick={() => removeTag(tag)}
+                            className="text-blue-500 hover:text-blue-800 ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">
+                      No topics selected yet. Add some topics to personalize
+                      your news feed.
+                    </p>
+                  )}
                 </section>
 
                 <section className={sectionClass}>
@@ -413,14 +482,16 @@ const SettingsPage = () => {
                       type="text"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Search tags"
+                      placeholder="Enter a topic name..."
                       className={`${inputClass} flex-1`}
+                      onKeyPress={(e) => e.key === "Enter" && addTag()}
                     />
                     <button
                       onClick={addTag}
-                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                      disabled={!newTag.trim()}
+                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      + Add
+                      + Add Topic
                     </button>
                   </div>
                 </section>
@@ -429,50 +500,72 @@ const SettingsPage = () => {
 
             {/* Subscriptions Tab */}
             {activeTab === "subscriptions" && (
-              <>
-                <section className={sectionClass}>
-                  <h2 className="text-lg font-medium mb-4">
-                    {t("settings.tabs.subscriptions")}
-                  </h2>
-                  <div className="space-y-3">
-                    {subscriptions.map((sub) => (
-                      <div
-                        key={sub.id}
-                        className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border border-gray-200 rounded-xl px-4 py-3 gap-2 sm:gap-0"
-                      >
-                        <div className="flex items-center gap-3">
-                          {sub.icon}
-                          <span className="text-gray-800 font-medium">
-                            {sub.name}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => removeSubscription(sub.id)}
-                          className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-[#EAF2FF] hover:border-[#0B66FF] hover:text-[#0B66FF] transition"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+              <section className={sectionClass}>
+                <h2 className="text-lg font-medium mb-4">
+                  {t("settings.tabs.subscriptions")}
+                </h2>
 
-                  <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <input
-                      type="text"
-                      value={newSubscription}
-                      onChange={(e) => setNewSubscription(e.target.value)}
-                      placeholder="Add new subscription"
-                      className={`${inputClass} flex-1`}
-                    />
-                    <button
-                      onClick={addSubscription}
-                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                {/* Current subscriptions */}
+                <div className="space-y-3 mb-6">
+                  {subscriptions.map((sub) => (
+                    <div
+                      key={sub.slug}
+                      className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center border border-gray-200 rounded-xl px-4 py-3 gap-2 sm:gap-0"
                     >
-                      + Add
-                    </button>
-                  </div>
-                </section>
-              </>
+                      <div className="flex items-center gap-3">
+                        {sub.logo_url && (
+                          <img
+                            src={sub.logo_url}
+                            alt={sub.name}
+                            className="w-6 h-6 rounded"
+                          />
+                        )}
+                        <span className="text-gray-800 font-medium">
+                          {sub.name}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleRemoveSubscription(sub.slug)}
+                        className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-[#EAF2FF] hover:border-[#0B66FF] hover:text-[#0B66FF] transition"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  {subscriptions.length === 0 && (
+                    <p className="text-gray-500 text-sm">
+                      No subscriptions yet.
+                    </p>
+                  )}
+                </div>
+
+                {/* Add subscription */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <select
+                    value={selectedSource}
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                    className={`${inputClass} flex-1`}
+                  >
+                    <option value="">Select a source...</option>
+                    {sources
+                      .filter(
+                        (src) =>
+                          !subscriptions.some((sub) => sub.slug === src.slug)
+                      )
+                      .map((src) => (
+                        <option key={src.slug} value={src.slug}>
+                          {src.name}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    onClick={handleAddSubscription}
+                    className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                  >
+                    + Add
+                  </button>
+                </div>
+              </section>
             )}
           </div>
         </div>

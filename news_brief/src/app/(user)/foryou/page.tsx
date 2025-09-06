@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { apiClient, News } from "@/lib/api";
 import { NewsGrid } from "@/components/news_component/NewsComponent";
 import TopBar from "@/components/reusable_components/search_topbar";
-import ChatBot from "@/components/reusable_components/chatbot";
+import ChatBot from "@/components/reusable_components/Generalchatbot";
 import router from "next/router";
 import { ThemeContext } from "@/app/contexts/ThemeContext";
 
