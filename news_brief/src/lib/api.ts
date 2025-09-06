@@ -13,7 +13,7 @@ export interface News {
   image_url: string;
 }
 export interface Source {
-  id:string;
+  id: string;
   slug: string;
   name: string;
   description: string;
@@ -211,30 +211,51 @@ class ApiClient {
   }
   async getUserTopics(): Promise<Topic[]> {
     try {
-      type UserTopicsResponse = {
-        topics: Topic[];
-        total_topics: number;
-      };
-
-      const res = await this.request<UserTopicsResponse>("/me/topics", {
+      const res = await this.request<
+        Topic[] | { topics: string[] } | { topics: Topic[] }
+      >("/me/topics", {
         method: "GET",
       });
 
-      if (res && Array.isArray(res.topics)) {
-        return res.topics;
+      if (Array.isArray(res)) {
+        if (res.length > 0 && typeof res[0] === "string") {
+          const allTopics = await this.getTopics();
+          const topicIds = res as unknown as string[];
+          const filteredTopics = allTopics.filter((topic) =>
+            topicIds.includes(topic.id)
+          );
+          return filteredTopics;
+        } else {
+          return res as Topic[];
+        }
+      }
+
+      if (res && typeof res === "object" && "topics" in res) {
+        const topicsData = (res as any).topics;
+        if (topicsData && Array.isArray(topicsData)) {
+          if (topicsData.length > 0 && typeof topicsData[0] === "string") {
+            const allTopics = await this.getTopics();
+            const topicIds = res as unknown as string[];
+            const filteredTopics = allTopics.filter((topic) =>
+              topicIds.includes(topic.id)
+            );
+            return filteredTopics;
+          } else {
+            return topicsData as Topic[];
+          }
+        }
       }
 
       return [];
     } catch (error) {
-      console.error("Error fetching user topics:", error);
       return [];
     }
   }
 
-  async addTopic(topicSlug: string): Promise<void> {
+  async addTopic(topicId: string): Promise<void> {
     await this.request(`/me/topics`, {
       method: "POST",
-      body: JSON.stringify({ topic_key: topicSlug }),
+      body: JSON.stringify({ topics: [topicId] }),
     });
   }
 

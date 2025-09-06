@@ -420,13 +420,13 @@ const SettingsPage = () => {
                       {userTopics.map((topic) => (
                         <span
                           key={topic.slug}
-                          className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
+                          className="flex items-center gap-2 bg-gray-200 text-black px-3 py-1.5 rounded-full text-sm font-medium"
                         >
                           {topic.label.en}
                           <button
                             onClick={() => removeTopic(topic.slug)}
                             disabled={topicsLoading}
-                            className="text-blue-500 hover:text-blue-800 ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="text-black hover:text-bllack ml-1 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             ✕
                           </button>
@@ -470,7 +470,7 @@ const SettingsPage = () => {
                     <button
                       onClick={addTopic}
                       disabled={!selectedTopic || topicsLoading}
-                      className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="bg-gray-900 hover:bg-gray-800 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition"
                     >
                       {topicsLoading ? "Adding..." : "+ Add Topic"}
                     </button>
