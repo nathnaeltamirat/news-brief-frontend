@@ -34,7 +34,7 @@ const SettingsPage = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [tags, setTags] = useState(["Technology", "Climate", "AI"]);
+  const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
 
   const tabs: { id: TabId; label: string }[] = [
@@ -44,25 +44,44 @@ const SettingsPage = () => {
     { id: "subscriptions", label: t("settings.tabs.subscriptions") },
   ];
 
-  // Load sources + subscriptions
+  // Load sources + subscriptions + tags from localStorage
   useEffect(() => {
     const fetchData = async () => {
       try {
-        alert("fetching source")
-;
         const allSources = await apiClient.getSources();
-        // const mySubs = await apiClient.getSubscriptions();
-        alert("from source")
-        console.log("from source",allSources)
+        const mySubs = await apiClient.getSubscriptions();
+        console.log("from source", allSources);
         setSources(allSources);
-        // setSubscriptions(mySubs);
-        
+        setSubscriptions(mySubs);
+
+        // Load tags from localStorage
+        const savedTags = localStorage.getItem("userTags");
+        if (savedTags) {
+          try {
+            const parsedTags = JSON.parse(savedTags);
+            setTags(parsedTags);
+          } catch (e) {
+            console.error("Error parsing saved tags:", e);
+            // Fallback to default tags
+            setTags(["Technology", "Climate", "AI"]);
+          }
+        } else {
+          // Set default tags if none saved
+          setTags(["Technology", "Climate", "AI"]);
+        }
       } catch (err) {
         console.error("Error fetching sources/subs:", err);
       }
     };
     fetchData();
   }, []);
+
+  // Save tags to localStorage whenever tags change
+  useEffect(() => {
+    if (tags.length > 0) {
+      localStorage.setItem("userTags", JSON.stringify(tags));
+    }
+  }, [tags]);
 
   // Add subscription
   const handleAddSubscription = async () => {
@@ -74,6 +93,11 @@ const SettingsPage = () => {
       setSelectedSource("");
     } catch (err) {
       console.error("Failed to add subscription:", err);
+      alert(
+        `Failed to add subscription: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
     }
   };
 
@@ -154,7 +178,7 @@ const SettingsPage = () => {
         localStorage.setItem("person", JSON.stringify(parsed));
       }
 
-      alert("Profile updated successfully!");
+      // Profile updated successfully - could add toast notification here
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to update profile");
     } finally {
@@ -165,11 +189,22 @@ const SettingsPage = () => {
   // Tag functions
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag)) {
-      setTags([...tags, newTag]);
+      const newTags = [...tags, newTag.trim()];
+      setTags(newTags);
       setNewTag("");
+
+      // Save to localStorage
+      localStorage.setItem("userTags", JSON.stringify(newTags));
     }
   };
-  const removeTag = (tag: string) => setTags(tags.filter((t) => t !== tag));
+
+  const removeTag = (tag: string) => {
+    const newTags = tags.filter((t) => t !== tag);
+    setTags(newTags);
+
+    // Save to localStorage
+    localStorage.setItem("userTags", JSON.stringify(newTags));
+  };
 
   // Dynamic classes for theme
   const inputClass = `w-full border rounded-lg px-3 py-2 ${
@@ -397,22 +432,33 @@ const SettingsPage = () => {
                   <h2 className="text-lg font-medium mb-4">
                     {t("settings.tabs.categories")}
                   </h2>
-                  <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center gap-2 bg-gray-100 text-gray-800 px-3 py-1.5 rounded-full text-sm font-medium"
-                      >
-                        {tag}
-                        <button
-                          onClick={() => removeTag(tag)}
-                          className="text-gray-500 hover:text-gray-800"
+                  <p className="text-sm text-gray-600 mb-4">
+                    Manage your topic interests to personalize your news feed.
+                  </p>
+
+                  {tags.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
                         >
-                          ✕
-                        </button>
-                      </span>
-                    ))}
-                  </div>
+                          {tag}
+                          <button
+                            onClick={() => removeTag(tag)}
+                            className="text-blue-500 hover:text-blue-800 ml-1"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-sm">
+                      No topics selected yet. Add some topics to personalize
+                      your news feed.
+                    </p>
+                  )}
                 </section>
 
                 <section className={sectionClass}>
@@ -424,14 +470,16 @@ const SettingsPage = () => {
                       type="text"
                       value={newTag}
                       onChange={(e) => setNewTag(e.target.value)}
-                      placeholder="Search tags"
+                      placeholder="Enter a topic name..."
                       className={`${inputClass} flex-1`}
+                      onKeyPress={(e) => e.key === "Enter" && addTag()}
                     />
                     <button
                       onClick={addTag}
-                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                      disabled={!newTag.trim()}
+                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      + Add
+                      + Add Topic
                     </button>
                   </div>
                 </section>
@@ -487,11 +535,16 @@ const SettingsPage = () => {
                     className={`${inputClass} flex-1`}
                   >
                     <option value="">Select a source...</option>
-                    {sources.map((src) => (
-                      <option key={src.slug} value={src.slug}>
-                        {src.name}
-                      </option>
-                    ))}
+                    {sources
+                      .filter(
+                        (src) =>
+                          !subscriptions.some((sub) => sub.slug === src.slug)
+                      )
+                      .map((src) => (
+                        <option key={src.slug} value={src.slug}>
+                          {src.name}
+                        </option>
+                      ))}
                   </select>
                   <button
                     onClick={handleAddSubscription}
