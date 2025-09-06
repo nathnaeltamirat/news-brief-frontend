@@ -135,7 +135,6 @@ export default function TopBar() {
     theme === "light"
       ? "hover:bg-gray-200 text-black"
       : "hover:bg-gray-700 text-white";
-
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     i18n.changeLanguage(e.target.value);
   };
