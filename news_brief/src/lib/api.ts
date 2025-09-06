@@ -22,7 +22,26 @@ export interface Source {
   topics: string[];
   reliability_score: number;
 }
-interface Topic {
+
+// API response structure for subscriptions
+export interface SubscriptionResponse {
+  source_slug: string;
+  source_name: string;
+  subscribed_at: string;
+  topics: string[];
+}
+
+export interface SubscriptionsApiResponse {
+  subscriptions: SubscriptionResponse[];
+  total_subscriptions: number;
+  subscription_limit: number;
+}
+
+export interface SourcesApiResponse {
+  sources: Source[];
+  total_sources: number;
+}
+export interface Topic {
   id: string;
   slug: string;
   topic_name: string;
@@ -65,13 +84,15 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
 
-    const token = typeof window !== "undefined" ? getAccessToken : null;
+    const token = typeof window !== "undefined" ? getAccessToken() : null;
+    console.log("Making request to:", url);
+    console.log("Token available:", !!token);
 
     const config: RequestInit = {
       ...options,
       headers: {
         "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${getAccessToken()}` }),
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...(options.headers || {}),
       },
     };
@@ -79,13 +100,29 @@ class ApiClient {
     const response = await fetch(url, config);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
+      let errorData = {};
+      try {
+        errorData = await response.json();
+        console.error("API Error Response:", errorData);
+      } catch (e) {
+        console.error("Error parsing error response:", e);
+      }
       throw new Error(
-        errorData.message || `HTTP error! status: ${response.status}`
+        `HTTP error! status: ${response.status} - ${JSON.stringify(errorData)}`
       );
     }
 
-    return await response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      try {
+        return await response.json();
+      } catch (e) {
+        console.error("Error parsing successful JSON response:", e);
+        throw new Error("Failed to parse JSON response.");
+      }
+    } else {
+      return {} as T;
+    }
   }
   // authenticated profile
   async getProfile(): Promise<User> {
@@ -93,21 +130,71 @@ class ApiClient {
   }
 
   async getSources(): Promise<Source[]> {
-    const res = await this.request<{ sources: Source[] }>("/sources", {
+    const res = await this.request<SourcesApiResponse>("/sources", {
       method: "GET",
     });
     console.log("getting source", res);
     return res.sources;
   }
   async getSubscriptions(): Promise<Source[]> {
-    const res = await this.request<{ subscriptions: Source[] }>(
+    const res = await this.request<SubscriptionsApiResponse>(
       "/me/subscriptions",
       { method: "GET" }
     );
     console.log("getting subscription", res);
-    return res.subscriptions;
+
+    // Transform API response to match Source interface
+    // We need to get full source details from the sources endpoint
+    const allSources = await this.getSources();
+
+    return res.subscriptions.map((sub) => {
+      const sourceDetails = allSources.find((s) => s.slug === sub.source_slug);
+      return {
+        slug: sub.source_slug,
+        name: sub.source_name,
+        description: sourceDetails?.description || "",
+        url: sourceDetails?.url || "",
+        logo_url: sourceDetails?.logo_url || "",
+        languages: sourceDetails?.languages || "",
+        topics: sub.topics,
+        reliability_score: sourceDetails?.reliability_score || 0,
+      };
+    });
   }
 
+  async getTopics(): Promise<Topic[]> {
+    try {
+      try {
+        const res = await this.request<{ topics: Topic[] }>("/me/topics", {
+          method: "GET",
+        });
+        console.log("getting user topics", res);
+
+        if (res && res.topics && res.topics.length > 0) {
+          return res.topics;
+        }
+      } catch (userTopicsError) {
+        console.log(
+          "User topics endpoint not available, falling back to general topics"
+        );
+      }
+
+      const res = await this.request<TopicsResponse>("/topics", {
+        method: "GET",
+      });
+      console.log("getting general topics", res);
+
+      if (res && res.topics) {
+        return res.topics;
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching topics:", error);
+      // Return empty array if API call fails
+      return [];
+    }
+  }
   async addSubscription(sourceSlug: string): Promise<void> {
     await this.request(`/me/subscriptions`, {
       method: "POST",
@@ -117,6 +204,19 @@ class ApiClient {
 
   async removeSubscription(sourceSlug: string): Promise<void> {
     await this.request(`/me/subscriptions/${sourceSlug}`, {
+      method: "DELETE",
+    });
+  }
+
+  async addTopic(topicSlug: string): Promise<void> {
+    await this.request(`/me/topics`, {
+      method: "POST",
+      body: JSON.stringify({ topic_key: topicSlug }),
+    });
+  }
+
+  async removeTopic(topicSlug: string): Promise<void> {
+    await this.request(`/me/topics/${topicSlug}`, {
       method: "DELETE",
     });
   }
@@ -198,31 +298,30 @@ class ApiClient {
     console.log(logged_val);
   }
   async getSubscribedNews(): Promise<News[]> {
-  try {
-    // First get the user's subscriptions
-    const subscriptions = await this.getSubscriptions();
-    
-    // If no subscriptions, return empty array
-    if (!subscriptions || subscriptions.length === 0) {
-      return [];
+    try {
+      // First get the user's subscriptions
+      const subscriptions = await this.getSubscriptions();
+
+      // If no subscriptions, return empty array
+      if (!subscriptions || subscriptions.length === 0) {
+        return [];
+      }
+
+      // Get all news
+      const allNews = await this.getDummyNews();
+
+      // Filter news to only include items from subscribed sources
+      const subscribedSources = subscriptions.map((sub) => sub.slug);
+      const subscribedNews = allNews.filter((news) =>
+        subscribedSources.includes(news.source.toLowerCase())
+      );
+
+      return subscribedNews;
+    } catch (error) {
+      console.error("Error fetching subscribed news:", error);
+      throw new Error("Failed to fetch news from your subscriptions");
     }
-    
-    // Get all news
-    const allNews = await this.getDummyNews();
-    
-    // Filter news to only include items from subscribed sources
-    const subscribedSources = subscriptions.map(sub => sub.slug);
-    const subscribedNews = allNews.filter(news => 
-      subscribedSources.includes(news.source.toLowerCase())
-    );
-    
-    return subscribedNews;
-    
-  } catch (error) {
-    console.error("Error fetching subscribed news:", error);
-    throw new Error("Failed to fetch news from your subscriptions");
   }
-}
 
   async forgotPassword(email: string) {
     return this.request<{ message: string }>("/auth/forgot-password", {
