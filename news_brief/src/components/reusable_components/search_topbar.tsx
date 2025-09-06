@@ -266,7 +266,7 @@ export default function TopBar() {
                 ))}
           </div>
 
-          {/* Third Row: Search */}
+          {/* Third Row: Search
           <div
             className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
           >
@@ -276,7 +276,7 @@ export default function TopBar() {
               placeholder={t("search.placeholder")}
               className="bg-transparent outline-none flex-1 text-sm"
             />
-          </div>
+          </div> */}
         </div>
       </header>
 
