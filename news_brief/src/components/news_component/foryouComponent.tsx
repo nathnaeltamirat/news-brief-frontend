@@ -47,7 +47,10 @@ export default function ForyouComponent() {
           ]);
           
           // Combine trending and today's news, removing duplicates
-          const combinedNews = [...trendingData.news, ...todayData];
+          const combinedNews = [...trendingData.news, ...todayData.map(news => ({
+            ...news,
+            is_bookmarked: news.is_bookmarked ?? false
+          }))];
           const uniqueNews = combinedNews.filter((news, index, self) => 
             index === self.findIndex(n => n.id === news.id)
           );
