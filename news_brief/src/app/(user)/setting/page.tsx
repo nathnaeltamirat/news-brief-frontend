@@ -129,7 +129,9 @@ const SettingsPage = () => {
   };
   const saveBtnClass = `px-4 py-2 rounded-lg transition-colors ${
     hasChanges
-      ? "bg-black text-white hover:bg-gray-800"
+      ? theme === "dark"
+        ? "bg-white text-black hover:bg-gray-200"
+        : "bg-black text-white hover:bg-gray-800"
       : theme === "dark"
       ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
       : "bg-gray-300 text-gray-900 hover:bg-gray-400"
@@ -146,17 +148,19 @@ const SettingsPage = () => {
     }
   };
 
-  // Add topic subscription
+  // Add topic subscription using batch API
   const handleAddTopicSubscription = async () => {
     if (!selectedTopic) return;
     try {
-      await apiClient.subscribeToTopic(selectedTopic);
+      // Use the batch subscription API
+      await apiClient.saveUserTopics([selectedTopic]);
       // Refresh subscribed topics
       const updatedSubscribedTopics = await apiClient.getSubscribedTopics();
       setSubscribedTopics(updatedSubscribedTopics);
       setSelectedTopic("");
     } catch (err) {
       console.error("Error adding topic subscription:", err);
+      alert(`Failed to subscribe to topic: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   };
 
@@ -169,6 +173,7 @@ const SettingsPage = () => {
       setSubscribedTopics(updatedSubscribedTopics);
     } catch (err) {
       console.error("Error removing topic subscription:", err);
+      alert(`Failed to unsubscribe from topic: ${err instanceof Error ? err.message : "Unknown error"}`);
     }
   };
 
@@ -479,14 +484,22 @@ const SettingsPage = () => {
                         {subscribedTopics.map((topic) => (
                           <span
                             key={topic.slug}
-                            className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                              theme === "dark"
+                                ? "bg-gray-700 text-gray-200"
+                                : "bg-gray-200 text-gray-800"
+                            }`}
                           >
                             {topic.label?.en || topic.topic_name}
                             <button
                               onClick={() =>
                                 handleRemoveTopicSubscription(topic.slug)
                               }
-                              className="text-blue-500 hover:text-blue-800 ml-1"
+                              className={`ml-1 hover:opacity-70 transition ${
+                                theme === "dark"
+                                  ? "text-gray-300 hover:text-white"
+                                  : "text-gray-600 hover:text-gray-900"
+                              }`}
                             >
                               ✕
                             </button>
@@ -517,7 +530,7 @@ const SettingsPage = () => {
                         .filter(
                           (topic) =>
                             !subscribedTopics.some(
-                              (sub) => sub.slug === topic.id
+                              (sub) => sub.slug === topic.slug
                             )
                         )
                         .map((topic) => (
@@ -529,7 +542,11 @@ const SettingsPage = () => {
                     <button
                       onClick={handleAddTopicSubscription}
                       disabled={!selectedTopic}
-                      className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={`px-4 py-2 rounded-lg transition w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed ${
+                        theme === "dark"
+                          ? "bg-white text-black hover:bg-gray-200"
+                          : "bg-black text-white hover:bg-gray-800"
+                      }`}
                     >
                       + Subscribe
                     </button>
@@ -566,7 +583,11 @@ const SettingsPage = () => {
                       </div>
                       <button
                         onClick={() => handleRemoveSubscription(sub.slug)}
-                        className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 hover:bg-[#EAF2FF] hover:border-[#0B66FF] hover:text-[#0B66FF] transition"
+                        className={`text-sm border rounded-lg px-3 py-1.5 transition ${
+                          theme === "dark"
+                            ? "border-gray-600 text-gray-300 hover:bg-gray-700 hover:border-gray-500 hover:text-white"
+                            : "border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400 hover:text-gray-900"
+                        }`}
                       >
                         Remove
                       </button>
@@ -600,7 +621,11 @@ const SettingsPage = () => {
                   </select>
                   <button
                     onClick={handleAddSubscription}
-                    className="bg-[#0B66FF] text-white px-4 py-2 rounded-lg hover:bg-[#EAF2FF] hover:text-black transition w-full sm:w-auto"
+                    className={`px-4 py-2 rounded-lg transition w-full sm:w-auto ${
+                      theme === "dark"
+                        ? "bg-white text-black hover:bg-gray-200"
+                        : "bg-black text-white hover:bg-gray-800"
+                    }`}
                   >
                     + Add
                   </button>
