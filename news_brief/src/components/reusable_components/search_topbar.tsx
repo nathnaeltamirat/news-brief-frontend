@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useState, useEffect } from "react";
-import { Globe, Search, Mic } from "lucide-react";
+import { Globe, Search, Mic, Lock } from "lucide-react";
 import Button from "./Button";
 import SignInCard from "../signin_components/siginCard";
 import SignUpCard from "../signup_components/signupCard";
@@ -28,6 +28,7 @@ export default function TopBar() {
   const [view, setView] = useState<"signin" | "signup" | "forgot">("signin");
   const [activeCategory, setActiveCategory] = useState("all");
   const [userTopics, setUserTopics] = useState<Topic[]>([]);
+  const [showDefaultTopics, setShowDefaultTopics] = useState(false);
 
   // Load topics from API and filter user's subscribed topics
   useEffect(() => {
@@ -39,24 +40,26 @@ export default function TopBar() {
         const personData = localStorage.getItem("person");
         if (personData) {
           try {
-            const parsed = JSON.parse(personData);
-            const userTopicIds = parsed.user?.preferences?.topics || [];
-            
+          const parsed = JSON.parse(personData);
+          const userTopicIds = parsed.user?.preferences?.topics || [];
+
             console.log("User topic IDs from localStorage:", userTopicIds);
             console.log("Available topics:", topicsData.length);
-            
-            // Filter topics to only show user's subscribed ones
-            const subscribedTopics = topicsData.filter(topic => 
-              userTopicIds.includes(topic.id)
+          
+          // Filter topics to only show user's subscribed ones
+            const subscribedTopics = topicsData.filter((topic) =>
+            userTopicIds.includes(topic.id)
             );
-            
+
             console.log("Subscribed topics found:", subscribedTopics.length);
-            
+
             if (subscribedTopics.length > 0) {
               setUserTopics(subscribedTopics);
             } else {
               // If no subscribed topics found, show empty array (will show skeleton)
-              console.log("No subscribed topics found, showing skeleton buttons");
+              console.log(
+                "No subscribed topics found, showing skeleton buttons"
+              );
               setUserTopics([]);
             }
           } catch (error) {
@@ -65,7 +68,9 @@ export default function TopBar() {
             setUserTopics([]);
           }
         } else {
-          console.log("No person data found in localStorage, showing skeleton buttons");
+          console.log(
+            "No person data found in localStorage, showing skeleton buttons"
+          );
           // Show empty array when no localStorage data (will show skeleton)
           setUserTopics([]);
         }
@@ -73,9 +78,21 @@ export default function TopBar() {
         console.error("Error loading topics:", error);
       }
     };
+
+    // Set timeout to show default topics after 20 seconds
+    const timeoutId = setTimeout(() => {
+      setShowDefaultTopics(true);
+    }, 20000);
+
     loadTopics();
+
+    // Cleanup timeout if component unmounts
+    return () => clearTimeout(timeoutId);
   }, []);
 
+  const handleLogout = () => {
+    router.replace("/logout");
+  };
   // Set active category based on current pathname
   useEffect(() => {
     if (pathname === "/news") {
@@ -148,9 +165,10 @@ export default function TopBar() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-3 flex-shrink-0">
-              <div className="hidden sm:block">    <DarkMode /></div>
-          
-    
+              <div className="hidden sm:block">
+                {" "}
+                <DarkMode />
+              </div>
 
               {/* Language Dropdown */}
               <div className="relative  ">
@@ -187,12 +205,7 @@ export default function TopBar() {
                   {t("auth.login")}
                 </Button>
               ) : (
-                <ProfileDropdown
-                  onLogoutClick={() => {
-                    setView("signin");
-                    setOpen(true);
-                  }}
-                />
+                <ProfileDropdown onLogoutClick={() => handleLogout()} />
               )}
             </div>
           </div>
@@ -215,45 +228,56 @@ export default function TopBar() {
             </button>
             
             {/* User's subscribed topics */}
-            {userTopics.length > 0 ? (
-              userTopics.map((topic) => (
+            {userTopics.length > 0
+              ? userTopics.map((topic) => (
                 <button
                   key={topic.id}
-                  onClick={() => handleTopicClick(topic.slug)}
+                    onClick={() => handleTopicClick(topic.slug)}
                   className={`relative whitespace-nowrap pb-2 transition-colors ${
                     activeCategory === topic.slug
                       ? "text-blue-600 font-semibold"
                       : "text-gray-500 hover:text-blue-500"
                   }`}
                 >
-                  {i18n.language === 'am' ? topic.label.am : topic.label.en}
+                    {i18n.language === "am" ? topic.label.am : topic.label.en}
                   {activeCategory === topic.slug && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-full" />
                   )}
                 </button>
               ))
-            ) : (
-              // Show skeleton buttons when no user topics are found
-              Array.from({ length: 5 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="relative pb-2"
-                >
-                  <div className="h-4 bg-gray-300 rounded animate-pulse" style={{ width: `${60 + (index * 10)}px` }}></div>
-                </div>
-              ))
-            )}
+              : showDefaultTopics
+              ? // Show default topics with lock icons after 20 seconds
+                ["Technology", "Health", "Sports", "Business", "Politics"].map((topicName, index) => (
+                  <div key={index} className="relative pb-2 flex items-center gap-1">
+                    <Lock size={12} className="text-gray-400" />
+                    <span className="text-gray-400 text-sm">{topicName}</span>
+                  </div>
+                ))
+              : // Show skeleton buttons when no user topics are found (first 20 seconds)
+                Array.from({ length: 5 }).map((_, index) => (
+                  <div key={index} className="relative pb-2">
+                    <div
+                      className="h-4 bg-gray-300 rounded animate-pulse"
+                      style={{ width: `${60 + index * 10}px` }}
+                    ></div>
+                  </div>
+                ))}
           </div>
 
           {/* Third Row: Search */}
-          <div className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}>
+          <div
+            className={`flex items-center rounded-full px-3 sm:px-4 py-2 ${bgInput}`}
+          >
             <Search size={18} className="mr-2 text-gray-500 flex-shrink-0" />
             <input
               type="text"
               placeholder={t("search.placeholder")}
               className="bg-transparent outline-none flex-1 text-sm"
             />
-            <Mic size={18} className="text-gray-500 cursor-pointer flex-shrink-0" />
+            <Mic
+              size={18}
+              className="text-gray-500 cursor-pointer flex-shrink-0"
+            />
           </div>
         </div>
       </header>
@@ -269,10 +293,16 @@ export default function TopBar() {
             />
           )}
           {view === "signup" && (
-            <SignUpCard onClose={() => setOpen(false)} onSwitchToSignIn={() => setView("signin")} />
+            <SignUpCard
+              onClose={() => setOpen(false)}
+              onSwitchToSignIn={() => setView("signin")}
+            />
           )}
           {view === "forgot" && (
-            <ForgotPasswordCard onClose={() => setOpen(false)} onBackToSignIn={() => setView("signin")} />
+            <ForgotPasswordCard
+              onClose={() => setOpen(false)}
+              onBackToSignIn={() => setView("signin")}
+            />
           )}
         </div>
       )}
