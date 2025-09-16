@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const { text, voice_id, language_code } = await req.json();
 
-  const apiKey = "sk_107fc415dec63614c2d861bf0426dc47e00cf5708cf41fd1";
+  const apiKey = "sk_9de05d81a976aca82eac5ac8dc3e81cbf9865c42b8690ca2";
   if (!apiKey) {
     return NextResponse.json({ error: "API key not found" }, { status: 500 });
   }
